@@ -1,9 +1,9 @@
 'use client';
 
-import type { UIMessage } from 'ai';
+import { UIMessage } from 'ai';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useState } from 'react';
+import { memo, useState, useRef } from 'react';
 import type { Vote } from '@/lib/db/schema';
 import { DocumentToolCall, DocumentToolResult } from './document';
 import { PencilEditIcon, SparklesIcon } from './icons';
@@ -19,6 +19,8 @@ import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
 import { UseChatHelpers } from '@ai-sdk/react';
+import { useArtifact } from '@/hooks/use-artifact';
+import React from 'react';
 
 const PurePreviewMessage = ({
   chatId,
@@ -38,6 +40,25 @@ const PurePreviewMessage = ({
   isReadonly: boolean;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const { setArtifact } = useArtifact();
+  
+  // Function to open PDF in artifact panel
+  const openPdfInArtifactPanel = (pdfUrl: string, fileName: string, id: string) => {
+    setArtifact({
+      documentId: id || 'pdf-view',
+      title: fileName || 'PDF Document',
+      content: pdfUrl,
+      kind: 'pdf',
+      isVisible: true,
+      status: 'idle',
+      boundingBox: {
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0
+      }
+    });
+  };
 
   return (
     <AnimatePresence>
@@ -176,6 +197,8 @@ const PurePreviewMessage = ({
                           args={args}
                           isReadonly={isReadonly}
                         />
+                      ) : toolName === 'requestPdf' ? (
+                        <div>Searching for PDF...</div>
                       ) : null}
                     </div>
                   );
@@ -205,6 +228,21 @@ const PurePreviewMessage = ({
                           result={result}
                           isReadonly={isReadonly}
                         />
+                      ) : toolName === 'requestPdf' ? (
+                        <div>
+                          {result.message && <p>{result.message}</p>}
+                          {result.fileUrl && (
+                            <div className="mt-2">
+                              <PdfPreviewThumb
+                                fileUrl={result.fileUrl}
+                                fileName={result.fileName}
+                                onExpand={() => {
+                                  openPdfInArtifactPanel(result.fileUrl, result.fileName, result.id);
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
                       ) : (
                         <pre>{JSON.stringify(result, null, 2)}</pre>
                       )}
@@ -274,3 +312,56 @@ export const ThinkingMessage = () => {
     </motion.div>
   );
 };
+
+export function PdfPreviewThumb({ fileUrl, fileName, onExpand }: {
+  fileUrl: string;
+  fileName?: string;
+  onExpand?: () => void;
+}) {
+  return (
+    <div
+      style={{
+        width: 120,
+        height: 160,
+        border: '1px solid #e5e7eb',
+        borderRadius: 6,
+        overflow: 'hidden',
+        background: '#fafafa',
+        position: 'relative',
+        cursor: 'pointer',
+      }}
+      onClick={onExpand}
+      title="Expand PDF"
+    >
+      <iframe
+        src={`${fileUrl}#page=1&view=FitH`}
+        style={{
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          pointerEvents: 'none',
+        }}
+        title={fileName || 'PDF Preview'}
+      />
+      <button
+        style={{
+          position: 'absolute',
+          bottom: 8,
+          right: 8,
+          background: 'rgba(255,255,255,0.8)',
+          border: '1px solid #ccc',
+          borderRadius: 4,
+          padding: '2px 6px',
+          fontSize: 12,
+          cursor: 'pointer',
+        }}
+        onClick={e => {
+          e.stopPropagation();
+          onExpand?.();
+        }}
+      >
+        Expand
+      </button>
+    </div>
+  );
+}

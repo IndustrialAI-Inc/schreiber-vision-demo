@@ -21,6 +21,17 @@ import { useArtifact } from '@/hooks/use-artifact';
 import equal from 'fast-deep-equal';
 import { SpreadsheetEditor } from './sheet-editor';
 import { ImageEditor } from './image-editor';
+import { PDFViewer } from './pdf-viewer';
+
+// Custom extended document type that includes PDF support
+type ExtendedDocument = Document | {
+  id: string;
+  createdAt: Date;
+  title: string;
+  content: string;
+  kind: 'pdf';
+  userId: string;
+};
 
 interface DocumentPreviewProps {
   isReadonly: boolean;
@@ -35,9 +46,18 @@ export function DocumentPreview({
 }: DocumentPreviewProps) {
   const { artifact, setArtifact } = useArtifact();
 
+  // Skip database lookup for PDFs - they come directly from blob storage
+  const shouldFetchDocument =
+    result &&
+    result.id &&
+    result.kind !== 'pdf' &&
+    !result.fileUrl;
+
+  console.log('shouldFetchDocument', shouldFetchDocument, result);
+
   const { data: documents, isLoading: isDocumentsFetching } = useSWR<
-    Array<Document>
-  >(result ? `/api/document?id=${result.id}` : null, fetcher);
+    Array<ExtendedDocument>
+  >(shouldFetchDocument ? `/api/document?id=${result.id}` : null, fetcher);
 
   const previewDocument = useMemo(() => documents?.[0], [documents]);
   const hitboxRef = useRef<HTMLDivElement>(null);
@@ -57,6 +77,21 @@ export function DocumentPreview({
       }));
     }
   }, [artifact.documentId, setArtifact]);
+
+  // For PDF files from blob storage, create a document-like object directly
+  const pdfDocument = useMemo(() => {
+    if (result && result.kind === 'pdf' && result.fileUrl) {
+      return {
+        id: result.id || 'pdf-preview',
+        createdAt: new Date(),
+        title: result.fileName || 'PDF Document',
+        content: result.fileUrl,
+        kind: 'pdf' as const,
+        userId: 'direct',
+      };
+    }
+    return null;
+  }, [result]);
 
   if (artifact.isVisible) {
     if (result) {
@@ -80,22 +115,38 @@ export function DocumentPreview({
     }
   }
 
-  if (isDocumentsFetching) {
-    return <LoadingSkeleton artifactKind={result.kind ?? args.kind} />;
+  if (isDocumentsFetching && !pdfDocument) {
+    return <LoadingSkeleton artifactKind={result?.kind ?? args?.kind} />;
   }
 
-  const document: Document | null = previewDocument
-    ? previewDocument
-    : artifact.status === 'streaming'
-      ? {
-          title: artifact.title,
-          kind: artifact.kind,
-          content: artifact.content,
-          id: artifact.documentId,
-          createdAt: new Date(),
-          userId: 'noop',
-        }
-      : null;
+  if (result && result.kind === 'pdf' && result.fileUrl) {
+    return (
+      <PDFViewer
+        title={result.fileName || 'PDF Document'}
+        content={result.fileUrl}
+        isCurrentVersion={true}
+        currentVersionIndex={0}
+        status="idle"
+        isInline={true}
+      />
+    );
+  }
+
+  let document: ExtendedDocument | null = null;
+  if (pdfDocument) {
+    document = pdfDocument;
+  } else if (previewDocument) {
+    document = previewDocument;
+  } else if (artifact.status === 'streaming') {
+    document = {
+      title: artifact.title,
+      kind: artifact.kind,
+      content: artifact.content,
+      id: artifact.documentId,
+      createdAt: new Date(),
+      userId: 'noop',
+    };
+  }
 
   if (!document) return <LoadingSkeleton artifactKind={artifact.kind} />;
 
@@ -234,14 +285,14 @@ const DocumentHeader = memo(PureDocumentHeader, (prevProps, nextProps) => {
   return true;
 });
 
-const DocumentContent = ({ document }: { document: Document }) => {
+const DocumentContent = ({ document }: { document: ExtendedDocument }) => {
   const { artifact } = useArtifact();
 
   const containerClassName = cn(
     'h-[257px] overflow-y-scroll border rounded-b-2xl dark:bg-muted border-t-0 dark:border-zinc-700',
     {
       'p-4 sm:px-14 sm:py-16': document.kind === 'text',
-      'p-0': document.kind === 'code',
+      'p-0': document.kind === 'code' || document.kind === 'pdf',
     },
   );
 
@@ -279,6 +330,19 @@ const DocumentContent = ({ document }: { document: Document }) => {
           status={artifact.status}
           isInline={true}
         />
+      ) : document.kind === 'pdf' ? (
+        <div className="flex flex-1 relative w-full">
+          <div className="absolute inset-0">
+            <PDFViewer
+              title={document.title}
+              content={document.content ?? ''}
+              isCurrentVersion={true}
+              currentVersionIndex={0}
+              status={artifact.status}
+              isInline={true}
+            />
+          </div>
+        </div>
       ) : null}
     </div>
   );

@@ -25,6 +25,7 @@ import { imageArtifact } from '@/artifacts/image/client';
 import { codeArtifact } from '@/artifacts/code/client';
 import { sheetArtifact } from '@/artifacts/sheet/client';
 import { textArtifact } from '@/artifacts/text/client';
+import { pdfArtifact } from '@/artifacts/pdf/client';
 import equal from 'fast-deep-equal';
 import { UseChatHelpers } from '@ai-sdk/react';
 
@@ -33,7 +34,9 @@ export const artifactDefinitions = [
   codeArtifact,
   imageArtifact,
   sheetArtifact,
+  pdfArtifact,
 ];
+
 export type ArtifactKind = (typeof artifactDefinitions)[number]['kind'];
 
 export interface UIArtifact {
@@ -84,14 +87,18 @@ function PureArtifact({
 }) {
   const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
 
+  const isDbArtifact =
+    artifact.documentId !== 'init' &&
+    artifact.status !== 'streaming' &&
+    artifact.kind !== 'pdf' &&
+    !artifact.content?.startsWith('http'); // or whatever logic you use for blob artifacts
+
   const {
     data: documents,
     isLoading: isDocumentsFetching,
     mutate: mutateDocuments,
   } = useSWR<Array<Document>>(
-    artifact.documentId !== 'init' && artifact.status !== 'streaming'
-      ? `/api/document?id=${artifact.documentId}`
-      : null,
+    isDbArtifact ? `/api/document?id=${artifact.documentId}` : null,
     fetcher,
   );
 
@@ -483,7 +490,7 @@ function PureArtifact({
             </div>
 
             <AnimatePresence>
-              {!isCurrentVersion && (
+              {!isCurrentVersion && documents && (
                 <VersionFooter
                   currentVersionIndex={currentVersionIndex}
                   documents={documents}

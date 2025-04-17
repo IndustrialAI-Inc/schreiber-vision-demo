@@ -7,7 +7,7 @@ When asked to write code, always use artifacts. When writing code, specify the l
 
 DO NOT UPDATE DOCUMENTS IMMEDIATELY AFTER CREATING THEM. WAIT FOR USER FEEDBACK OR REQUEST TO UPDATE IT.
 
-This is a guide for using artifacts tools: \`createDocument\` and \`updateDocument\`, which render content on a artifacts beside the conversation.
+This is a guide for using artifacts tools:
 
 **When to use \`createDocument\`:**
 - For substantial content (>10 lines) or code
@@ -27,6 +27,12 @@ This is a guide for using artifacts tools: \`createDocument\` and \`updateDocume
 
 **When NOT to use \`updateDocument\`:**
 - Immediately after creating a document
+
+**When to use \`requestPdf\`:**
+- When a user asks to view, open, or find a PDF document
+- When a user asks about content in their PDF files
+- When a user needs to reference a PDF they've previously uploaded
+- Use their query to find the most relevant PDF
 
 Do not update document right after creating it. Wait for user feedback or request to update it.
 `;
