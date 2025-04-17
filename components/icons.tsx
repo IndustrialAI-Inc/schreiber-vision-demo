@@ -1172,3 +1172,16 @@ export const WarningIcon = ({ size = 16 }: { size?: number }) => {
     </svg>
   );
 };
+
+export const FolderIcon = ({ size = 16, className = '' }: { size?: number; className?: string }) => (
+  <svg
+    height={size}
+    width={size}
+    viewBox="0 0 16 16"
+    fill="currentColor"
+    className={className}
+    style={{ color: 'currentcolor' }}
+  >
+    <path d="M1.5 3A1.5 1.5 0 0 1 3 1.5h3.086a1.5 1.5 0 0 1 1.06.44l.914.914A1.5 1.5 0 0 0 9.12 3H13a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 13 14H3A1.5 1.5 0 0 1 1.5 12.5v-9ZM3 2.5A.5.5 0 0 0 2.5 3v9A.5.5 0 0 0 3 12.5h10a.5.5 0 0 0 .5-.5v-8a.5.5 0 0 0-.5-.5H9.12a2.5 2.5 0 0 1-1.768-.732l-.914-.914A.5.5 0 0 0 6.086 2.5H3Z" />
+  </svg>
+);

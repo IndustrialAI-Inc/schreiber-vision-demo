@@ -26,6 +26,8 @@ import {
   vote,
   type DBMessage,
   type Chat,
+  userFile,
+  type UserFile,
 } from './schema';
 import type { ArtifactKind } from '@/components/artifact';
 
@@ -416,6 +418,47 @@ export async function updateChatVisiblityById({
     return await db.update(chat).set({ visibility }).where(eq(chat.id, chatId));
   } catch (error) {
     console.error('Failed to update chat visibility in database');
+    throw error;
+  }
+}
+
+export async function saveUserFile({
+  fileName,
+  fileUrl,
+  fileType,
+  fileSize,
+  userId,
+}: {
+  fileName: string;
+  fileUrl: string;
+  fileType: string;
+  fileSize: number;
+  userId: string;
+}) {
+  try {
+    return await db.insert(userFile).values({
+      fileName,
+      fileUrl,
+      fileType,
+      fileSize: fileSize.toString(),
+      userId,
+      createdAt: new Date(),
+    });
+  } catch (error) {
+    console.error('Failed to save user file in database');
+    throw error;
+  }
+}
+
+export async function getUserFilesByUserId({ userId }: { userId: string }) {
+  try {
+    return await db
+      .select()
+      .from(userFile)
+      .where(eq(userFile.userId, userId))
+      .orderBy(desc(userFile.createdAt));
+  } catch (error) {
+    console.error('Failed to get user files by user id from database');
     throw error;
   }
 }

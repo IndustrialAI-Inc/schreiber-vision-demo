@@ -3,7 +3,7 @@
 import type { User } from 'next-auth';
 import { useRouter } from 'next/navigation';
 
-import { PlusIcon } from '@/components/icons';
+import { FolderIcon, PlusIcon } from '@/components/icons';
 import { SidebarHistory } from '@/components/sidebar-history';
 import { SidebarUserNav } from '@/components/sidebar-user-nav';
 import { Button } from '@/components/ui/button';
@@ -36,6 +36,18 @@ export function AppSidebar({ user }: { user: User | undefined }) {
             >
               <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
                 Chatbot
+              </span>
+            </Link>
+            <Link
+              href="/repository"
+              onClick={() => {
+                setOpenMobile(false);
+              }}
+              className="flex flex-row gap-2 items-center ml-2"
+            >
+              <FolderIcon className="h-4 w-4" />
+              <span className="text-sm font-medium hover:bg-muted rounded-md cursor-pointer px-1">
+                Repository
               </span>
             </Link>
             <Tooltip>

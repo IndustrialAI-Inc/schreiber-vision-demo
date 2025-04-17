@@ -12,25 +12,33 @@ interface SuggestedActionsProps {
 
 function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
   const suggestedActions = [
+    // ───────────  PHASE 1  ───────────
     {
-      title: 'What are the advantages',
-      label: 'of using Next.js?',
-      action: 'What are the advantages of using Next.js?',
+      title: 'Create supplier spec',
+      label: 'Start a new specification request',
+      action: 'I need to create a new supplier spec sheet and fill it out from the PDFs from the respository.',
     },
+
+    // ───────────  PHASE 2  ───────────
     {
-      title: 'Write code to',
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: 'Semantic search',
+      label: 'Ask across all existing specs',
+      action:
+        'Search the spec repository for "vegetable proteins without soy".',
     },
+
+    // ───────────  PHASE 3  ───────────
     {
-      title: 'Help me write an essay',
-      label: `about silicon valley`,
-      action: `Help me write an essay about silicon valley`,
+      title: 'Usage dashboard',
+      label: 'Show current doc & API metrics',
+      action: 'Show me the latest usage metrics dashboard.',
     },
+
+    // ───────────  PHASE 4  ───────────
     {
-      title: 'What is the weather',
-      label: 'in San Francisco?',
-      action: 'What is the weather in San Francisco?',
+      title: 'Repository browser',
+      label: 'Open full spec repository',
+      action: 'Open the repository table for all supplier documents.',
     },
   ];
 
