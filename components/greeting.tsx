@@ -10,6 +10,19 @@ export const Greeting = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
+        transition={{ delay: 0.4 }}
+        className="mb-6"
+      >
+        <img 
+          src="/images/Schreiber-logo-hi-res-color.png" 
+          alt="Schreiber Logo" 
+          className="h-16 md:h-20 w-auto"
+        />
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.5 }}
         className="text-2xl font-semibold"
       >
