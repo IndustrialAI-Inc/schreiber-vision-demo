@@ -1,0 +1,1609 @@
+{
+  "questions": [
+    {
+      "question_key": "C_SUPPLIERLEGALLABEL",
+      "question": "Legal Label Description",
+      "answer": "A strawberry light fruit prep for yogurt applications"
+    },
+    {
+      "question_key": "C_SUPPLIERINGRSTMT",
+      "question": "Ingredient Statement",
+      "answer": "Water, Strawberries, Crystalline Fructose, Modified Food Starch, Fruit and Vegetable Juice for Color, Natural Flavor, Malic Acid, Sucralose, Potassium Sorbate as a Preservative."
+    },
+    {
+      "question_key": "C_SUPPIERITEMNMBR",
+      "question": "Supplier Item Number",
+      "answer": "503941-04"
+    },
+    {
+      "question_key": "C_FLAVORDESC",
+      "question": "Flavor Description",
+      "answer": "Strawberry"
+    },
+    {
+      "question_key": "C_AROMA",
+      "question": "Aroma",
+      "answer": ""
+    },
+    {
+      "question_key": "C_APPEARANCE",
+      "question": "Appearance",
+      "answer": ""
+    },
+    {
+      "question_key": "C_COLOR_NCISENSORYTXT",
+      "question": "Color",
+      "answer": "Red"
+    },
+    {
+      "question_key": "C_PHY_BODY_TEXTURE",
+      "question": "Body and Texture",
+      "answer": "Viscous liquid"
+    },
+    {
+      "question_key": "BROKER",
+      "question": "Are  you a Broker Y/N",
+      "answer": "No"
+    },
+    {
+      "question_key": "PACKED_COUNTRY_OR",
+      "question": "Identifies the country where the item is packed or produced",
+      "answer": "United States"
+    },
+    {
+      "question_key": "FLAVOR_SOURCE\n\nTarget-12d455b46949",
+      "question": "If flavors are used, select the flavor source (natural, artificial or natural and artificial)",
+      "answer": "Natural With Other Natural Flavor"
+    },
+    {
+      "question_key": "ENZYME_SOURCE",
+      "question": "If enzymes are used, select the enzyme source (microbiological, animal or plant)",
+      "answer": "Not Applicable"
+    },
+    {
+      "question_key": "STARCH_SOURCE",
+      "question": "If starch(es) are used, select the source of starch(es)",
+      "answer": "Corn"
+    },
+    {
+      "question_key": "HAZARDOUS_MTL",
+      "question": "Is the raw material considered hazardous and need special handling? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "READY_TO_EAT",
+      "question": "This item is ready to eat? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "MICRO_RED_TREAT",
+      "question": "Identify the treatment used to reduce the microbial load of this product",
+      "answer": "Pasteurization"
+    },
+    {
+      "question_key": "FS_ADD_PROCESSING",
+      "question": "Does this item need additional processing to address chemical or physical  hazards? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "C_RECYLINGINSTR",
+      "question": "Recycling Instructions",
+      "answer": ""
+    },
+    {
+      "question_key": "C_STORAGEINSTR",
+      "question": "Storage Instructions",
+      "answer": "Store 40\u00b0F and below"
+    },
+    {
+      "question_key": "C_PKGMARKINGS",
+      "question": "Marking on Package and/ Container",
+      "answer": "Kosher Symbol, Production Date, Use by Date, Storage Requirements, and Company Address"
+    },
+    {
+      "question_key": "C_PKGWARNINGCAUTION",
+      "question": "Caution/Warning on Packag and/or Container",
+      "answer": ""
+    },
+    {
+      "question_key": "C_CODE_EXPLANATION",
+      "question": "Code Explanation",
+      "answer": "PRODUCTION BATCH NUMBER PLUS DATE OF MANUFACTURE"
+    },
+    {
+      "question_key": "Item Line (%min and % max, COO, and Function)",
+      "question": "Range Formula ",
+      "answer": "WATER - FOR FRUIT PREP (45-55%, United States, MOISTURE)\nSTRAWBERRIES (25-35%, United States,Morocco, FRUIT)\nFRUCTOSE (5-15%, Turkey, SWEETENER)\nMODIFIED FOOD STARCH (5-15%, United States, STABILIZER)\nFRUIT AND VEGETABLE JUICE (COLOR) (1-10%, United States, COLOR)\nNATURAL FLAVOR (0.01-1%, United States, FLAVOR)\nMALIC ACID (0.01-1%, Canada, ACIDULANT [SYNTHETICALLY DERIVED)\nSUCRALOSE (0.01-1%, China, SWEETENER)\nPOTASSIUM SORBATE (INCIDENTAL) (0.01-1%, China, PRESERVATIVE)"
+    },
+    {
+      "question_key": "Form/Extracted From , and Additive Number, and Size or Concentration Rate",
+      "question": "Range Formula ",
+      "answer": ""
+    },
+    {
+      "question_key": "RM_DAIRY",
+      "question": "NEW - Does your product contain any dairy? y/n",
+      "answer": "No"
+    },
+    {
+      "question_key": "C_SUPPLIERADDITIVE",
+      "question": "Does this item contain any incidental additives or processing aids",
+      "answer": "0"
+    },
+    {
+      "question_key": "C_SUPPLR_ADDTVCNTRL",
+      "question": "Are controls in place such that there would be no other unlabeled additives in this item, besides those indicated?",
+      "answer": "1"
+    },
+    {
+      "question_key": "SHIP_TEMP_RANGE",
+      "question": "Identifies the range of temperature within which an item should be shipped",
+      "answer": "40"
+    },
+    {
+      "question_key": "STORAGE_TEMP_RANGE",
+      "question": "Identifies the range of temperature within which an item should be stored",
+      "answer": "40"
+    },
+    {
+      "question_key": "SHELF_LIFE - MAPPED to GUARANTEE",
+      "question": "Identifies the expected shelf life - unopened",
+      "answer": ""
+    },
+    {
+      "question_key": "SHELFLIFE_OPEN",
+      "question": "Shelf life of product after package has been opened",
+      "answer": "14"
+    },
+    {
+      "question_key": "LEAD_TIME",
+      "question": "Lead time in days",
+      "answer": "7"
+    },
+    {
+      "question_key": "MIN_ORDER_QTY",
+      "question": "Minimum order quantity in pounds",
+      "answer": "2000"
+    },
+    {
+      "question_key": "DENSITY_2",
+      "question": "Density  (Lb/Gal_Us)",
+      "answer": "8.902"
+    },
+    {
+      "question_key": "SCOVILLE_UNITS",
+      "question": "Scoville units - measurement of flavor heat level",
+      "answer": ""
+    },
+    {
+      "question_key": "PARTICLE_SZ_ON",
+      "question": "The amount of particles retained on a specific mesh size",
+      "answer": ""
+    },
+    {
+      "question_key": "PARTICLE_SZ_THRU",
+      "question": "The amount of particles that passed thru a specific mesh size",
+      "answer": ""
+    },
+    {
+      "question_key": "SIEVE_SIZE_ON",
+      "question": "Sieve size used to measure the particle size retained on the mesh",
+      "answer": ""
+    },
+    {
+      "question_key": "SIEVE_SIZE_THRU",
+      "question": "Sieve size used to measure the particle size passed thru the mesh",
+      "answer": ""
+    },
+    {
+      "question_key": "PIECE_SIZE",
+      "question": "Particulate size in inches",
+      "answer": ""
+    },
+    {
+      "question_key": "PIECE_RETENTION",
+      "question": "Amount (%) of particles retained after rinsing with water (wet weight basis)",
+      "answer": ""
+    },
+    {
+      "question_key": "SPECIFIC_GRAVITY",
+      "question": "Specific gravity",
+      "answer": ""
+    },
+    {
+      "question_key": "SUGAR_BRIX",
+      "question": "Brix - measurement of sugar level",
+      "answer": "17"
+    },
+    {
+      "question_key": "VISCOSITY1",
+      "question": "Viscosity",
+      "answer": "5"
+    },
+    {
+      "question_key": "VISCOSITY_METHOD",
+      "question": "NEW QUESTION - Viscosity method ",
+      "answer": "Bostwick (cenco) (cm)"
+    },
+    {
+      "question_key": "VISCOSITY_TIME",
+      "question": "NEW QUESTION - Viscosity Time in seconds",
+      "answer": "30"
+    },
+    {
+      "question_key": "VISCOSITY_TEMP",
+      "question": "NEW QUESTION - Viscosity Temp F",
+      "answer": "40"
+    },
+    {
+      "question_key": "PKG_CONTAINER_TYPE",
+      "question": "Describes the package type",
+      "answer": "Bag in Box"
+    },
+    {
+      "question_key": "PACKAGING_MATERIAL",
+      "question": "Identifies the make up of the packaging material",
+      "answer": "Cardboard"
+    },
+    {
+      "question_key": "PALLET_HOOD",
+      "question": "Is the item palletized with a pallet hood? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "PALLET_SHRINK_WRAP",
+      "question": "Is the item palletized with shrink wrap? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "PALLET_SLIP_SHEET",
+      "question": "Is the item palletized with a slip sheet? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SHIP_CTNR_GROSS_WGT",
+      "question": "Total gross weight of the ship container (including product and packaging materials)",
+      "answer": "43"
+    },
+    {
+      "question_key": "SHIP_CTNR_NET_WEIGHT",
+      "question": "Net weight of product in a ship container (not including any packaging materials)",
+      "answer": "40"
+    },
+    {
+      "question_key": "SHIP_CTNR_PER_LAYER",
+      "question": "Number of ship containers per pallet layer",
+      "answer": "10"
+    },
+    {
+      "question_key": "SHIP_CTNR_PER_PALLET",
+      "question": "Number of ship containers per pallet",
+      "answer": "40"
+    },
+    {
+      "question_key": "SHIP_CTNR_LENGTH",
+      "question": "Length target of a ship container",
+      "answer": "52"
+    },
+    {
+      "question_key": "SHIP_CTNR_WIDTH",
+      "question": "Width target of a ship container",
+      "answer": "52"
+    },
+    {
+      "question_key": "SHIP_CTNR_HEIGHT",
+      "question": "Height target of a ship container",
+      "answer": "60"
+    },
+    {
+      "question_key": "ALLERGEN_CRUSTACEA",
+      "question": "Allergen crustacean / shellfish present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_CRUSTC_PISL",
+      "question": "Crustacean shellfish present in any item manufactured on same line",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_CRUSTCA_PIF",
+      "question": "Crustacean shellfish present in same manufacturing facility",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_EGG",
+      "question": "Allergen egg present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_EGG_PISL",
+      "question": "Egg products or egg present in any item manufactured on the same line",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_EGG_PIF",
+      "question": "Egg products or egg derivatives present in same manufacturing facility",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_FISH",
+      "question": "Allergen fish present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_FISH_PISL",
+      "question": "Fish present in any item manufactured on the same line",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_FISH_PIF",
+      "question": "Fish present in same manufacturing facility",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_DAIRY",
+      "question": "Allergen dairy present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_DAIRY_PISL",
+      "question": "Dairy products or dairy derivatives present in any item manufactured on the same line",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_DAIRY_PIF",
+      "question": "Dairy products or dairy derivatives present in same manufacturing facility",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_PEANUTS",
+      "question": "Allergen peanuts present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_PEANUT_PISL",
+      "question": "Peanuts present in any item manufactured on the same line",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_PEANUTS_PIF",
+      "question": "Peanuts present in same manufacturing facility",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_SESAME",
+      "question": "Allergen sesame seeds or derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_SESAME_PIF",
+      "question": "Sesame seeds or derivatives present in same manufacturing facility? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_SESAME_PISL",
+      "question": "Sesame seeds or derivatives present in any item manufactured on the same line? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_SOYBEANS",
+      "question": "Allergen soybean present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_SOYPRO_PISL",
+      "question": "Soy products & hydrolysates present in any item manufactured on same line",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_SOYPROD_PIF",
+      "question": "Soy products & hydrolysates present in same manufacturing facility",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_TREENUT",
+      "question": "Allergen treenut present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_TREENU_PISL",
+      "question": "Treenut or treenut derivatives (includes coconut) present in any item manufactured on the same line",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_TREENUT_PIF",
+      "question": "Treenut or nut derivatives (includes coconut and/or coconut oil) present in the same manufacturing facility",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_WHEAT",
+      "question": "Allergen wheat present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ALLERGEN_WHEAT_PISL",
+      "question": "Wheat products and hydrolysates present in any item manufactured on same line",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "ALLERGEN_WHEAT_PIF",
+      "question": "Wheat products and hydrolysates present in same manufacturing facility",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SENS_APPLE",
+      "question": "Apple present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_COLOR_ART",
+      "question": "Artificial color present (certificated colors)? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_COLORS_NATURAL",
+      "question": "Natural color present? No certificated colors (i.e. annatto, beet juice, turmeric) (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SENS_SWEETNER_ART",
+      "question": "Artificial sweetener present? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SENS_BEEF",
+      "question": "Beef or beef derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_BEET_SUGAR",
+      "question": "Beet sugar present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_CELERY",
+      "question": "Celery present \u2013 roots, leaves, stalks, seeds? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_CHOCOLATE",
+      "question": "Chocolate and / or chocolate derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_CORN",
+      "question": "Corn or corn derivatives present? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SENS_GARLIC",
+      "question": "Garlic or garlic derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_GLUTEN",
+      "question": "Gluten (from wheat, spelt, kamut, tritcale, oats, rye and / or barley) present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_GLUTEN_PIF",
+      "question": "Gluten present in same manufacturing facility?",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SENS_GLUTEN_PISL",
+      "question": "Gluten present in any item manufactured on same line?",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SENS_GLUTEN_HYDROLY",
+      "question": "Do any ingredients used to make this product (including growth media and substrates) contain gluten?",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_GLUTEN_DISTILLE",
+      "question": "If gluten was present as an ingredient, was distillation used to remove any residual protein?",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_MSG",
+      "question": "Monosodium glutamate added? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_SYN_BIO",
+      "question": "Are synthetically modified organisms intentionally added? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_PRESERVATIVES",
+      "question": "Preservatives or antioxidants present? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SENS_PRSRV_INCID",
+      "question": "Are incidental preservatives or antioxidants present? Y/N (These additives may be present from cross contact or be ingredients within ingredients etc. but have no technical or functional effect).",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_PORK",
+      "question": "Pork derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_SEEDS",
+      "question": "Seed or seed derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_MUSHROOM",
+      "question": "Are mushrooms present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_TBHQ",
+      "question": "Is TBHQ (used as a preservative for vegetable oils and edible animal fats) present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_YEAST_DERIV",
+      "question": "Yeast and / or yeast derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_HERB_SPICE",
+      "question": "Are herb or spices present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_LUPINE",
+      "question": "Lupine or lupine derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_PART_HYDR_OIL",
+      "question": "Any partially hydrogenated oils present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_RENNET",
+      "question": "Rennet present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_NANO",
+      "question": "Nanotech Materials Intentionally added or made approx. size 1-100nm? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "POTASSIUM_SORBATE_FR",
+      "question": "Potassium sorbate present?  (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "SENS_BUCKWHEAT",
+      "question": "Buckwheat or buckwheat derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_MUSTARD",
+      "question": "Mustard or mustard derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_BEE_POLLEN",
+      "question": "Bee Pollen/Propolis present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_ROYAL_JELLY",
+      "question": "Royal Jelly present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_MANGO",
+      "question": "Mango present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_PEACH",
+      "question": "Peach present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_TOMATO",
+      "question": "Tomato present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_LATEX",
+      "question": "Latex (natural rubber) present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_ORANGE",
+      "question": "Oranges present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_KIWI_FRUIT",
+      "question": "Kiwi Fruit present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SNES_CHICKEN",
+      "question": "Chicken present? (y/n) --- Poultry or poultry derivatives present? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_BANANA",
+      "question": "Banana present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_YAMS",
+      "question": "Yams present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_GELATIN",
+      "question": "Gelatin present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_PALM_OIL",
+      "question": "Palm oil or Palm oil derivatives present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ADTV_BHA",
+      "question": "BHA (butylated hydroxyanisole) present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ADTV_BHT",
+      "question": "BHT (butylated hydroxytoluene) present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ADTV_TOCOPHEROL_NAT",
+      "question": "Natural tocopherol present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ADTV_TOCOPHEROL_SYNT",
+      "question": "Synthetic tocopherol present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "SENS_SULFITE",
+      "question": "Sulfites, sulfur dioxide, sodium (bi)-sulfate present? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "CALORIES",
+      "question": "Calories per 100g  - no rounding",
+      "answer": "74.577"
+    },
+    {
+      "question_key": "FATS",
+      "question": "Total fat value per 100g - no rounding",
+      "answer": "0.077"
+    },
+    {
+      "question_key": "FATS_SAT",
+      "question": "Saturated fat value per 100g - no rounding",
+      "answer": "0.015"
+    },
+    {
+      "question_key": "FATS_TRANS",
+      "question": "Trans fat value per 100g - no rounding",
+      "answer": "0.001"
+    },
+    {
+      "question_key": "FATS_POLYUNSAT",
+      "question": "Polyunsaturated fat value per 100g - no rounding",
+      "answer": ""
+    },
+    {
+      "question_key": "FATS_MONOUNSAT",
+      "question": "Monounsaturated fat value per 100g - no rounding",
+      "answer": ""
+    },
+    {
+      "question_key": "CHOLESTEROL",
+      "question": "Cholesterol value per 100g - no rounding",
+      "answer": "0"
+    },
+    {
+      "question_key": "SODIUM",
+      "question": "Sodium value per 100g - no rounding",
+      "answer": "14.978"
+    },
+    {
+      "question_key": "CARBOHYDRATES",
+      "question": "Total carbohydrates value per 100g - no rounding",
+      "answer": "17.838"
+    },
+    {
+      "question_key": "FIBER_NEW",
+      "question": "NEW - Dietary fiber (basis new definition) value per 100g \u2013 no rounding",
+      "answer": "0.64"
+    },
+    {
+      "question_key": "FIBER_SOLUBLE",
+      "question": "Soluble fiber value per 100g - no rounding",
+      "answer": ""
+    },
+    {
+      "question_key": "FIBER_INSOLUBLE",
+      "question": "Insoluble fiber value per 100g - no rounding",
+      "answer": ""
+    },
+    {
+      "question_key": "SUGARS",
+      "question": "Sugars value per 100g - no rounding",
+      "answer": "11.346"
+    },
+    {
+      "question_key": "SUGAR_ADD",
+      "question": "NEW - Added Sugars  value per 100g",
+      "answer": "9.873"
+    },
+    {
+      "question_key": "SUGAR_ALCOHOL",
+      "question": "Sugar alcohol per 100g - no rounding",
+      "answer": ""
+    },
+    {
+      "question_key": "CARBOHYDRATES_OTHER",
+      "question": "Other carbohydrate value per 100g - no rounding",
+      "answer": ""
+    },
+    {
+      "question_key": "PROTEIN",
+      "question": "Protein value per 100g - no rounding",
+      "answer": "0.211"
+    },
+    {
+      "question_key": "VIT_D_MCG",
+      "question": "NEW - Vitamin D value per 100g (mcg) - no rounding",
+      "answer": "0"
+    },
+    {
+      "question_key": "CALCIUM",
+      "question": "Calcium value per 100g - no rounding",
+      "answer": "6.185"
+    },
+    {
+      "question_key": "IRON",
+      "question": "Iron value per 100g - no rounding",
+      "answer": "0.257"
+    },
+    {
+      "question_key": "POTASSIUM",
+      "question": "Potassium value per 100g - no rounding",
+      "answer": "70.584"
+    },
+    {
+      "question_key": "VIT_A_MCG",
+      "question": "NEW - Vitamin A value retinol activity equivalents per 100g - no rounding",
+      "answer": "0.675"
+    },
+    {
+      "question_key": "VIT_C",
+      "question": "Vitamin C value per 100g - no rounding",
+      "answer": "12.36"
+    },
+    {
+      "question_key": "VIT_E",
+      "question": "Vitamin E value per 100g - no rounding",
+      "answer": ""
+    },
+    {
+      "question_key": "VIT_E_MG",
+      "question": "NEW - Vitamin E value per 100g (mg) - no rounding",
+      "answer": "0.13"
+    },
+    {
+      "question_key": "THIAMIN",
+      "question": "Thiamin value per 100g - no rounding",
+      "answer": "0.007"
+    },
+    {
+      "question_key": "RIBOFLAVIN",
+      "question": "Riboflavin (vitamin B2) value per 100g - no rounding",
+      "answer": "0.015"
+    },
+    {
+      "question_key": "NIACIN",
+      "question": "Niacin value per 100g - no rounding",
+      "answer": "0.177"
+    },
+    {
+      "question_key": "VIT_B6",
+      "question": "Vitamin B6 (pyridoxine) value per 100g - no rounding",
+      "answer": "0.008"
+    },
+    {
+      "question_key": "FOLIC_ACID_NEW",
+      "question": "NEW - Folate DFE (folate, folic acid) value per 100g \u2013 no rounding",
+      "answer": "5.1"
+    },
+    {
+      "question_key": "VIT_B12",
+      "question": "Vitamin B12 value per 100g - no rounding",
+      "answer": "0"
+    },
+    {
+      "question_key": "BIOTIN",
+      "question": "Biotin value per 100g - no rounding",
+      "answer": "0.33"
+    },
+    {
+      "question_key": "PANTOTHENIC_ACID",
+      "question": "Pantothenic acid value per 100g - no rounding",
+      "answer": "0.032"
+    },
+    {
+      "question_key": "PHOSPHORUS",
+      "question": "Phosphorus value per 100g - no rounding",
+      "answer": "3.9"
+    },
+    {
+      "question_key": "IODINE",
+      "question": "Iodine value per 100g - no rounding",
+      "answer": "0"
+    },
+    {
+      "question_key": "MAGNESIUM",
+      "question": "Magnesium value per 100g - no rounding",
+      "answer": "3.319"
+    },
+    {
+      "question_key": "ZN",
+      "question": "Zinc value per 100g - no rounding",
+      "answer": "0.039"
+    },
+    {
+      "question_key": "COPPER",
+      "question": "Copper value per 100g - no rounding",
+      "answer": "0.024"
+    },
+    {
+      "question_key": "MANGANESE",
+      "question": "Manganese value per 100g - no rounding",
+      "answer": "0.088"
+    },
+    {
+      "question_key": "MOISTURE",
+      "question": "Moisture content",
+      "answer": "80.872"
+    },
+    {
+      "question_key": "NATAMYCIN",
+      "question": "Natamycin",
+      "answer": ""
+    },
+    {
+      "question_key": "PH",
+      "question": "pH - measure of acidity or basicity",
+      "answer": "3.3"
+    },
+    {
+      "question_key": "SALT",
+      "question": "Salt content",
+      "answer": ""
+    },
+    {
+      "question_key": "SOLIDS",
+      "question": "Total solids content",
+      "answer": "19.128"
+    },
+    {
+      "question_key": "SOLIDS_CORN_SYRUP",
+      "question": "Corn syrup solids content",
+      "answer": "0"
+    },
+    {
+      "question_key": "SOLIDS_H_FRUCTOSE_CS",
+      "question": "High fructose corn syrup solids content",
+      "answer": "0"
+    },
+    {
+      "question_key": "SUCROSE",
+      "question": "Sucrose content",
+      "answer": "0"
+    },
+    {
+      "question_key": "SUCROSE_EQUIVALENT",
+      "question": "Sucrose equivalent content",
+      "answer": "0"
+    },
+    {
+      "question_key": "RM_MICRO_REQ",
+      "question": "Can you meet Microbiological specifications - y/n",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "KOSHER_CERT",
+      "question": "Kosher certification? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "HALAL",
+      "question": "Halal certified? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "ORGANIC_CERT",
+      "question": "Organic certified? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "EU_CERTIFIED",
+      "question": "European Union certified? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "VEGETARIAN",
+      "question": "Is this item vegetarian? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "BIOENGINEERED_FOOD",
+      "question": "Is this item a \u201cbioengineered food,\u201d as defined in 7 CFR 66.1 (contains genetic material modified through rDNA techniques, modification could not otherwise be obtained through conventional breeding found in nature)?",
+      "answer": "No"
+    },
+    {
+      "question_key": "DIS_BIOENGINEER_FOOD",
+      "question": "Is this item exempt from disclosure requirements for bioengineered foods, as allowed for by 7 CFR 66?",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "DNA_CRISPR",
+      "question": "Contains gene edited DNA (CRISPR)? (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "DNA_CRISPR_REFINED",
+      "question": "Made from gene edited (CRISPR) material, not detectable, highly refined ingredient?  (y/n)",
+      "answer": "No"
+    },
+    {
+      "question_key": "PROP_65 --- roll up",
+      "question": "Is this item Prop 65 certified? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_GLUTEN_FR_CERT",
+      "question": "Do you have Gluten Free Certification (y/n)?",
+      "answer": "No"
+    },
+    {
+      "question_key": "KOSHER_EXPIRE ",
+      "question": "Kosher certification expiration date",
+      "answer": "2025-08-31"
+    },
+    {
+      "question_key": "HALAL_CERT_EXPIRE",
+      "question": "Indicate the expiration date of the Halal certificate",
+      "answer": ""
+    },
+    {
+      "question_key": "ORGANIC_CERT_EXPIRE",
+      "question": "Indicate the expiration date of the Organicl certificate",
+      "answer": ""
+    },
+    {
+      "question_key": "go live 1/18/24",
+      "question": "If ORGANIC_CERT = YES then Attachment type Packaging Label is Requried",
+      "answer": ""
+    },
+    {
+      "question_key": "C_SUPPLRADDTIVE_LIST",
+      "question": "If this item contains incidental additives or processing aids, please identify them",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_SRC_COLOR_ART",
+      "question": "If natural or artificial color(s) are added, identify the source\nKD - follow up",
+      "answer": "Carrot Juice;Pumpkin;Sweet Potato"
+    },
+    {
+      "question_key": "KOSHER_TYPE",
+      "question": "If item is Kosher, select the type of Kosher certification",
+      "answer": "KOSHER PARVE"
+    },
+    {
+      "question_key": "HALAL_QUALIFIES",
+      "question": "Can item be Halal certified? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "EXP_BIOENGINEER_FOOD\n",
+      "question": "Under what exemption does this item apply?",
+      "answer": "Refined: derived from BE crop, but does not contain detectable modified DNA"
+    },
+    {
+      "question_key": "Specification Code_system_populate",
+      "question": "Specification Code",
+      "answer": ""
+    },
+    {
+      "question_key": "Description_system_populate",
+      "question": "Description",
+      "answer": ""
+    },
+    {
+      "question_key": "Version_system_populate",
+      "question": "Version",
+      "answer": ""
+    },
+    {
+      "question_key": "Class_system_populate",
+      "question": "Class",
+      "answer": ""
+    },
+    {
+      "question_key": "RM_CATEGORY\nRM_Category-37c87f8afd30",
+      "question": "Raw Material Category",
+      "answer": "Fruit - Sauce, Pulp, Puree, Composite"
+    },
+    {
+      "question_key": "Schreiber Item Number_system_populate",
+      "question": "Schreiber Item Number",
+      "answer": ""
+    },
+    {
+      "question_key": "MANUFACTURE_NAME",
+      "question": "Identifies the manufacturer name if supplied by a Broker",
+      "answer": ""
+    },
+    {
+      "question_key": "FCC",
+      "question": "Is this item FCC / Codex compliant? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "NATURAL_FLAV_SOURCE",
+      "question": "If natural flavor what is the source - free text",
+      "answer": "Derived from strawberry with other natural flavors"
+    },
+    {
+      "question_key": "ENZYME_ANIMAL_TYPE",
+      "question": "If Enzyme source is animal, identify type of animal",
+      "answer": ""
+    },
+    {
+      "question_key": "STARCH_E_NUMBER",
+      "question": "If corn starch, what is the E Number",
+      "answer": "E1442"
+    },
+    {
+      "question_key": "TYPES_OF_CULTURES",
+      "question": "If cultures are present, select the culture type(s)",
+      "answer": ""
+    },
+    {
+      "question_key": "HAZARDOUS_CLASS",
+      "question": "If hazardous material, what is the class",
+      "answer": ""
+    },
+    {
+      "question_key": "FLASH_POINT",
+      "question": "What is the flash point?",
+      "answer": ""
+    },
+    {
+      "question_key": "BOILING_POINT",
+      "question": "What is the boiling point?",
+      "answer": ""
+    },
+    {
+      "question_key": "IRRADIATED",
+      "question": "Is the material irradiated? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "FS_HAZARD",
+      "question": "Describe the hazard(s) that need to be addressed",
+      "answer": ""
+    },
+    {
+      "question_key": "DAIRY_SOLIDS",
+      "question": "Does this raw material contain Dairy Solids?",
+      "answer": "No"
+    },
+    {
+      "question_key": "FORMULA_GRADE",
+      "question": "If this material contains dairy solids, what is the grade of the dairy solids?",
+      "answer": ""
+    },
+    {
+      "question_key": "C_INTENDEDUSEMFG",
+      "question": "MFG Intended Use:",
+      "answer": ""
+    },
+    {
+      "question_key": "C_MELT",
+      "question": "Melt",
+      "answer": ""
+    },
+    {
+      "question_key": "FOREIGN_DAIRY",
+      "question": "Does your product contain any Non-US Dairy",
+      "answer": "No"
+    },
+    {
+      "question_key": "RM_HS_CODE",
+      "question": "If this product contains Non-Us dairy, what is the 6 digit HS code (Harmonized System Code)",
+      "answer": ""
+    },
+    {
+      "question_key": "HACCP_PROGRAM",
+      "question": "Do you have an established and functional HACCP program in place at your manufacturing plant for this item? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "KEEPING_QUALITY_PGRM",
+      "question": "Do you have a keeping quality or retention program? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "QA_TEST",
+      "question": "Is in-process quality testing being done? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "QA_TEST_FREQUENCY",
+      "question": "What is the frequency of in-process quality testing?",
+      "answer": ""
+    },
+    {
+      "question_key": "DENSITY",
+      "question": "Density (Kg Per Lt) - Primary UOM Conversion",
+      "answer": ""
+    },
+    {
+      "question_key": "DEXTROSE_EQUIVALENT",
+      "question": "Measure of sweetness level.  Test range: 0-100",
+      "answer": ""
+    },
+    {
+      "question_key": "PYROPHOSPHATE",
+      "question": "Pyrophosphate content",
+      "answer": ""
+    },
+    {
+      "question_key": "REFRACTIVE_INDEX",
+      "question": "Measure of refractive index",
+      "answer": ""
+    },
+    {
+      "question_key": "SCORCHED_PARTICLES",
+      "question": "Measurement of scorched particles",
+      "answer": ""
+    },
+    {
+      "question_key": "INSOLUBLE_SUBST",
+      "question": "Insoluble substance is the amount of substance that does not dissolve in a solvent.",
+      "answer": ""
+    },
+    {
+      "question_key": "SOLUBILITY",
+      "question": "Solubility",
+      "answer": ""
+    },
+    {
+      "question_key": "VISCOSITY_BROOK_TYPE",
+      "question": "NEW - Type of Brookfield",
+      "answer": ""
+    },
+    {
+      "question_key": "VISCOSITY_SPINDEL_NU",
+      "question": "Spindle Number",
+      "answer": ""
+    },
+    {
+      "question_key": "VISCOSITY_RPM_SPEED",
+      "question": "RPM speed",
+      "answer": ""
+    },
+    {
+      "question_key": "PALLET_HOOD_MATRL",
+      "question": "Identifies the pallet hood material such as cardboard",
+      "answer": "Plastic"
+    },
+    {
+      "question_key": "C_CULTURE_G_WEIGHT",
+      "question": "Culture Weight (g) -  1 packet",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_CRUSTCA_LVL",
+      "question": "Crustacean shellfish amount/100g",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_CRUSTCA_SRC",
+      "question": "Crustacean shellfish - source of",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_EGG_LVL",
+      "question": "Egg products or egg derivatives amount/100g",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_EGG_SRC",
+      "question": "Egg products or egg derivatives - source of",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_FISH_LVL",
+      "question": "Fish amount/100g",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_FISH_SRC",
+      "question": "Fish - source of",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_DAIRY_LVL",
+      "question": "Dairy products or dairy derivatives amount/100g",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_DAIRY_SRC",
+      "question": "Dairy products or dairy derivatives - source of",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_PEANUTS_LVL",
+      "question": "Peanut amount/100g",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_PEANUTS_SRC",
+      "question": "Peanut - source of",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_SESAME_LVL",
+      "question": "Sesame seeds amount/100g?",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_SOYPROD_LVL",
+      "question": "Soy products & hydrolysates amount/100g",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_SOYPROD_SRC",
+      "question": "Soy products & hydrolysates - source of",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_SOY_CCNUT",
+      "question": "If soybean or coconut oil is present, is soybean oil and/or coconut oil NOT highly refined? (refined, bleached and deodorized)",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_TREENUT_LVL",
+      "question": "Treenut or nut derivatives (includes coconut and/or coconut oil) amount/100g",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_TREENUT_SRC",
+      "question": "Treenut - source of",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_WHEAT_LVL",
+      "question": "Wheat products and hydrolysates amount/100g",
+      "answer": ""
+    },
+    {
+      "question_key": "ALLERGEN_WHEAT_SRC",
+      "question": "Wheat Products And Hydrolysates - source of",
+      "answer": ""
+    },
+    {
+      "question_key": "CARAMEL_COLOR_CLASS",
+      "question": "If caramel color is present, identity the class",
+      "answer": ""
+    },
+    {
+      "question_key": "CARAMEL_METH_LVL",
+      "question": "If class III or IV, indicate the level of 4-Methylimidazole",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_GLUTEN_LVL",
+      "question": "Gluten  (from wheat, spelt, kamut, triticale, oats, rye and / or barley) level",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_SRC_SEED",
+      "question": "If seeds or seed derivatives present, identify the source",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_SRC_HERB",
+      "question": "If herb or spices are present, identity the source",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_PALM_SUSTAINABL",
+      "question": "Does palm oil/derivative come form a sustainable source?",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_PALM_SUS_SOURCE",
+      "question": " If Yes, what RSPO supply chain method(s) is used.",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_PALM_SUS_OPTION",
+      "question": " If No, is a sustainable sourcing option availabel?",
+      "answer": ""
+    },
+    {
+      "question_key": "SOURCE_SULFITE",
+      "question": "If Sulfites, sulfur dioxide, sodium (bi)-sulfate are present, what is the source?",
+      "answer": ""
+    },
+    {
+      "question_key": "SENS_SULFITE_LVL",
+      "question": "If sulfites, sulfur dioxide, sodium (bi)-sulfate are present, what is the level?",
+      "answer": ""
+    },
+    {
+      "question_key": "ASH",
+      "question": "Ash content",
+      "answer": "0.189"
+    },
+    {
+      "question_key": "CASEIN",
+      "question": "Casein content",
+      "answer": "0"
+    },
+    {
+      "question_key": "FAT_MILK",
+      "question": "Milkfat content",
+      "answer": "0"
+    },
+    {
+      "question_key": "FDM",
+      "question": "Fat in dry matter",
+      "answer": ""
+    },
+    {
+      "question_key": "LACTOSE",
+      "question": "Lactose content",
+      "answer": "0"
+    },
+    {
+      "question_key": "MELTING_POINT",
+      "question": "Melting point",
+      "answer": ""
+    },
+    {
+      "question_key": "MELT_TEMP_F",
+      "question": "Melt temperature \u00b0C",
+      "answer": ""
+    },
+    {
+      "question_key": "MELT_TEMP_C",
+      "question": "Melt temperature",
+      "answer": ""
+    },
+    {
+      "question_key": "METALS_HEAVY",
+      "question": "Heavy metals content",
+      "answer": ""
+    },
+    {
+      "question_key": "LEAD",
+      "question": "Measure of the lead content",
+      "answer": ""
+    },
+    {
+      "question_key": "NORBIXIN",
+      "question": "Norbixin - color concentration",
+      "answer": ""
+    },
+    {
+      "question_key": "NPN",
+      "question": "Non protein nitrogen content",
+      "answer": ""
+    },
+    {
+      "question_key": "PEROXIDE",
+      "question": "Peroxide value - a measure of rancidity",
+      "answer": ""
+    },
+    {
+      "question_key": "AFLATOXIN",
+      "question": "Aflatoxin - measure of the toxic chemical metabolites produced by Aspergillus molds",
+      "answer": ""
+    },
+    {
+      "question_key": "LOSS_ON_IGNT",
+      "question": "The mass loss after heating to a specific temperature allowing volatile substances to escape",
+      "answer": ""
+    },
+    {
+      "question_key": "RESIDUE_ON_IGNT",
+      "question": "Measures the amount of residual substance not volatilized",
+      "answer": ""
+    },
+    {
+      "question_key": "PROTEASE_ACTIVITY",
+      "question": "Protease activity - measure of protein breakdown",
+      "answer": ""
+    },
+    {
+      "question_key": "ENZYME_ACTIVITY",
+      "question": "Measure of the activity of an enzyme",
+      "answer": ""
+    },
+    {
+      "question_key": "PURITY",
+      "question": "Purity - assay, percent pure",
+      "answer": ""
+    },
+    {
+      "question_key": "SOLIDS_MILK_NONFAT",
+      "question": "Milk solids nonfat (MSNF) content",
+      "answer": "0"
+    },
+    {
+      "question_key": "SOLIDS_MILK",
+      "question": "Milk Solids",
+      "answer": "0"
+    },
+    {
+      "question_key": "STABILIZER_AMOUNT",
+      "question": "Stabilizer content",
+      "answer": "0"
+    },
+    {
+      "question_key": "SORBIC_ACID",
+      "question": "Sorbic acid content",
+      "answer": "0"
+    },
+    {
+      "question_key": "TITRATABLE_ACIDITY",
+      "question": "Measure of titratable acidity",
+      "answer": ""
+    },
+    {
+      "question_key": "WHEY_PROTEIN",
+      "question": "Whey protein content",
+      "answer": "0"
+    },
+    {
+      "question_key": "WPN",
+      "question": "Whey protein nitrogen content",
+      "answer": ""
+    },
+    {
+      "question_key": "C_SUPPLIER_MIRCO_COM",
+      "question": "If no, please state your specificaitons",
+      "answer": ""
+    },
+    {
+      "question_key": "MICRO_LISTERIA",
+      "question": "Listeria present? (positive / negative)",
+      "answer": "NEGATIVE"
+    },
+    {
+      "question_key": "MICRO_SALMONELLA",
+      "question": "Salmonella present? (positive / negative)",
+      "answer": "NEGATIVE"
+    },
+    {
+      "question_key": "MICRO_STPH_AUREUS",
+      "question": "Indicates the maximum acceptable level of Staphylococcus aureus",
+      "answer": ""
+    },
+    {
+      "question_key": "MICRO_YEAST",
+      "question": "Indicates the maximum acceptable level of yeast",
+      "answer": "9"
+    },
+    {
+      "question_key": "MICRO_MOLD",
+      "question": "Identifies the maximum acceptable level of mold",
+      "answer": "9"
+    },
+    {
+      "question_key": "MICRO_ENTEROTOXIN",
+      "question": "Enterotoxin present? (yes/no)",
+      "answer": ""
+    },
+    {
+      "question_key": "MICRO_PLATE_C",
+      "question": "Indicates the maximum acceptable level of standard plate count",
+      "answer": "999"
+    },
+    {
+      "question_key": "MICRO_COLIFORM",
+      "question": "Identifies the maximum acceptable level of coliform",
+      "answer": "9"
+    },
+    {
+      "question_key": "MICRO_HLB",
+      "question": "Identifies the maximum acceptable level of heterofermentative Lactobacilli",
+      "answer": ""
+    },
+    {
+      "question_key": "HETEROTROPHS",
+      "question": "Measure of Heterotrophic bacteria",
+      "answer": ""
+    },
+    {
+      "question_key": "COLOR_NCI",
+      "question": "NCI color score range. Applies to cheese and plain CC formulas.",
+      "answer": ""
+    },
+    {
+      "question_key": "HUNTER_L_COLOR",
+      "question": "Hunter L - measure of the color lightness or darkness",
+      "answer": ""
+    },
+    {
+      "question_key": "HUNTER_A_COLOR",
+      "question": "Hunter A - measure of the color greeness or redness",
+      "answer": ""
+    },
+    {
+      "question_key": "HUNTER_B_COLOR",
+      "question": "Hunter B - measure of the color blueness or yellowness",
+      "answer": ""
+    },
+    {
+      "question_key": "KOSHER_QUALIFIES",
+      "question": "Can item be Kosher certified? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "ORGANIC_PCT_LEVEL",
+      "question": "Percent of the product which is certified organic. If the product doesn\u2019t contain Organic, the % will be 0.",
+      "answer": ""
+    },
+    {
+      "question_key": "ORGANIC_CERT_AGENCY",
+      "question": "Organic certification agency name",
+      "answer": ""
+    },
+    {
+      "question_key": "RBST_FREE",
+      "question": "Is this item rBST free? (y/n)",
+      "answer": "Yes"
+    },
+    {
+      "question_key": "VEGETARIAN_TYPE",
+      "question": "If the item is classified as vegetarian, select the vegetarian type.",
+      "answer": "Vegan (no aminal products including honey)"
+    },
+    {
+      "question_key": "GMO - follow - REMOVE QUESTION",
+      "question": "Contains or made from genetically modified organisms? (y/n)",
+      "answer": ""
+    },
+    {
+      "question_key": "PROP_65_CHEMICAL",
+      "question": "If yes, what is the chemical",
+      "answer": ""
+    },
+    {
+      "question_key": "TRIGGER_PRO_65",
+      "question": "Based on intended standard usage levels in our finished products \u2013 would it trigger prop 65 warning? (y/n)",
+      "answer": ""
+    }
+  ]
+}

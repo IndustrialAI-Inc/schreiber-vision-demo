@@ -230,7 +230,7 @@ const PurePreviewMessage = ({
                         />
                       ) : toolName === 'requestPdf' ? (
                         <div>
-                          {result.message && <p>{result.message}</p>}
+                          {result.message && <Markdown>{result.message}</Markdown>}
                           {result.fileUrl && (
                             <div className="mt-2">
                               <PdfPreviewThumb
