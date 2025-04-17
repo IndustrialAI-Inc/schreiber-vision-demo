@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:15-alpine
-    container_name: schreiber-postgres
+    container_name: schreiber-vision-demo-postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
