@@ -1,8 +1,11 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UserFile } from '@/lib/db/schema';
+import { TrashIcon } from '@/components/icons';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return bytes + ' bytes';
@@ -20,7 +23,39 @@ function formatDate(date: Date): string {
   }).format(date);
 }
 
-export default function RepositoryClient({ files }: { files: UserFile[] }) {
+export default function RepositoryClient({ files: initialFiles }: { files: UserFile[] }) {
+  const [files, setFiles] = useState(initialFiles);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const deleteFile = async (fileId: string) => {
+    if (deleting) return; // Prevent multiple clicks
+    
+    setDeleting(fileId);
+    
+    try {
+      const response = await fetch(`/api/files/delete`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ fileId }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete file');
+      }
+      
+      // Remove file from state
+      setFiles(files.filter(file => file.id !== fileId));
+      toast.success('File deleted successfully');
+    } catch (error) {
+      toast.error('Failed to delete file');
+      console.error('Error deleting file:', error);
+    } finally {
+      setDeleting(null);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-2xl font-bold mb-6">Your Files Repository</h1>
@@ -33,7 +68,18 @@ export default function RepositoryClient({ files }: { files: UserFile[] }) {
         {files.map((file) => (
           <Card key={file.id} className="overflow-hidden">
             <CardHeader className="pb-2">
-              <CardTitle className="truncate text-lg">{file.fileName}</CardTitle>
+              <div className="flex justify-between items-start">
+                <CardTitle className="truncate text-lg">{file.fileName}</CardTitle>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500"
+                  onClick={() => deleteFile(file.id)}
+                  disabled={deleting === file.id}
+                >
+                  <TrashIcon size={16} />
+                </Button>
+              </div>
               <p className="text-sm text-muted-foreground">
                 {formatDate(new Date(file.createdAt))}
               </p>

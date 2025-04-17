@@ -462,3 +462,25 @@ export async function getUserFilesByUserId({ userId }: { userId: string }) {
     throw error;
   }
 }
+
+export async function getUserFileById({ id }: { id: string }) {
+  try {
+    const [file] = await db
+      .select()
+      .from(userFile)
+      .where(eq(userFile.id, id));
+    return file;
+  } catch (error) {
+    console.error('Failed to get user file by id from database', error);
+    throw error;
+  }
+}
+
+export async function deleteUserFile({ id }: { id: string }) {
+  try {
+    return await db.delete(userFile).where(eq(userFile.id, id));
+  } catch (error) {
+    console.error('Failed to delete user file from database', error);
+    throw error;
+  }
+}
