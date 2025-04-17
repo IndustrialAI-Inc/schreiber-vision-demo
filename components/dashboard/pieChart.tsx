@@ -63,7 +63,7 @@ export default function PieChartComponent() {
             <CardTitle className="text-xl font-medium text-bright">
               Top 3 suppliers
             </CardTitle>
-            <CardDescription>January - June 2024</CardDescription>
+            <CardDescription>Amount of specs created per supplier since 2022</CardDescription>
           </div>
           <MoreHorizontal className="h-5 w-5 text-bright" />
         </div>
