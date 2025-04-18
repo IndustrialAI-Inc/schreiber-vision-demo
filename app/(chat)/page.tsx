@@ -4,7 +4,6 @@ import { Chat } from '@/components/chat';
 import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
 import { generateUUID } from '@/lib/utils';
 import { DataStreamHandler } from '@/components/data-stream-handler';
-import { SupplierAlert } from '@/components/supplier-alert';
 
 export default async function Page() {
   const id = generateUUID();
@@ -15,9 +14,6 @@ export default async function Page() {
   if (!modelIdFromCookie) {
     return (
       <>
-        <div className="w-full max-w-3xl mx-auto px-4 pt-4">
-          <SupplierAlert />
-        </div>
         <Chat
           key={id}
           id={id}
@@ -33,9 +29,6 @@ export default async function Page() {
 
   return (
     <>
-      <div className="w-full max-w-3xl mx-auto px-4 pt-4">
-        <SupplierAlert />
-      </div>
       <Chat
         key={id}
         id={id}

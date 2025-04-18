@@ -30,54 +30,59 @@ export function AppSidebar({ user }: { user: User | undefined }) {
     <Sidebar className="group-data-[side=left]:border-r-0">
       <SidebarHeader>
         <SidebarMenu>
-          <div className="flex flex-row justify-between items-center">
-            <Link
-              href="/"
-              onClick={() => {
-                setOpenMobile(false);
-              }}
-              className="flex flex-row gap-3 items-center"
-            >
-              <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer">
-                {mode === 'supplier' ? 'Supplier Portal' : 'Chatbot'}
-              </span>
-            </Link>
+          <div className="flex flex-col space-y-2">
+            <div className="flex flex-row justify-between items-center">
+              <Link
+                href="/"
+                onClick={() => {
+                  setOpenMobile(false);
+                }}
+                className="flex flex-row gap-3 items-center flex-grow"
+              >
+                <span className="text-lg font-semibold px-2 hover:bg-muted rounded-md cursor-pointer whitespace-normal">
+                  {mode === 'supplier' ? 'Supplier Portal' : 'Chatbot'}
+                </span>
+              </Link>
+              
+              {mode === 'schreiber' && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      type="button"
+                      className="p-2 h-fit"
+                      onClick={() => {
+                        setOpenMobile(false);
+                        router.push('/');
+                        router.refresh();
+                      }}
+                    >
+                      <PlusIcon />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent align="end">New Chat</TooltipContent>
+                </Tooltip>
+              )}
+            </div>
+            
             <Link
               href="/repository"
               onClick={() => {
                 setOpenMobile(false);
               }}
-              className="flex flex-row gap-2 items-center ml-2"
+              className="flex flex-row gap-2 items-center"
             >
               <FolderIcon className="h-4 w-4" />
               <span className="text-sm font-medium hover:bg-muted rounded-md cursor-pointer px-1">
                 Repository
               </span>
             </Link>
-            {mode === 'schreiber' && (
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    type="button"
-                    className="p-2 h-fit"
-                    onClick={() => {
-                      setOpenMobile(false);
-                      router.push('/');
-                      router.refresh();
-                    }}
-                  >
-                    <PlusIcon />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent align="end">New Chat</TooltipContent>
-              </Tooltip>
-            )}
+            
+            {/* <div className="px-2 py-2">
+              <ModeToggle />
+            </div> */}
+            <Separator className="my-1" />
           </div>
-          <div className="px-2 py-2">
-            <ModeToggle />
-          </div>
-          <Separator className="my-1" />
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>

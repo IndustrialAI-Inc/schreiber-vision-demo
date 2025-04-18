@@ -60,14 +60,18 @@ const PurePreviewMessage = ({
     });
   };
 
+  const role = message.role;
+  const hasArtifacts = (message as any).artifacts?.length > 0;
+
   return (
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       <motion.div
-        data-testid={`message-${message.role}`}
-        className="w-full mx-auto max-w-3xl px-4 group/message"
+        data-testid={`message-${role}`}
+        className={`w-full mx-auto max-w-3xl px-4 group/message message ${hasArtifacts ? 'has-artifact' : ''}`}
         initial={{ y: 5, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        data-role={message.role}
+        animate={{ y: 0, opacity: 1, transition: { delay: 0.1 } }}
+        data-role={role}
+        data-message-role={role}
       >
         <div
           className={cn(

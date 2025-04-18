@@ -4,41 +4,47 @@ import { motion } from 'framer-motion';
 import { Button } from './ui/button';
 import { memo } from 'react';
 import { UseChatHelpers } from '@ai-sdk/react';
+import { useRouter } from 'next/navigation';
 
 interface SuggestedActionsProps {
   chatId: string;
   append: UseChatHelpers['append'];
+  disabled?: boolean;
 }
 
-function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
+function PureSuggestedActions({ chatId, append, disabled = false }: SuggestedActionsProps) {
+  const router = useRouter();
   const suggestedActions = [
     // ───────────  PHASE 1  ───────────
     {
       title: 'Create supplier spec',
       label: 'Start a new specification request',
       action: 'I need to create a new supplier spec sheet and fill it out from the PDFs from the respository.',
+      type: 'chat',
     },
 
     // ───────────  PHASE 2  ───────────
     {
       title: 'Semantic search',
       label: 'Ask across all existing specs',
-      action:
-        'Search the spec repository for "vegetable proteins without soy".',
+      action: '/search',
+      type: 'route',
     },
 
     // ───────────  PHASE 3  ───────────
     {
       title: 'Usage dashboard',
       label: 'Show current doc & API metrics',
-      action: 'Show me the latest usage metrics dashboard.',
+      action: '/dashboard',
+      type: 'route',
     },
 
     // ───────────  PHASE 4  ───────────
     {
       title: 'Repository browser',
       label: 'Open full spec repository',
-      action: 'Open the repository table for all supplier documents.',
+      action: '/repository',
+      type: 'route',
     },
   ];
 
@@ -59,13 +65,18 @@ function PureSuggestedActions({ chatId, append }: SuggestedActionsProps) {
           <Button
             variant="ghost"
             onClick={async () => {
-              window.history.replaceState({}, '', `/chat/${chatId}`);
-
-              append({
-                role: 'user',
-                content: suggestedAction.action,
-              });
+              if (disabled) return;
+              if (suggestedAction.type === 'route') {
+                router.push(suggestedAction.action);
+              } else {
+                window.history.replaceState({}, '', `/chat/${chatId}`);
+                append({
+                  role: 'user',
+                  content: suggestedAction.action,
+                });
+              }
             }}
+            disabled={disabled}
             className="text-left border rounded-xl px-4 py-3.5 text-sm flex-1 gap-1 sm:flex-col w-full h-auto justify-start items-start"
           >
             <span className="font-medium">{suggestedAction.title}</span>

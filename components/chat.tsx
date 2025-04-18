@@ -2,7 +2,7 @@
 
 import type { Attachment, UIMessage } from 'ai';
 import { useChat } from '@ai-sdk/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { ChatHeader } from '@/components/chat-header';
 import type { Vote } from '@/lib/db/schema';
@@ -18,6 +18,9 @@ import { getChatHistoryPaginationKey } from './sidebar-history';
 import { SupplierTimeline } from './supplier-timeline';
 import { useUserMode } from './mode-toggle';
 import { SupplierFeedbackInput } from './supplier-feedback-input';
+import { SupplierSheetAnalysis } from './supplier-sheet-analysis';
+import { useArtifact } from '@/hooks/use-artifact';
+import { cn } from '@/lib/utils';
 
 export function Chat({
   id,
@@ -34,6 +37,47 @@ export function Chat({
 }) {
   const { mutate } = useSWRConfig();
   const { mode } = useUserMode();
+  const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
+  const [sheetContent, setSheetContent] = useState<string>('');
+  
+  // Fetch sheet content for supplier analysis
+  useEffect(() => {
+    if (mode === 'supplier' && id) {
+      // Check if we're in feedback mode before fetching
+      const checkTimelineAndFetch = async () => {
+        try {
+          const timelineRes = await fetch(`/api/timeline?chatId=${id}`);
+          const timeline = await timelineRes.json();
+          
+          // Only fetch sheet if we're in feedback mode
+          const isFeedbackInProgress = timeline?.steps?.some(
+            (step: {id: string, status: string}) => 
+              step.id === 'feedback' && step.status === 'in-progress'
+          );
+          
+          if (isFeedbackInProgress) {
+            // Attempt to fetch the latest sheet artifact for this chat
+            fetch(`/api/artifacts?chatId=${id}&kind=sheet`)
+              .then(res => res.json())
+              .then(data => {
+                if (data && data.length > 0) {
+                  // Get the latest sheet
+                  const latestSheet = data[0];
+                  setSheetContent(latestSheet.content || '');
+                }
+              })
+              .catch(err => {
+                console.error('Error fetching sheet content:', err);
+              });
+          }
+        } catch (error) {
+          console.error('Error checking timeline status:', error);
+        }
+      };
+      
+      checkTimelineAndFetch();
+    }
+  }, [id, mode]);
 
   const {
     messages,
@@ -66,7 +110,6 @@ export function Chat({
   );
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
-  const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
   
   // Handler for when supplier sends feedback
   const handleSendFeedback = (feedback: string) => {
@@ -78,7 +121,9 @@ export function Chat({
 
   return (
     <>
-      <div className="flex flex-col min-w-0 h-dvh bg-background">
+      <div className={cn(
+        "flex flex-col min-w-0 h-dvh bg-background"
+      )}>
         <ChatHeader
           chatId={id}
           selectedModelId={selectedChatModel}
@@ -87,6 +132,14 @@ export function Chat({
         />
 
         <SupplierTimeline chatId={id} />
+
+        {mode === 'supplier' && sheetContent && (
+          <SupplierSheetAnalysis
+            chatId={id}
+            sheetContent={sheetContent}
+            append={append}
+          />
+        )}
 
         <Messages
           chatId={id}
@@ -100,28 +153,21 @@ export function Chat({
         />
 
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl flex-col">
-          {mode === 'supplier' && (
-            <SupplierFeedbackInput 
-              chatId={id}
-              onSendFeedback={handleSendFeedback}
-            />
-          )}
-          
-          {!isReadonly && mode !== 'supplier' && (
-            <MultimodalInput
-              chatId={id}
-              input={input}
-              setInput={setInput}
-              handleSubmit={handleSubmit}
-              status={status}
-              stop={stop}
-              attachments={attachments}
-              setAttachments={setAttachments}
-              messages={messages}
-              setMessages={setMessages}
-              append={append}
-            />
-          )}
+          <MultimodalInput
+            chatId={id}
+            input={input}
+            setInput={setInput}
+            handleSubmit={handleSubmit}
+            status={status}
+            stop={stop}
+            attachments={attachments}
+            setAttachments={setAttachments}
+            messages={messages}
+            setMessages={setMessages}
+            append={append}
+            disabled={isReadonly}
+            supplierMode={mode === 'supplier'}
+          />
         </form>
       </div>
 

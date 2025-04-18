@@ -37,6 +37,8 @@ function PureMultimodalInput({
   append,
   handleSubmit,
   className,
+  disabled = false,
+  supplierMode = false,
 }: {
   chatId: string;
   input: UseChatHelpers['input'];
@@ -50,6 +52,8 @@ function PureMultimodalInput({
   append: UseChatHelpers['append'];
   handleSubmit: UseChatHelpers['handleSubmit'];
   className?: string;
+  disabled?: boolean;
+  supplierMode?: boolean;
 }) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { width } = useWindowSize();
@@ -96,6 +100,7 @@ function PureMultimodalInput({
   }, [input, setLocalStorageInput]);
 
   const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (disabled) return;
     setInput(event.target.value);
     adjustHeight();
   };
@@ -104,6 +109,8 @@ function PureMultimodalInput({
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
 
   const submitForm = useCallback(() => {
+    if (disabled) return;
+    
     window.history.replaceState({}, '', `/chat/${chatId}`);
 
     handleSubmit(undefined, {
@@ -119,6 +126,7 @@ function PureMultimodalInput({
     }
   }, [
     attachments,
+    disabled,
     handleSubmit,
     setAttachments,
     setLocalStorageInput,
@@ -184,7 +192,7 @@ function PureMultimodalInput({
       {messages.length === 0 &&
         attachments.length === 0 &&
         uploadQueue.length === 0 && (
-          <SuggestedActions append={append} chatId={chatId} />
+          <SuggestedActions append={append} chatId={chatId} disabled={disabled} />
         )}
 
       <input
@@ -194,6 +202,7 @@ function PureMultimodalInput({
         multiple
         onChange={handleFileChange}
         tabIndex={-1}
+        disabled={disabled || status !== 'ready'}
       />
 
       {(attachments.length > 0 || uploadQueue.length > 0) && (
@@ -222,11 +231,11 @@ function PureMultimodalInput({
       <Textarea
         data-testid="multimodal-input"
         ref={textareaRef}
-        placeholder="Send a message..."
+        placeholder={supplierMode ? 'Send supplier feedback...' : 'Send a message...'}
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base bg-muted pb-10 dark:border-zinc-700',
+          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base pb-10 dark:border-zinc-700 bg-amber-50 border-amber-200 text-amber-900',
           className,
         )}
         rows={2}
@@ -246,20 +255,23 @@ function PureMultimodalInput({
             }
           }
         }}
+        autoComplete="off"
+        disabled={disabled || status === 'submitted'}
       />
 
       <div className="absolute bottom-0 p-2 w-fit flex flex-row justify-start">
-        <AttachmentsButton fileInputRef={fileInputRef} status={status} />
+        <AttachmentsButton fileInputRef={fileInputRef} status={status} disabled={disabled} />
       </div>
 
       <div className="absolute bottom-0 right-0 p-2 w-fit flex flex-row justify-end">
         {status === 'submitted' ? (
-          <StopButton stop={stop} setMessages={setMessages} />
+          <StopButton stop={stop} setMessages={setMessages} disabled={disabled} />
         ) : (
           <SendButton
             input={input}
             submitForm={submitForm}
             uploadQueue={uploadQueue}
+            disabled={disabled}
           />
         )}
       </div>
@@ -281,9 +293,11 @@ export const MultimodalInput = memo(
 function PureAttachmentsButton({
   fileInputRef,
   status,
+  disabled,
 }: {
   fileInputRef: React.MutableRefObject<HTMLInputElement | null>;
   status: UseChatHelpers['status'];
+  disabled: boolean;
 }) {
   return (
     <Button
@@ -293,7 +307,7 @@ function PureAttachmentsButton({
         event.preventDefault();
         fileInputRef.current?.click();
       }}
-      disabled={status !== 'ready'}
+      disabled={disabled || status !== 'ready'}
       variant="ghost"
     >
       <PaperclipIcon size={14} />
@@ -306,9 +320,11 @@ const AttachmentsButton = memo(PureAttachmentsButton);
 function PureStopButton({
   stop,
   setMessages,
+  disabled,
 }: {
   stop: () => void;
   setMessages: UseChatHelpers['setMessages'];
+  disabled: boolean;
 }) {
   return (
     <Button
@@ -331,10 +347,12 @@ function PureSendButton({
   submitForm,
   input,
   uploadQueue,
+  disabled,
 }: {
   submitForm: () => void;
   input: string;
   uploadQueue: Array<string>;
+  disabled: boolean;
 }) {
   return (
     <Button
@@ -344,7 +362,7 @@ function PureSendButton({
         event.preventDefault();
         submitForm();
       }}
-      disabled={input.length === 0 || uploadQueue.length > 0}
+      disabled={disabled || input.length === 0 || uploadQueue.length > 0}
     >
       <ArrowUpIcon size={14} />
     </Button>

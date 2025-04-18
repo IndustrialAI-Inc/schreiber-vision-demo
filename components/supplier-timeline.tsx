@@ -9,6 +9,9 @@ import { Button } from '@/components/ui/button';
 import { useUserMode } from './mode-toggle';
 import { toast } from 'sonner';
 import { mutate } from 'swr';
+import { useArtifact } from '@/hooks/use-artifact';
+import { useEffect, useState } from 'react';
+import { parse } from 'papaparse';
 
 interface SupplierTimelineProps {
   chatId: string;
@@ -18,18 +21,45 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
   // For debugging path extraction
   const pathname = usePathname();
   const { mode } = useUserMode();
-  
-  console.log('Path extraction:', { pathname, passedChatId: chatId });
+  const { setArtifact, artifact } = useArtifact();
+  const [sheetContent, setSheetContent] = useState<string>('');
+  const [missingFields, setMissingFields] = useState<number>(0);
   
   const { timeline, isTimelineVisible, updateStepStatus } = useSupplierTimeline(chatId);
-  
-  // For debugging
-  console.log('SupplierTimeline rendering:', { 
-    chatId, 
-    isVisible: timeline?.isVisible, 
-    isTimelineVisible,
-    steps: timeline?.steps 
-  });
+
+  // Fetch sheet content when needed (for supplier mode)
+  useEffect(() => {
+    if (mode === 'supplier' && chatId) {
+      fetch(`/api/artifacts?chatId=${chatId}&kind=sheet`)
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.length > 0) {
+            const latestSheet = data[0];
+            setSheetContent(latestSheet.content || '');
+            
+            // Count missing fields
+            try {
+              const result = parse<string[]>(latestSheet.content, { skipEmptyLines: true });
+              let count = 0;
+              
+              result.data.forEach((row, index) => {
+                if (index === 0) return; // Skip header
+                if (row[0] && row[1] && (!row[2] || row[2].trim() === '')) {
+                  count++;
+                }
+              });
+              
+              setMissingFields(count);
+            } catch (error) {
+              console.error('Error analyzing sheet:', error);
+            }
+          }
+        })
+        .catch(err => {
+          console.error('Error fetching sheet content:', err);
+        });
+    }
+  }, [chatId, mode]);
   
   // Only show if this chat's timeline is visible
   if (!isTimelineVisible) return null;
@@ -44,7 +74,7 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
     step => step.id === 'feedback' && step.status === 'in-progress'
   );
   
-  // Handler for when supplier provides feedback
+  // Handler for when supplier provides feedback - enhanced to show artifacts
   const handleProvideFeedback = async () => {
     try {
       // Mark send as completed and feedback as in-progress
@@ -56,7 +86,48 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
       mutate(`/api/timeline?chatId=${chatId}`);
       mutate('/api/timeline/pending');
       
-      toast.success('Status updated to providing feedback');
+      // Make sure we have the sheet content
+      if (chatId) {
+        try {
+          // Fetch the latest sheet artifact
+          const artifactRes = await fetch(`/api/artifacts?chatId=${chatId}&kind=sheet`);
+          if (artifactRes.ok) {
+            const artifacts = await artifactRes.json();
+            if (artifacts && artifacts.length > 0) {
+              const latestSheet = artifacts[0];
+              
+              // Make the artifact panel visible with the sheet content
+              setArtifact(current => ({
+                ...current,
+                kind: 'sheet',
+                content: latestSheet.content || '',
+                isVisible: true,
+                status: 'idle'
+              }));
+              
+              // Find the sheet element and scroll to it
+              setTimeout(() => {
+                const sheetElement = document.querySelector('[data-artifact="sheet"]');
+                if (sheetElement) {
+                  sheetElement.scrollIntoView({ behavior: 'smooth' });
+                  
+                  // Show toast guiding user what to do
+                  if (missingFields > 0) {
+                    toast.info(
+                      `Please review the ${missingFields} highlighted question${missingFields !== 1 ? 's' : ''} that need${missingFields === 1 ? 's' : ''} your input.`,
+                      { duration: 5000 }
+                    );
+                  }
+                }
+              }, 500);
+            }
+          }
+        } catch (error) {
+          console.error('Error fetching sheet artifact:', error);
+        }
+      }
+      
+      toast.success('Ready to provide feedback');
     } catch (error) {
       console.error('Error updating timeline status:', error);
       toast.error('Failed to update status');
@@ -80,7 +151,95 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
       toast.error('Failed to update status');
     }
   };
+
+  // Render a more compact version for supplier mode
+  if (mode === 'supplier') {
+    const currentStep = timeline.steps.find(step => step.status === 'in-progress')?.id || '';
+    let stageText = "Reviewing Specification";
+    let actionButton = null;
+    
+    if (isSendInProgress) {
+      stageText = "Ready for review";
+      actionButton = (
+        <Button 
+          size="sm" 
+          variant="default"
+          onClick={handleProvideFeedback}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          Begin Providing Feedback
+        </Button>
+      );
+    } else if (isFeedbackInProgress) {
+      stageText = "Providing feedback";
+      
+      // Enhanced with missing fields information
+      const missingFieldsText = missingFields > 0 
+        ? ` (${missingFields} question${missingFields !== 1 ? 's' : ''} need${missingFields === 1 ? 's' : ''} review)` 
+        : '';
+      
+      actionButton = (
+        <div className="flex items-center gap-2">
+          {missingFields > 0 && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                // Show artifact and scroll to sheet
+                if (!artifact.isVisible) {
+                  setArtifact(current => ({
+                    ...current,
+                    isVisible: true
+                  }));
+                }
+                
+                setTimeout(() => {
+                  const sheetElement = document.querySelector('[data-artifact="sheet"]');
+                  if (sheetElement) {
+                    sheetElement.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }, 100);
+              }}
+              className="border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800"
+            >
+              Review Missing Fields
+            </Button>
+          )}
+          <Button 
+            size="sm" 
+            variant="default"
+            onClick={handleCompleteFeedback}
+            className="bg-green-600 hover:bg-green-700"
+            disabled={missingFields > 0}
+            title={missingFields > 0 ? "Please complete all missing fields first" : "Complete your feedback"}
+          >
+            Complete Feedback
+          </Button>
+        </div>
+      );
+      
+      // Update stage text with missing fields info
+      if (missingFields > 0) {
+        stageText = `Providing feedback${missingFieldsText}`;
+      }
+    }
+    
+    return (
+      <div className="w-full bg-blue-50 border-b border-blue-100 px-4 py-2">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+            <h3 className="font-medium">
+              {stageText}
+            </h3>
+          </div>
+          {actionButton}
+        </div>
+      </div>
+    );
+  }
   
+  // Default rendering for Schreiber mode
   return (
     <div className="w-full bg-zinc-100 border-b px-4 py-3">
       <div className="flex justify-between items-start">
@@ -100,26 +259,6 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
             ))}
           </div>
         </div>
-        
-        {mode === 'supplier' && isSendInProgress && (
-          <Button 
-            size="sm" 
-            variant="default"
-            onClick={handleProvideFeedback}
-          >
-            Begin Providing Feedback
-          </Button>
-        )}
-        
-        {mode === 'supplier' && isFeedbackInProgress && (
-          <Button 
-            size="sm" 
-            variant="default"
-            onClick={handleCompleteFeedback}
-          >
-            Complete Feedback
-          </Button>
-        )}
       </div>
     </div>
   );

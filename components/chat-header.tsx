@@ -13,6 +13,7 @@ import { useSidebar } from './ui/sidebar';
 import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { type VisibilityType, VisibilitySelector } from './visibility-selector';
+import { useUserMode } from './mode-toggle';
 
 function PureChatHeader({
   chatId,
@@ -28,6 +29,7 @@ function PureChatHeader({
   const router = useRouter();
   const { open } = useSidebar();
   const { theme, setTheme } = useTheme();
+  const { mode, setMode } = useUserMode();
 
   const { width: windowWidth } = useWindowSize();
 
@@ -71,9 +73,13 @@ function PureChatHeader({
 
       <Button
         className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4 md:ml-auto"
-        onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+        onClick={() => {
+          const newMode = mode === 'schreiber' ? 'supplier' : 'schreiber';
+          setMode(newMode);
+          router.refresh();
+        }}
       >
-        {theme === 'light' ? 'Supplier Mode' : 'Schreiber Mode'}
+        {mode === 'supplier' ? 'Schreiber Mode' : 'Supplier Mode'}
       </Button>
     </header>
   );

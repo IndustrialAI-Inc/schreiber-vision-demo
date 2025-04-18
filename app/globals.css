@@ -162,3 +162,30 @@
 .suggestion-highlight {
     @apply bg-blue-200 hover:bg-blue-300 dark:hover:bg-blue-400/50 dark:text-blue-50 dark:bg-blue-500/40;
 }
+
+/* Supplier Mode Styles */
+.supplier-mode .rdg-cell:empty {
+  background-color: rgba(255, 0, 0, 0.05);
+}
+
+/* Ensure empty cells are more visible in supplier mode */
+.supplier-mode .rdg-row:hover .rdg-cell:empty {
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Hide non-artifact messages in supplier mode */
+.supplier-mode .message:not(.has-artifact) {
+  display: none;
+}
+
+/* Increase prominence of artifact messages */
+.supplier-mode .message.has-artifact {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Make the supplier feedback form more prominent */
+.supplier-mode form {
+  margin-top: auto;
+}

@@ -2,10 +2,11 @@ import type { UIMessage } from 'ai';
 import { PreviewMessage, ThinkingMessage } from './message';
 import { useScrollToBottom } from './use-scroll-to-bottom';
 import { Greeting } from './greeting';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import type { Vote } from '@/lib/db/schema';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
+import { useUserMode } from './mode-toggle';
 
 interface MessagesProps {
   chatId: string;
@@ -29,6 +30,32 @@ function PureMessages({
 }: MessagesProps) {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
+  const { mode } = useUserMode();
+
+  // Filter messages for supplier mode - only show artifacts and supplier feedback
+  const filteredMessages = useMemo(() => {
+    if (mode !== 'supplier') return messages;
+    
+    return messages.filter(message => {
+      // Always show supplier feedback
+      if (message.role === 'user' && message.content.includes('**SUPPLIER FEEDBACK:**')) {
+        return true;
+      }
+      
+      // Always show the most recent assistant message
+      if (message.role === 'assistant' && messages[messages.length - 1] === message) {
+        return true;
+      }
+      
+      // Show messages with artifacts
+      if (message.role === 'assistant' && 
+          (message as any).artifacts?.some((a: any) => a.kind === 'sheet')) {
+        return true;
+      }
+      
+      return false;
+    });
+  }, [messages, mode]);
 
   return (
     <div
@@ -37,12 +64,12 @@ function PureMessages({
     >
       {messages.length === 0 && <Greeting />}
 
-      {messages.map((message, index) => (
+      {filteredMessages.map((message, index) => (
         <PreviewMessage
           key={message.id}
           chatId={chatId}
           message={message}
-          isLoading={status === 'streaming' && messages.length - 1 === index}
+          isLoading={status === 'streaming' && filteredMessages.length - 1 === index}
           vote={
             votes
               ? votes.find((vote) => vote.messageId === message.id)
@@ -55,8 +82,8 @@ function PureMessages({
       ))}
 
       {status === 'submitted' &&
-        messages.length > 0 &&
-        messages[messages.length - 1].role === 'user' && <ThinkingMessage />}
+        filteredMessages.length > 0 &&
+        filteredMessages[filteredMessages.length - 1].role === 'user' && <ThinkingMessage />}
 
       <div
         ref={messagesEndRef}

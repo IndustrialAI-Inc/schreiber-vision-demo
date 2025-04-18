@@ -1,10 +1,13 @@
 import { motion } from 'framer-motion';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { useUserMode } from '@/components/mode-toggle';
+import { SupplierAlert } from '@/components/supplier-alert';
 
 export const Greeting = () => {
   const { theme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { mode } = useUserMode();
   
   // Avoid hydration mismatch
   useEffect(() => {
@@ -15,27 +18,13 @@ export const Greeting = () => {
   if (!mounted) return null;
   
   const isDarkMode = theme === 'dark';
+  const isSupplierMode = mode === 'supplier';
   
   return (
     <div
       key="overview"
       className="max-w-3xl mx-auto md:mt-20 px-8 size-full flex flex-col justify-center"
     >
-      {!isDarkMode && (
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 10 }}
-          transition={{ delay: 0.4 }}
-          className="mb-6"
-        >
-          <img 
-            src="/images/Schreiber-logo-hi-res-color.png" 
-            alt="Schreiber Logo" 
-            className="h-16 md:h-20 w-auto"
-          />
-        </motion.div>
-      )}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -54,6 +43,24 @@ export const Greeting = () => {
       >
         {isDarkMode ? "How can I help you today?" : "How can I help you today?"}
       </motion.div>
+      <div className="mt-6">
+        <SupplierAlert />
+      </div>
+      {!isDarkMode && !isSupplierMode && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 10 }}
+          transition={{ delay: 0.4 }}
+          className="mb-6"
+        >
+          <img 
+            src="/images/Schreiber-logo-hi-res-color.png" 
+            alt="Schreiber Logo" 
+            className="h-16 md:h-20 w-auto"
+          />
+        </motion.div>
+      )}
     </div>
   );
 };

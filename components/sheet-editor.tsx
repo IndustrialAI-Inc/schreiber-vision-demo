@@ -5,6 +5,7 @@ import DataGrid, { textEditor } from 'react-data-grid';
 import { parse, unparse } from 'papaparse';
 import { useTheme } from 'next-themes';
 import { cn } from '@/lib/utils';
+import { useUserMode } from './mode-toggle';
 
 import 'react-data-grid/lib/styles.css';
 
@@ -28,6 +29,8 @@ const PureSpreadsheetEditor = ({
   columns: customColumns,
 }: SheetEditorProps) => {
   const { theme } = useTheme();
+  const { mode } = useUserMode();
+  const isSupplierMode = mode === 'supplier';
 
   const parseData = useMemo(() => {
     if (!content) return Array(MIN_ROWS).fill(Array(MIN_COLS).fill(''));
@@ -70,16 +73,24 @@ const PureSpreadsheetEditor = ({
     const dataColumns = columnDefinitions.map((col, i) => ({
       ...col,
       renderEditCell: textEditor,
-      cellClass: cn(`border-t dark:bg-zinc-950 dark:text-zinc-50`, {
+      cellClass: (row: any) => {
+        // For supplier mode: highlight empty Answer cells in red
+        const isEmpty = i === 2 && (!row[col.key] || row[col.key].trim() === '');
+        const isEmptyHighlight = isSupplierMode && isEmpty 
+          ? 'bg-red-50 dark:bg-red-900/30' 
+          : '';
+        
+        return cn(`border-t dark:bg-zinc-950 dark:text-zinc-50 ${isEmptyHighlight}`, {
         'border-l': i !== 0,
-      }),
+        });
+      },
       headerCellClass: cn(`border-t dark:bg-zinc-900 dark:text-zinc-50`, {
         'border-l': i !== 0,
       }),
     }));
 
     return [rowNumberColumn, ...dataColumns];
-  }, [customColumns]);
+  }, [customColumns, isSupplierMode]);
 
   const initialRows = useMemo(() => {
     return parseData.map((row, rowIndex) => {
@@ -118,6 +129,13 @@ const PureSpreadsheetEditor = ({
   };
 
   return (
+    <div className="flex flex-col w-full">
+      {isSupplierMode && (
+        <div className="px-4 py-2 mb-2 text-sm bg-yellow-50 border border-yellow-200 rounded-md">
+          <p className="font-medium">Supplier instructions:</p>
+          <p>Empty answer fields are highlighted in red. Please review and provide feedback on the specification.</p>
+        </div>
+      )}
     <DataGrid
       className={theme === 'dark' ? 'rdg-dark' : 'rdg-light'}
       columns={columns}
@@ -135,6 +153,7 @@ const PureSpreadsheetEditor = ({
         sortable: true,
       }}
     />
+    </div>
   );
 };
 
