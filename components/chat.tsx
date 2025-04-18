@@ -167,6 +167,10 @@ export function Chat({
             append={append}
             disabled={isReadonly}
             supplierMode={mode === 'supplier'}
+            className={cn(
+              'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base pb-10 dark:border-zinc-700',
+              mode === 'supplier' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-muted border-zinc-200',
+            )}
           />
         </form>
       </div>
