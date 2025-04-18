@@ -14,16 +14,18 @@ type SheetEditorProps = {
   status: string;
   isCurrentVersion: boolean;
   currentVersionIndex: number;
+  columns?: any[];
 };
 
-const MIN_ROWS = 50;
-const MIN_COLS = 26;
+const MIN_ROWS = 334;
+const MIN_COLS = 4;
 
 const PureSpreadsheetEditor = ({
   content,
   saveContent,
   status,
   isCurrentVersion,
+  columns: customColumns,
 }: SheetEditorProps) => {
   const { theme } = useTheme();
 
@@ -47,6 +49,7 @@ const PureSpreadsheetEditor = ({
   }, [content]);
 
   const columns = useMemo(() => {
+    if (customColumns) return customColumns;
     const rowNumberColumn = {
       key: 'rowNumber',
       name: '',
@@ -57,11 +60,16 @@ const PureSpreadsheetEditor = ({
       headerCellClass: 'border-t border-r dark:bg-zinc-900 dark:text-zinc-50',
     };
 
-    const dataColumns = Array.from({ length: MIN_COLS }, (_, i) => ({
-      key: i.toString(),
-      name: String.fromCharCode(65 + i),
+    const columnDefinitions = [
+      { key: '0', name: 'ID', width: 240 },
+      { key: '1', name: 'Question', width: 250 },
+      { key: '2', name: 'Answer', width: 250 },
+      { key: '3', name: 'Source', width: 150 }
+    ];
+
+    const dataColumns = columnDefinitions.map((col, i) => ({
+      ...col,
       renderEditCell: textEditor,
-      width: 120,
       cellClass: cn(`border-t dark:bg-zinc-950 dark:text-zinc-50`, {
         'border-l': i !== 0,
       }),
@@ -71,7 +79,7 @@ const PureSpreadsheetEditor = ({
     }));
 
     return [rowNumberColumn, ...dataColumns];
-  }, []);
+  }, [customColumns]);
 
   const initialRows = useMemo(() => {
     return parseData.map((row, rowIndex) => {

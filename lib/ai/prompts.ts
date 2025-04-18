@@ -81,7 +81,22 @@ print(f"Factorial of 5 is: {factorial(5)}")
 `;
 
 export const sheetPrompt = `
-You are a spreadsheet creation assistant. Create a spreadsheet in csv format based on the given prompt. The spreadsheet should contain meaningful column headers and data.
+You are updating a four‑column specification sheet:
+
+A = ID (read‑only) - This is a unique identifier for each question  
+B = Question (read‑only) - This describes what information is needed
+C = Answer (fill this) - Provide a reasonable answer based on the question in column B
+D = Source (write "LLM" if you supplied the answer, otherwise leave blank)
+
+CRITICAL INSTRUCTIONS:
+1. REPEAT THE ID AND QUESTION (COLUMNS A AND B) EXACTLY AS PROVIDED - DO NOT CHANGE THEM!
+2. Provide relevant, concise answers in column C for each question
+3. Always put "LLM" in column D for any answer you provide
+4. If you can't reasonably answer a question, leave the answer cell empty
+5. Maintain the CSV format with the same number of rows and columns
+6. Return the COMPLETE CSV with ALL rows, even if you only answered some questions
+
+Return the full specification sheet as CSV with columns A and B exactly as provided and your answers in columns C and D.
 `;
 
 export const updateDocumentPrompt = (
@@ -102,8 +117,23 @@ ${currentContent}
 `
       : type === 'sheet'
         ? `\
-Improve the following spreadsheet based on the given prompt.
+You are updating a four-column specification sheet:
 
+A = ID (read-only) - This is a unique identifier for each question
+B = Question (read-only) - This describes what information is needed
+C = Answer (fill this) - Provide a reasonable answer based on the question in column B
+D = Source (write "LLM" if you supplied the answer, otherwise leave blank)
+
+CRITICAL INSTRUCTIONS:
+1. REPEAT THE ID AND QUESTION (COLUMNS A AND B) EXACTLY AS PROVIDED - DO NOT CHANGE THEM!
+2. Provide relevant, concise answers in column C for each question
+3. Always put "LLM" in column D for any answer you provide
+4. If you can't reasonably answer a question, leave the answer cell empty
+5. Maintain the CSV format with the same number of rows and columns
+6. Return the COMPLETE CSV with ALL rows, even if you only answered some questions
+
+Here is the current specification sheet - DO NOT MODIFY THE ID AND QUESTION COLUMNS:
 ${currentContent}
-`
+
+Return the full specification sheet as CSV with columns A and B exactly as provided and your answers in columns C and D.`
         : '';

@@ -8,6 +8,7 @@ import { Document } from '../db/schema';
 import { saveDocument } from '../db/queries';
 import { Session } from 'next-auth';
 import { pdfDocumentHandler } from '@/artifacts/pdf/server';
+import { parse, unparse } from 'papaparse';
 
 export interface SaveDocumentProps {
   id: string;
@@ -99,3 +100,26 @@ export const documentHandlersByArtifactKind: Array<DocumentHandler> = [
 ];
 
 export const artifactKinds = ['text', 'code', 'image', 'sheet', 'pdf'] as const;
+
+export function updateSheetDocument(document: Document, csv: string, dataStream: DataStreamWriter) {
+  // Parse the original content and LLM response
+  const originalContent = document.content || '';
+  const originalRows = parse<string[]>(originalContent).data;
+  const llmRows = parse<string[]>(csv).data;
+
+  // Create merged content by keeping original columns A/B and LLM's C/D
+  const mergedRows = originalRows.map((row: string[], i: number) => {
+    if (i === 0 || !llmRows[i]) return row; // Keep header row or if LLM didn't provide this row
+    return [row[0], row[1], llmRows[i][2] || '', llmRows[i][3] || ''];
+  });
+
+  // Convert back to CSV
+  const mergedCsv = unparse(mergedRows);
+
+  dataStream.writeData({
+    type: 'sheet-delta',
+    content: mergedCsv,
+  });
+
+  return mergedCsv;
+}
