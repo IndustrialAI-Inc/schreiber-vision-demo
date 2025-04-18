@@ -1,6 +1,7 @@
 'use client';
 
 import React, { memo, useEffect, useMemo, useState } from 'react';
+import { useTheme } from 'next-themes';
 import { parse, unparse } from 'papaparse';
 import { cn } from '@/lib/utils';
 import 'react-data-grid/lib/styles.css';
@@ -29,6 +30,8 @@ const PureSpreadsheetEditor = ({
   isCurrentVersion,
   columns: customColumns,
 }: SheetEditorProps) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [hideEmptyAnswers, setHideEmptyAnswers] = useState(false);
   const [editCell, setEditCell] = useState<{ rowIndex: number; colIndex: number } | null>(null);
 
@@ -195,20 +198,29 @@ const PureSpreadsheetEditor = ({
         </div>
       </div>
       
-      <div className="border-[0.5px] border-slate-200 overflow-auto w-full h-[calc(100%-50px)]">
+      <div className={cn(
+        "overflow-auto w-full h-[calc(100%-50px)]",
+        isDark ? "border-0" : "border-[0.5px] border-slate-200"
+      )}>
         <table className="border-separate border-spacing-0 w-full table-fixed">
           <thead>
-            <tr className="bg-[#F9F9F9] font-semibold h-[20px] sticky top-0 z-[3] dark:bg-zinc-800">
+            <tr className={cn(
+              "font-semibold h-[20px] sticky top-0 z-[3]",
+              isDark ? "bg-[#1A1B1A] text-[#FAFAF9]" : "bg-[#F9F9F9]"
+            )}>
               {tableHeaders.map((header, index) => {
                 const isIDColumn = index === 0;
                 return (
                   <th 
                     key={header.key}
                     className={cn(
-                      'px-4 py-2 h-[20px] border-b-[0.5px] border-slate-200 overflow-hidden text-ellipsis whitespace-nowrap relative box-border text-left font-semibold', 
-                      'bg-[#F9F9F9] dark:text-zinc-50 dark:border-zinc-700',
-                      isIDColumn ? 'border-r-[0.5px] sticky left-0 z-[1] shadow-[2px_0_8px_-2px_rgba(0,0,0,0.05)] dark:bg-zinc-900 overflow-visible text-clip whitespace-normal' : '',
-                      index > 1 ? 'border-l-[0.5px]' : ''
+                      'px-4 py-2 h-[20px] overflow-hidden text-ellipsis whitespace-nowrap relative box-border text-left font-semibold', 
+                      isDark ? 'border-b-[0.5px] border-[#1A1B1A] bg-[#1A1B1A] text-[#FAFAF9]' : 'border-b-[0.5px] border-t-[0.5px] border-slate-200 bg-[#F9F9F9]',
+                      isIDColumn ? cn(
+                        'sticky left-0 z-[1] overflow-visible text-clip whitespace-normal border-r-[0.5px]',
+                        isDark ? 'bg-[#1A1B1A] shadow-[2px_0_8px_-2px_rgba(0,0,0,0.15)]' : 'shadow-[2px_0_8px_-2px_rgba(0,0,0,0.05)]'
+                      ) : '',
+                      index > 1 ? isDark ? 'border-l-[0.5px] border-[#1A1B1A]' : 'border-l-[0.5px]' : ''
                     )}
                     style={{ width: header.width }}
                   >
@@ -243,7 +255,11 @@ const PureSpreadsheetEditor = ({
                     >
                     {/* Row Number Cell */}
                     <td 
-                      className="px-4 py-2 h-[20px] border-b-[0.5px] border-slate-200 border-r-[0.5px] bg-white dark:bg-zinc-950 dark:text-zinc-50 dark:border-zinc-700 sticky left-0 z-[1] shadow-[2px_0_8px_-2px_rgba(0,0,0,0.05)] overflow-visible text-clip whitespace-normal"
+                      className={cn(
+                        "px-4 py-2 h-[20px] sticky left-0 z-[1] overflow-visible text-clip whitespace-normal",
+                        isDark ? "border-b-[0.5px] border-r-[0.5px] border-[#1A1B1A] bg-[#0A0A0A] text-[#FAFAF9] shadow-[2px_0_8px_-2px_rgba(0,0,0,0.15)]" : 
+                               "border-b-[0.5px] border-r-[0.5px] border-slate-200 bg-white shadow-[2px_0_8px_-2px_rgba(0,0,0,0.05)]"
+                      )}
                       style={{ width: tableHeaders[0]?.width || '50px' }}
                     >
                       {row.rowNumber || ''}
@@ -254,6 +270,7 @@ const PureSpreadsheetEditor = ({
                       // Highlight unanswered answer cells in red when in unanswered mode
                       const isAnswerCol = cellIndex === 2;
                       const isUnanswered = isAnswerCol && (!cell || cell.trim() === '');
+                      
                       // Check if this is the first row or if the previous row is answered (not unanswered)
                       const rowIndex = displayedRows.findIndex(r => r.id === row.id);
                       const prevRow = rowIndex > 0 ? displayedRows[rowIndex - 1] : null;
@@ -263,19 +280,28 @@ const PureSpreadsheetEditor = ({
                         <motion.td
                           key={cellIndex}
                           className={cn(
-                            "px-4 py-2 h-[20px] border-b-[0.5px] border-slate-200 overflow-hidden text-ellipsis whitespace-nowrap relative box-border dark:bg-zinc-950 dark:text-zinc-50 dark:border-zinc-700",
-                            cellIndex > 0 ? "border-l-[0.5px]" : ""
+                            "px-4 py-2 h-[20px] overflow-hidden text-ellipsis whitespace-nowrap relative box-border",
+                            isDark ? "border-b-[0.5px] border-[#1A1B1A] text-[#FAFAF9]" : "border-b-[0.5px] border-slate-200",
+                            cellIndex > 0 ? isDark ? "border-l-[0.5px] border-[#1A1B1A]" : "border-l-[0.5px]" : ""
                           )}
                           initial={false}
                           animate={{
-                            backgroundColor: hideEmptyAnswers && isUnanswered ? "rgba(254, 226, 226, 1)" : "rgba(255, 255, 255, 1)",
-                            borderColor: hideEmptyAnswers && isUnanswered ? "rgba(239, 68, 68, 1)" : "rgba(226, 232, 240, 1)"
+                            backgroundColor: hideEmptyAnswers && isUnanswered 
+                              ? isDark ? "rgba(64, 17, 17, 0.6)" : "rgba(254, 226, 226, 1)" 
+                              : isDark ? "rgba(10, 10, 10, 1)" : "rgba(255, 255, 255, 1)",
+                            borderColor: hideEmptyAnswers && isUnanswered 
+                              ? isDark ? "rgba(127, 29, 29, 0.6)" : "rgba(239, 68, 68, 1)" 
+                              : isDark ? "rgba(26, 27, 26, 1)" : "rgba(226, 232, 240, 1)"
                           }}
                           transition={{ duration: 0.3 }}
                           style={{ 
                             width: cellIndex < tableHeaders.length - 1 ? tableHeaders[cellIndex + 1]?.width || 'auto' : '150px',
-                            borderRight: hideEmptyAnswers && isUnanswered ? '0.5px solid rgba(239, 68, 68, 1)' : undefined,
-                            borderTop: hideEmptyAnswers && isUnanswered && isFirstRow ? '0.5px solid rgba(239, 68, 68, 1)' : undefined
+                            borderRight: hideEmptyAnswers && isUnanswered 
+                              ? isDark ? '0.5px solid rgba(127, 29, 29, 0.6)' : '0.5px solid rgba(239, 68, 68, 1)' 
+                              : undefined,
+                            borderTop: hideEmptyAnswers && isUnanswered && isFirstRow 
+                              ? isDark ? '0.5px solid rgba(127, 29, 29, 0.6)' : '0.5px solid rgba(239, 68, 68, 1)' 
+                              : undefined
                           }}
                           onClick={() => setEditCell({ rowIndex: row.id, colIndex: cellIndex })}
                         >
