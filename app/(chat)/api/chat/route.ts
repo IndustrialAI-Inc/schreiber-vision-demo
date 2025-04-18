@@ -24,6 +24,7 @@ import { updateDocument } from '@/lib/ai/tools/update-document';
 import { requestSuggestions } from '@/lib/ai/tools/request-suggestions';
 import { requestPdf } from '@/lib/ai/tools/request-pdf';
 import { getWeather } from '@/lib/ai/tools/get-weather';
+import { getDashboard } from '@/lib/ai/tools/get-dashboard';
 import { isProductionEnvironment } from '@/lib/constants';
 import { myProvider } from '@/lib/ai/providers';
 
@@ -92,6 +93,7 @@ export async function POST(request: Request) {
               ? []
               : [
                   'getWeather',
+                  'getDashboard',
                   'createDocument',
                   'updateDocument',
                   'requestSuggestions',
@@ -101,6 +103,7 @@ export async function POST(request: Request) {
           experimental_generateMessageId: generateUUID,
           tools: {
             getWeather,
+            getDashboard: getDashboard({ session, dataStream }),
             createDocument: createDocument({ session, dataStream }),
             updateDocument: updateDocument({ session, dataStream }),
             requestSuggestions: requestSuggestions({

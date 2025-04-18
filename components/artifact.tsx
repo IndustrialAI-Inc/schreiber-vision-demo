@@ -26,6 +26,7 @@ import { codeArtifact } from '@/artifacts/code/client';
 import { sheetArtifact } from '@/artifacts/sheet/client';
 import { textArtifact } from '@/artifacts/text/client';
 import { pdfArtifact } from '@/artifacts/pdf/client';
+import { dashboardArtifact } from '@/artifacts/dashboard/client';
 import equal from 'fast-deep-equal';
 import { UseChatHelpers } from '@ai-sdk/react';
 
@@ -35,6 +36,7 @@ export const artifactDefinitions = [
   imageArtifact,
   sheetArtifact,
   pdfArtifact,
+  dashboardArtifact,
 ];
 
 export type ArtifactKind = (typeof artifactDefinitions)[number]['kind'];

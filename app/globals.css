@@ -6,6 +6,16 @@
     --foreground-rgb: 0, 0, 0;
     --background-start-rgb: 214, 219, 220;
     --background-end-rgb: 255, 255, 255;
+    --color-bright: #F6F6F6;
+    --color-bright20: #F6F6F630;
+    --color-dark: #313130;
+    --color-fulldark: #18181B;
+    --color-fulldark50: #18181B80;
+    --color-mainred: #D01E28;
+    --color-mainblue: #2573A3;
+    --color-mainblue80: #2573A3EE;
+    --color-mainblue70: #2573A399;
+    --color-mainblue60: #2573A350;
 }
 
 @media (prefers-color-scheme: dark) {
