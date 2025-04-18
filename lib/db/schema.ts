@@ -10,7 +10,9 @@ import {
   foreignKey,
   boolean,
   numeric,
+  index,
 } from 'drizzle-orm/pg-core';
+import { InferInsertModel, relations, sql } from 'drizzle-orm';
 
 export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
@@ -165,3 +167,35 @@ export const userFile = pgTable('UserFile', {
 });
 
 export type UserFile = InferSelectModel<typeof userFile>;
+
+export const timeline = pgTable(
+  'timeline',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => sql`gen_random_uuid()`),
+    chatId: text('chat_id').notNull(),
+    isVisible: boolean('is_visible').notNull().default(false),
+    steps: text('steps').notNull().$type<string>(),
+    lastUpdated: timestamp('last_updated').notNull().defaultNow(),
+  },
+  (table) => ({
+    chatIdIdx: index('timeline_chat_id_idx').on(table.chatId),
+  })
+);
+
+export type Timeline = InferSelectModel<typeof timeline>;
+export type NewTimeline = InferInsertModel<typeof timeline>;
+
+export const timelineRelations = relations(timeline, ({ one }) => ({
+  chat: one(chat, {
+    fields: [timeline.chatId],
+    references: [chat.id],
+  }),
+}));
+
+export const chatRelations = relations(chat, ({ many, one }) => ({
+  messages: many(message),
+  files: many(userFile),
+  timelines: many(timeline),
+}));

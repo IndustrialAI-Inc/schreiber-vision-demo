@@ -59,3 +59,44 @@ pnpm dev
 ```
 
 Your app template should now be running on [localhost:3000](http://localhost:3000).
+
+## Timeline Feature
+
+The application now supports a persistent timeline feature for tracking progress across supplier workflows. This feature replaces the previous localStorage-based implementation with database storage for better persistence and synchronization.
+
+### Key Components:
+
+1. **Database Schema**:
+   - The timeline is stored in the database with a schema defined in `lib/db/schema.ts`
+   - A migration has been created in `lib/db/migrations/0007_add_timeline_table.sql`
+
+2. **API Endpoints**:
+   - `/api/timeline` - GET and POST endpoints for retrieving and updating timelines
+   - Timelines are tied to specific chat IDs for context
+
+3. **React Hooks**:
+   - `useTimeline` - A React hook for interacting with timeline data
+
+### Running the Migration:
+
+To apply the timeline database migration, run:
+
+```bash
+npm run db:migrate
+# or
+yarn db:migrate
+```
+
+### Using the Timeline:
+
+The timeline can be used from any component by importing the hook:
+
+```tsx
+import { useTimeline } from '@/app/hooks/useTimeline';
+
+function MyComponent({ chatId }) {
+  const { timeline, loading, error, addStep, removeStep, toggleVisibility } = useTimeline(chatId);
+
+  // Use timeline data and functions here
+}
+```

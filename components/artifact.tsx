@@ -480,9 +480,10 @@ function PureArtifact({
                     isToolbarVisible={isToolbarVisible}
                     setIsToolbarVisible={setIsToolbarVisible}
                     append={append}
-                    status={status}
                     stop={stop}
+                    status={status}
                     setMessages={setMessages}
+                    chatId={chatId}
                     artifactKind={artifact.kind}
                   />
                 )}

@@ -10,6 +10,7 @@ import {
   gte,
   inArray,
   lt,
+  ne,
   type SQL,
 } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -28,6 +29,8 @@ import {
   type Chat,
   userFile,
   type UserFile,
+  timeline,
+  type Timeline,
 } from './schema';
 import type { ArtifactKind } from '@/components/artifact';
 
@@ -481,6 +484,139 @@ export async function deleteUserFile({ id }: { id: string }) {
     return await db.delete(userFile).where(eq(userFile.id, id));
   } catch (error) {
     console.error('Failed to delete user file from database', error);
+    throw error;
+  }
+}
+
+export async function getTimelineByChatId({ chatId }: { chatId: string }) {
+  try {
+    const [selectedTimeline] = await db
+      .select()
+      .from(timeline)
+      .where(eq(timeline.chatId, chatId));
+    
+    if (selectedTimeline) {
+      // Parse the steps JSON string
+      try {
+        return {
+          ...selectedTimeline,
+          steps: selectedTimeline.steps ? JSON.parse(selectedTimeline.steps) : []
+        };
+      } catch (parseError) {
+        console.error('Failed to parse timeline steps:', parseError);
+        return selectedTimeline;
+      }
+    }
+    
+    return selectedTimeline;
+  } catch (error) {
+    console.error('Failed to get timeline by chat id from database', error);
+    throw error;
+  }
+}
+
+export async function getVisibleTimelines() {
+  try {
+    const timelines = await db
+      .select()
+      .from(timeline)
+      .where(eq(timeline.isVisible, true));
+    
+    // Parse the steps JSON for each timeline
+    return timelines.map(t => {
+      try {
+        return {
+          ...t,
+          steps: t.steps ? JSON.parse(t.steps) : []
+        };
+      } catch (parseError) {
+        console.error('Failed to parse timeline steps:', parseError);
+        return t;
+      }
+    });
+  } catch (error) {
+    console.error('Failed to get visible timelines from database', error);
+    throw error;
+  }
+}
+
+export async function createOrUpdateTimeline({
+  chatId,
+  isVisible,
+  steps,
+}: {
+  chatId: string;
+  isVisible?: boolean;
+  steps: any;
+}) {
+  try {
+    const now = new Date();
+    
+    // Check if timeline exists
+    const existingTimeline = await getTimelineByChatId({ chatId });
+    
+    console.log('Creating/updating timeline:', { 
+      chatId, 
+      isVisible: isVisible ?? false, 
+      existingTimeline: existingTimeline ? true : false 
+    });
+    
+    if (existingTimeline) {
+      // Update existing timeline
+      await db
+        .update(timeline)
+        .set({ 
+          isVisible: isVisible ?? existingTimeline.isVisible,
+          steps: JSON.stringify(steps),
+          lastUpdated: now
+        })
+        .where(eq(timeline.chatId, chatId));
+      
+      // If making visible, hide others
+      if (isVisible) {
+        await db
+          .update(timeline)
+          .set({ 
+            isVisible: false,
+            lastUpdated: now
+          })
+          .where(
+            and(
+              eq(timeline.isVisible, true),
+              ne(timeline.chatId, chatId)
+            )
+          );
+      }
+      
+      return await getTimelineByChatId({ chatId });
+    } else {
+      // Create new timeline
+      // If making visible, hide others
+      if (isVisible) {
+        await db
+          .update(timeline)
+          .set({ 
+            isVisible: false,
+            lastUpdated: now
+          })
+          .where(eq(timeline.isVisible, true));
+      }
+      
+      // Insert new timeline with UUID
+      const [newTimeline] = await db
+        .insert(timeline)
+        .values({
+          chatId,
+          isVisible: isVisible ?? false,
+          steps: JSON.stringify(steps),
+          lastUpdated: now
+        })
+        .returning();
+        
+      return newTimeline;
+    }
+  } catch (error) {
+    console.error('Failed to create or update timeline in database', error);
     throw error;
   }
 }

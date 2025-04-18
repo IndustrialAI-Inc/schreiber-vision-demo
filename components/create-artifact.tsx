@@ -24,6 +24,7 @@ type ArtifactAction<M = any> = {
 
 export type ArtifactToolbarContext = {
   appendMessage: UseChatHelpers['append'];
+  chatId: string;
 };
 
 export type ArtifactToolbarItem = {

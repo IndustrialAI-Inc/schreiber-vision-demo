@@ -42,8 +42,10 @@ type ToolProps = {
   append: UseChatHelpers['append'];
   onClick: ({
     appendMessage,
+    chatId,
   }: {
     appendMessage: UseChatHelpers['append'];
+    chatId: string;
   }) => void;
 };
 
@@ -68,6 +70,7 @@ const Tool = ({
 
   const handleSelect = () => {
     if (!isToolbarVisible && setIsToolbarVisible) {
+      setIsHovered(true);
       setIsToolbarVisible(true);
       return;
     }
@@ -82,7 +85,7 @@ const Tool = ({
       setSelectedTool(description);
     } else {
       setSelectedTool(null);
-      onClick({ appendMessage: append });
+      onClick({ appendMessage: append, chatId: '' });
     }
   };
 
@@ -247,6 +250,7 @@ export const Tools = ({
   isAnimating,
   setIsToolbarVisible,
   tools,
+  chatId,
 }: {
   isToolbarVisible: boolean;
   selectedTool: string | null;
@@ -255,6 +259,7 @@ export const Tools = ({
   isAnimating: boolean;
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
   tools: Array<ArtifactToolbarItem>;
+  chatId: string;
 }) => {
   const [primaryTool, ...secondaryTools] = tools;
 
@@ -276,7 +281,7 @@ export const Tools = ({
               setSelectedTool={setSelectedTool}
               append={append}
               isAnimating={isAnimating}
-              onClick={secondaryTool.onClick}
+              onClick={secondaryTool.onClick.bind(null, { appendMessage: append, chatId })}
             />
           ))}
       </AnimatePresence>
@@ -290,7 +295,7 @@ export const Tools = ({
         setIsToolbarVisible={setIsToolbarVisible}
         append={append}
         isAnimating={isAnimating}
-        onClick={primaryTool.onClick}
+        onClick={primaryTool.onClick.bind(null, { appendMessage: append, chatId })}
       />
     </motion.div>
   );
@@ -304,6 +309,7 @@ const PureToolbar = ({
   stop,
   setMessages,
   artifactKind,
+  chatId,
 }: {
   isToolbarVisible: boolean;
   setIsToolbarVisible: Dispatch<SetStateAction<boolean>>;
@@ -312,6 +318,7 @@ const PureToolbar = ({
   stop: UseChatHelpers['stop'];
   setMessages: UseChatHelpers['setMessages'];
   artifactKind: ArtifactKind;
+  chatId: string;
 }) => {
   const toolbarRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
@@ -445,6 +452,7 @@ const PureToolbar = ({
             setIsToolbarVisible={setIsToolbarVisible}
             setSelectedTool={setSelectedTool}
             tools={toolsByArtifactKind}
+            chatId={chatId}
           />
         )}
       </motion.div>
@@ -456,6 +464,7 @@ export const Toolbar = memo(PureToolbar, (prevProps, nextProps) => {
   if (prevProps.status !== nextProps.status) return false;
   if (prevProps.isToolbarVisible !== nextProps.isToolbarVisible) return false;
   if (prevProps.artifactKind !== nextProps.artifactKind) return false;
+  if (prevProps.chatId !== nextProps.chatId) return false;
 
   return true;
 });

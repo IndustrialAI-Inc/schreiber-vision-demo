@@ -15,6 +15,7 @@ import { useArtifactSelector } from '@/hooks/use-artifact';
 import { toast } from 'sonner';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
+import { SupplierTimeline } from './supplier-timeline';
 
 export function Chat({
   id,
@@ -73,6 +74,8 @@ export function Chat({
           selectedVisibilityType={selectedVisibilityType}
           isReadonly={isReadonly}
         />
+
+        <SupplierTimeline chatId={id} />
 
         <Messages
           chatId={id}

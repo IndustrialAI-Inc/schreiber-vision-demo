@@ -5,10 +5,14 @@ import {
   RedoIcon,
   SparklesIcon,
   UndoIcon,
+  ShareIcon,
+  CheckCircleFillIcon,
 } from '@/components/icons';
 import { SpreadsheetEditor } from '@/components/sheet-editor';
 import { parse, unparse } from 'papaparse';
 import { toast } from 'sonner';
+import { TimelineStep } from '@/hooks/use-supplier-timeline';
+import { mutate } from 'swr';
 
 type Metadata = any;
 
@@ -91,24 +95,208 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
   ],
   toolbar: [
     {
-      description: 'Format and clean data',
-      icon: <SparklesIcon />,
-      onClick: ({ appendMessage }) => {
-        appendMessage({
-          role: 'user',
-          content: 'Can you please format and clean the data?',
-        });
+      description: 'Send to Supplier',
+      icon: <ShareIcon />,
+      onClick: async ({ chatId }) => {
+        try {
+          if (!chatId) {
+            toast.error('Missing chat ID');
+            return;
+          }
+
+          console.log('Starting send to supplier with chatId:', chatId);
+          
+          // Initial timeline data with JSON string steps
+          const steps = [
+            {
+              id: 'prepare',
+              label: 'Prepare specifications',
+              status: 'completed',
+              timestamp: new Date().toISOString(),
+            },
+            {
+              id: 'review',
+              label: 'Internal review',
+              status: 'completed',
+              timestamp: new Date().toISOString(),
+            },
+            {
+              id: 'send',
+              label: 'Send to supplier',
+              status: 'in-progress',
+              timestamp: new Date().toISOString(),
+            },
+            {
+              id: 'feedback',
+              label: 'Supplier feedback',
+              status: 'pending',
+            },
+            {
+              id: 'finalize',
+              label: 'Finalize specifications',
+              status: 'pending',
+            },
+          ];
+          
+          console.log('Sending timeline data:', { chatId, steps });
+          
+          // Create or update timeline in database
+          const response = await fetch('/api/timeline', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              chatId,
+              isVisible: true,
+              steps,
+            }),
+          });
+          
+          if (!response.ok) {
+            const errorText = await response.text();
+            console.error('API error:', response.status, errorText);
+            throw new Error(`Failed to update timeline: ${response.status} ${errorText}`);
+          }
+          
+          const result = await response.json();
+          console.log('Timeline create/update result:', result);
+          
+          // Update SWR cache
+          mutate('/api/timeline');
+          if (chatId) {
+            mutate(`/api/timeline?chatId=${chatId}`);
+          }
+          
+          // Notify the user
+          toast.success('Specification sent to supplier for review');
+        } catch (error) {
+          console.error('Error updating timeline:', error);
+          toast.error(`Failed to send specification: ${error instanceof Error ? error.message : 'Unknown error'}`);
+        }
       },
     },
     {
       description: 'Analyze and visualize data',
       icon: <LineChartIcon />,
-      onClick: ({ appendMessage }) => {
-        appendMessage({
-          role: 'user',
-          content:
-            'Can you please analyze and visualize the data by creating a new code artifact in python?',
-        });
+      onClick: async ({ chatId, appendMessage }) => {
+        try {
+          // Check if timeline exists for this chat
+          if (chatId) {
+            const response = await fetch(`/api/timeline?chatId=${chatId}`);
+            if (response.ok) {
+              const timeline = await response.json();
+              
+              // If timeline exists and is visible, update it
+              if (timeline) {
+                const updatedSteps = timeline.steps.map((step: TimelineStep) => {
+                  if (step.id === 'review') {
+                    return { ...step, status: 'completed', timestamp: new Date().toISOString() };
+                  }
+                  if (step.id === 'send') {
+                    return { ...step, status: 'in-progress', timestamp: new Date().toISOString() };
+                  }
+                  return step;
+                });
+                
+                // Update timeline
+                const updateResponse = await fetch('/api/timeline', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    chatId,
+                    isVisible: true,
+                    steps: updatedSteps,
+                  }),
+                });
+                
+                if (updateResponse.ok) {
+                  // Update SWR cache
+                  mutate('/api/timeline');
+                  mutate(`/api/timeline?chatId=${chatId}`);
+                  
+                  toast.success('Specification analysis complete, preparing to send');
+                }
+              }
+            }
+          }
+          
+          // Always append the message for analysis
+          appendMessage({
+            role: 'user',
+            content:
+              'Can you please analyze and visualize the data by creating a new code artifact in python?',
+          });
+        } catch (error) {
+          console.error('Error updating timeline:', error);
+          
+          // Fallback to just append the message
+          appendMessage({
+            role: 'user',
+            content:
+              'Can you please analyze and visualize the data by creating a new code artifact in python?',
+          });
+        }
+      },
+    },
+    {
+      description: 'Double check the specification',
+      icon: <CheckCircleFillIcon />,
+      onClick: async ({ chatId, appendMessage }) => {
+        try {
+          // Check if timeline exists for this chat
+          if (chatId) {
+            const response = await fetch(`/api/timeline?chatId=${chatId}`);
+            if (response.ok) {
+              const timeline = await response.json();
+              
+              // If timeline exists and is visible, update it
+              if (timeline) {
+                const updatedSteps = timeline.steps.map((step: TimelineStep) => {
+                  if (step.id === 'prepare') {
+                    return { ...step, status: 'completed', timestamp: new Date().toISOString() };
+                  }
+                  if (step.id === 'review') {
+                    return { ...step, status: 'in-progress', timestamp: new Date().toISOString() };
+                  }
+                  return step;
+                });
+                
+                // Update timeline
+                const updateResponse = await fetch('/api/timeline', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    chatId,
+                    isVisible: true,
+                    steps: updatedSteps,
+                  }),
+                });
+                
+                if (updateResponse.ok) {
+                  // Update SWR cache
+                  mutate('/api/timeline');
+                  mutate(`/api/timeline?chatId=${chatId}`);
+                  
+                  toast.success('Specification review started');
+                  return;
+                }
+              }
+            }
+          }
+          
+          // Fallback: Send the message if the timeline doesn't exist
+          appendMessage({
+            role: 'user',
+            content: 'Can you please double check the answers in this specification sheet with the documents?',
+          });
+        } catch (error) {
+          console.error('Error updating timeline:', error);
+          
+          // Fallback to just append the message
+          appendMessage({
+            role: 'user',
+            content: 'Can you please double check the answers in this specification sheet with the documents?',
+          });
+        }
       },
     },
   ],
