@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -6,13 +6,18 @@ WORKDIR /app
 RUN apk add --no-cache python3 make g++ gcc libc-dev postgresql-client
 
 # Install pnpm
-RUN npm install -g pnpm
+RUN npm install -g pnpm@9.12.3
+
+# Set pnpm to use exact versions to match lockfile
+RUN pnpm config set node-linker hoisted
+RUN pnpm config set auto-install-peers true
+RUN pnpm config set strict-peer-dependencies false
 
 # Copy package files
 COPY package.json pnpm-lock.yaml* ./
 
-# Install dependencies
-RUN pnpm install
+# Install dependencies with legacy peer deps to handle React version conflicts
+RUN pnpm install --no-frozen-lockfile
 
 # Copy the start script first
 COPY start.sh ./

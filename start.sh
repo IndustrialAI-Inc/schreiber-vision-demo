@@ -13,5 +13,10 @@ for migration in ./lib/db/migrations/*.sql; do
   PGPASSWORD=postgres psql -h postgres -p 5432 -U postgres -d schreiber -f "$migration"
 done
 
+# Run database migrations using the TypeScript migration script
+echo "Running TypeScript migrations"
+pnpm db:migrate
+
 echo "Starting Next.js application in development mode"
-pnpm dev
+# Use exec to ensure the process receives signals properly
+exec pnpm dev
