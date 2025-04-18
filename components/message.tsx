@@ -80,6 +80,23 @@ const PurePreviewMessage = ({
   const role = message.role;
   const hasArtifacts = (message as any).artifacts?.length > 0;
 
+  const openDashboardInArtifactPanel = () => {
+    setArtifact({
+      documentId: 'dashboard',
+      title: 'dashboard',
+      content: 'dashboard',
+      kind: 'dashboard',
+      isVisible: true,
+      status: 'idle',
+      boundingBox: {
+        top: 0,
+        left: 0,
+        width: 0,
+        height: 0
+      }
+    });
+  }
+
   return (
     <AnimatePresence initial={false}>
       <motion.div
@@ -261,6 +278,10 @@ const PurePreviewMessage = ({
                     <div key={toolCallId}>
                       {toolName === 'getWeather' ? (
                         <Weather weatherAtLocation={result} />
+                      ) : toolName === 'getDashboard' ? (
+                        <DashboardPreviewThumb onExpand={() => {
+                          openDashboardInArtifactPanel();
+                        }} />
                       ) : toolName === 'createDocument' ? (
                         <DocumentPreview
                           isReadonly={isReadonly}
@@ -432,6 +453,22 @@ export function PdfPreviewThumb({ fileUrl, fileName, onExpand }: {
       >
         Expand
       </button>
+    </div>
+  );
+}
+
+export function DashboardPreviewThumb({ onExpand }: {
+  onExpand?: () => void;
+}) {
+  return (
+    <div
+      onClick={onExpand}
+      title="Expand PDF"
+      className='rounded-[12px] bg-gradient-to-r from-mainred to-mainblue flex justify-center items-center p-0.5 w-[200px] h-[50px] cursor-pointer'
+    >
+      <div className='flex flex-row items-center justify-center px-2 py-2 bg-[#313130] rounded-[12px] w-full h-full'>
+        <span className='text-md text-[#F6F6F6]'>Preview dashboard</span>
+      </div>
     </div>
   );
 }

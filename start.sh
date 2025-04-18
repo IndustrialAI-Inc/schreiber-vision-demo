@@ -17,6 +17,10 @@ done
 echo "Running TypeScript migrations"
 pnpm db:migrate
 
+# Ensure recharts is properly installed
+echo "Ensuring recharts is properly installed"
+pnpm install recharts
+
 echo "Starting Next.js application in development mode"
 # Use exec to ensure the process receives signals properly
 exec pnpm dev
