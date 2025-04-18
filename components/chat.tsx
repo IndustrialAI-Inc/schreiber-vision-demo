@@ -16,6 +16,8 @@ import { toast } from 'sonner';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
 import { SupplierTimeline } from './supplier-timeline';
+import { useUserMode } from './mode-toggle';
+import { SupplierFeedbackInput } from './supplier-feedback-input';
 
 export function Chat({
   id,
@@ -31,6 +33,7 @@ export function Chat({
   isReadonly: boolean;
 }) {
   const { mutate } = useSWRConfig();
+  const { mode } = useUserMode();
 
   const {
     messages,
@@ -64,6 +67,14 @@ export function Chat({
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
+  
+  // Handler for when supplier sends feedback
+  const handleSendFeedback = (feedback: string) => {
+    append({
+      role: 'user',
+      content: `**SUPPLIER FEEDBACK:**\n\n${feedback}`,
+    });
+  };
 
   return (
     <>
@@ -84,12 +95,19 @@ export function Chat({
           messages={messages}
           setMessages={setMessages}
           reload={reload}
-          isReadonly={isReadonly}
+          isReadonly={isReadonly || (mode === 'supplier')}
           isArtifactVisible={isArtifactVisible}
         />
 
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl">
-          {!isReadonly && (
+        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl flex-col">
+          {mode === 'supplier' && (
+            <SupplierFeedbackInput 
+              chatId={id}
+              onSendFeedback={handleSendFeedback}
+            />
+          )}
+          
+          {!isReadonly && mode !== 'supplier' && (
             <MultimodalInput
               chatId={id}
               input={input}

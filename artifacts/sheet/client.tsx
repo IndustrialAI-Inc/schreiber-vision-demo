@@ -7,6 +7,7 @@ import {
   UndoIcon,
   ShareIcon,
   CheckCircleFillIcon,
+  CheckmarkIcon
 } from '@/components/icons';
 import { SpreadsheetEditor } from '@/components/sheet-editor';
 import { parse, unparse } from 'papaparse';
@@ -96,7 +97,7 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
   toolbar: [
     {
       description: 'Send to Supplier',
-      icon: <ShareIcon />,
+      icon: <CheckmarkIcon />,
       onClick: async ({ chatId }) => {
         try {
           if (!chatId) {
@@ -239,7 +240,7 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
     },
     {
       description: 'Double check the specification',
-      icon: <CheckCircleFillIcon />,
+      icon: <SparklesIcon />,
       onClick: async ({ chatId, appendMessage }) => {
         try {
           // Check if timeline exists for this chat

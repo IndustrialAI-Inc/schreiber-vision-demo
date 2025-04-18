@@ -948,6 +948,25 @@ export const ShareIcon = ({ size = 16 }: { size?: number }) => {
     </svg>
   );
 };
+export const CheckmarkIcon = ({ size = 16 }: { size?: number }) => {
+  return (
+    <svg
+      height={size}
+      strokeLinejoin="round"
+      viewBox="0 0 16 16"
+      width={size}
+      style={{ color: 'white' }}
+      className="bg-emerald-500 rounded-full p-0.5"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"
+        fill="currentColor"
+      ></path>
+    </svg>
+  );
+};
 
 export const CodeIcon = ({ size = 16 }: { size?: number }) => {
   return (

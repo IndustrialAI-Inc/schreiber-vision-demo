@@ -27,6 +27,8 @@ import { fetcher } from '@/lib/utils';
 import { ChatItem } from './sidebar-history-item';
 import useSWRInfinite from 'swr/infinite';
 import { LoaderIcon } from './icons';
+import { useUserMode } from './mode-toggle';
+import useSWR from 'swr';
 
 type GroupedChats = {
   today: Chat[];
@@ -96,6 +98,13 @@ export function getChatHistoryPaginationKey(
 export function SidebarHistory({ user }: { user: User | undefined }) {
   const { setOpenMobile } = useSidebar();
   const { id } = useParams();
+  const { mode } = useUserMode();
+
+  // Fetch pending timelines for supplier mode
+  const { data: pendingTimelines } = useSWR(
+    mode === 'supplier' ? '/api/timeline/pending' : null,
+    fetcher
+  );
 
   const {
     data: paginatedChatHistories,
@@ -118,6 +127,22 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
   const hasEmptyChatHistory = paginatedChatHistories
     ? paginatedChatHistories.every((page) => page.chats.length === 0)
     : false;
+
+  // If we're in supplier mode, filter to only show chats with pending review
+  const getPendingChatIds = () => {
+    if (!pendingTimelines) return [];
+    return pendingTimelines.map(timeline => timeline.chatId);
+  };
+  
+  const pendingChatIds = mode === 'supplier' ? getPendingChatIds() : [];
+  
+  // Filter chats based on mode
+  const filterChatsByMode = (chats: Chat[]) => {
+    if (mode === 'supplier') {
+      return chats.filter(chat => pendingChatIds.includes(chat.id));
+    }
+    return chats;
+  };
 
   const handleDelete = async () => {
     const deletePromise = fetch(`/api/chat?id=${deleteId}`, {
@@ -212,10 +237,16 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                   (paginatedChatHistory) => paginatedChatHistory.chats,
                 );
 
-                const groupedChats = groupChatsByDate(chatsFromHistory);
+                const filteredChats = filterChatsByMode(chatsFromHistory);
+                const groupedChats = groupChatsByDate(filteredChats);
 
                 return (
                   <div className="flex flex-col gap-6">
+                    {mode === 'supplier' && (
+                      <div className="px-2 py-1 text-xs text-orange-500 font-semibold">
+                        Showing {filteredChats.length} specification{filteredChats.length !== 1 ? 's' : ''} for review
+                      </div>
+                    )}
                     {groupedChats.today.length > 0 && (
                       <div>
                         <div className="px-2 py-1 text-xs text-sidebar-foreground/50">

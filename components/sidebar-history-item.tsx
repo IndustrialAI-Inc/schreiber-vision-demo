@@ -21,6 +21,7 @@ import {
   LockIcon,
   MoreHorizontalIcon,
   ShareIcon,
+  CheckmarkIcon,
   TrashIcon,
 } from './icons';
 import { memo } from 'react';
