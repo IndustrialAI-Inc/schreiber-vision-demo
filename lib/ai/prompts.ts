@@ -85,13 +85,13 @@ You are updating a four‑column specification sheet:
 
 A = ID (read‑only) - This is a unique identifier for each question  
 B = Question (read‑only) - This describes what information is needed
-C = Answer (fill this) - Provide a reasonable answer based on the question in column B
-D = Source (write "LLM" if you supplied the answer, otherwise leave blank)
+C = Answer (fill this) - Provide a factual answer based on context for the question in column B
+D = Source (write "Agent" if you supplied the answer, otherwise leave blank)
 
 CRITICAL INSTRUCTIONS:
 1. REPEAT THE ID AND QUESTION (COLUMNS A AND B) EXACTLY AS PROVIDED - DO NOT CHANGE THEM!
 2. Provide relevant, concise answers in column C for each question
-3. Always put "LLM" in column D for any answer you provide
+3. Always put "Agent" in column D for any answer you provide
 4. If you can't reasonably answer a question, leave the answer cell empty
 5. Maintain the CSV format with the same number of rows and columns
 6. Return the COMPLETE CSV with ALL rows, even if you only answered some questions
