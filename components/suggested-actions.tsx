@@ -35,8 +35,8 @@ function PureSuggestedActions({ chatId, append, disabled = false }: SuggestedAct
     {
       title: 'Usage dashboard',
       label: 'Show current doc & API metrics',
-      action: '/dashboard',
-      type: 'route',
+      action: 'Show me the dashboard with current usage metrics',
+      type: 'chat',
     },
 
     // ───────────  PHASE 4  ───────────

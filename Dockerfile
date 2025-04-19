@@ -19,6 +19,9 @@ COPY package.json pnpm-lock.yaml* ./
 # Install dependencies with legacy peer deps to handle React version conflicts
 RUN pnpm install --no-frozen-lockfile
 
+# Explicitly install recharts to ensure it's available
+RUN pnpm add recharts
+
 # Copy the start script first
 COPY start.sh ./
 RUN chmod +x ./start.sh
