@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import React, { memo, useEffect, useMemo, useState, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import { parse, unparse } from 'papaparse';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ type SheetEditorProps = {
   columns?: any[];
 };
 
-const MIN_ROWS = 334;
+const MIN_ROWS = 50;
 const MIN_COLS = 4;
 
 const PureSpreadsheetEditor = ({
@@ -124,31 +124,42 @@ const PureSpreadsheetEditor = ({
   
   const handleCellEdit = (rowIndex: number, colIndex: number, newValue: string) => {
     try {
-      // Update local data
-      const updatedRows = [...localRows];
+      // Create a proper deep copy to avoid mutation issues
+      const updatedRows = localRows.map(row => ({
+        ...row,
+        cells: [...row.cells]
+      }));
+      
       if (!updatedRows[rowIndex] || !Array.isArray(updatedRows[rowIndex].cells)) {
         console.error('Invalid row data for editing');
         return;
       }
       
-      setLocalRows(updatedRows);
-      setEditCell(null);
+      // Update the cell value
+      updatedRows[rowIndex].cells[colIndex] = newValue;
   
-      // Update CSV content
+      // Update CSV content before setting state to avoid multiple renders
       const updatedData = updatedRows.map(row => Array.isArray(row.cells) ? row.cells : []);
       const newContent = unparse(updatedData);
       
-      // Save content
+      // First save content to parent
       saveContent(newContent, isCurrentVersion);
+      
+      // Then update local state
+      setLocalRows(updatedRows);
     } catch (error) {
       console.error('Error handling cell edit:', error);
-      setEditCell(null);
     }
   };
   
-  // Effect to set locked question IDs when filter is first activated
+  // Use ref to track previous state of hideEmptyAnswers to avoid unnecessary updates
+  const prevHideEmptyAnswersRef = useRef(hideEmptyAnswers);
+  
+  // Effect to set locked question IDs when filter is activated
   useEffect(() => {
-    if (hideEmptyAnswers && lockedQuestionIds.length === 0) {
+    // Only run this effect if hideEmptyAnswers has actually changed
+    if (prevHideEmptyAnswersRef.current !== hideEmptyAnswers) {
+      if (hideEmptyAnswers) {
       // Find unanswered questions
       const unansweredRows = localRows.filter(row => {
         const questionCell = row.cells[1];
@@ -161,11 +172,15 @@ const PureSpreadsheetEditor = ({
       
       // Lock these IDs in
       setLockedQuestionIds(firstFiveIds);
-    } else if (!hideEmptyAnswers) {
+      } else {
       // When we turn off the filter, clear the locked IDs
       setLockedQuestionIds([]);
     }
-  }, [hideEmptyAnswers, localRows, lockedQuestionIds.length]);
+      
+      // Update ref to current value
+      prevHideEmptyAnswersRef.current = hideEmptyAnswers;
+    }
+  }, [hideEmptyAnswers, localRows]);
   
   // Toggle empty answers visibility
   const toggleEmptyAnswers = () => {
@@ -296,12 +311,17 @@ const PureSpreadsheetEditor = ({
                           transition={{ duration: 0.3 }}
                           style={{ 
                             width: cellIndex < tableHeaders.length - 1 ? tableHeaders[cellIndex + 1]?.width || 'auto' : '150px',
-                            borderRight: hideEmptyAnswers && isUnanswered 
-                              ? isDark ? '0.5px solid rgba(127, 29, 29, 0.6)' : '0.5px solid rgba(239, 68, 68, 1)' 
-                              : undefined,
-                            borderTop: hideEmptyAnswers && isUnanswered && isFirstRow 
-                              ? isDark ? '0.5px solid rgba(127, 29, 29, 0.6)' : '0.5px solid rgba(239, 68, 68, 1)' 
-                              : undefined
+                            // Use individual border properties to avoid React styling warnings
+                            ...(hideEmptyAnswers && isUnanswered ? {
+                              borderRightWidth: '0.5px',
+                              borderRightStyle: 'solid',
+                              borderRightColor: isDark ? 'rgba(127, 29, 29, 0.6)' : 'rgba(239, 68, 68, 1)',
+                              ...(isFirstRow ? {
+                                borderTopWidth: '0.5px',
+                                borderTopStyle: 'solid',
+                                borderTopColor: isDark ? 'rgba(127, 29, 29, 0.6)' : 'rgba(239, 68, 68, 1)',
+                              } : {})
+                            } : {})
                           }}
                           onClick={() => setEditCell({ rowIndex: row.id, colIndex: cellIndex })}
                         >
@@ -328,17 +348,23 @@ const PureSpreadsheetEditor = ({
                                     }
                                   }}
                                   onBlur={() => {
-                                    if (localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
-                                      // Save the current row ID and cell index for reference
+                                    // Only update if we're still editing this cell
+                                    if (editCell && editCell.rowIndex === row.id && editCell.colIndex === cellIndex &&
+                                        localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
                                       const currentRowId = row.id;
                                       const currentCellIndex = cellIndex;
                                       const currentValue = localRows[row.id].cells[cellIndex] || '';
+                                      // Set editCell to null before calling handleCellEdit to break potential circular updates
+                                      setEditCell(null);
                                       handleCellEdit(currentRowId, currentCellIndex, currentValue);
                                     }
                                   }}
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter' && localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
-                                      handleCellEdit(row.id, cellIndex, localRows[row.id].cells[cellIndex] || '');
+                                      // Set editCell to null before calling handleCellEdit
+                                      const value = localRows[row.id].cells[cellIndex] || '';
+                                      setEditCell(null);
+                                      handleCellEdit(row.id, cellIndex, value);
                                     }
                                   }}
                                 />
