@@ -74,63 +74,48 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
     step => step.id === 'feedback' && step.status === 'in-progress'
   );
   
-  // Handler for when supplier provides feedback - enhanced to show artifacts
+  // Handler for "Submit for Review" button - updates timeline and opens artifact panel
   const handleProvideFeedback = async () => {
     try {
       // Mark send as completed and feedback as in-progress
       await updateStepStatus('send', 'completed');
       await updateStepStatus('feedback', 'in-progress');
       
-      // Update SWR cache
+      // Update SWR cache to refresh UI
       mutate('/api/timeline');
       mutate(`/api/timeline?chatId=${chatId}`);
       mutate('/api/timeline/pending');
       
-      // Make sure we have the sheet content
-      if (chatId) {
-        try {
-          // Fetch the latest sheet artifact
-          const artifactRes = await fetch(`/api/artifacts?chatId=${chatId}&kind=sheet`);
-          if (artifactRes.ok) {
-            const artifacts = await artifactRes.json();
-            if (artifacts && artifacts.length > 0) {
-              const latestSheet = artifacts[0];
-              
-              // Make the artifact panel visible with the sheet content
-              setArtifact(current => ({
-                ...current,
-                kind: 'sheet',
-                content: latestSheet.content || '',
-                isVisible: true,
-                status: 'idle'
-              }));
-              
-              // Find the sheet element and scroll to it
-              setTimeout(() => {
-                const sheetElement = document.querySelector('[data-artifact="sheet"]');
-                if (sheetElement) {
-                  sheetElement.scrollIntoView({ behavior: 'smooth' });
-                  
-                  // Show toast guiding user what to do
-                  if (missingFields > 0) {
-                    toast.info(
-                      `Please review the ${missingFields} highlighted question${missingFields !== 1 ? 's' : ''} that need${missingFields === 1 ? 's' : ''} your input.`,
-                      { duration: 5000 }
-                    );
-                  }
-                }
-              }, 500);
-            }
+      // Open the sheet artifact panel if it exists
+      try {
+        const artifactRes = await fetch(`/api/artifacts?chatId=${chatId}&kind=sheet`);
+        if (artifactRes.ok) {
+          const artifacts = await artifactRes.json();
+          if (artifacts && artifacts.length > 0) {
+            const latestSheet = artifacts[0];
+            
+            // Open the sheet in the artifact panel
+            setArtifact({
+              documentId: latestSheet.id || 'sheet-view',
+              title: latestSheet.title || 'Specification Sheet',
+              kind: 'sheet',
+              content: latestSheet.content || '',
+              isVisible: true,
+              status: 'idle',
+              boundingBox: {
+                top: 0,
+                left: 0,
+                width: 0,
+                height: 0
+              }
+            });
           }
-        } catch (error) {
-          console.error('Error fetching sheet artifact:', error);
         }
+      } catch (error) {
+        console.error('Error fetching artifact:', error);
       }
-      
-      toast.success('Ready to provide feedback');
     } catch (error) {
-      console.error('Error updating timeline status:', error);
-      toast.error('Failed to update status');
+      console.error('Timeline update error:', error);
     }
   };
   
@@ -145,64 +130,73 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
       mutate(`/api/timeline?chatId=${chatId}`);
       mutate('/api/timeline/pending');
       
-      toast.success('Feedback completed successfully');
+      // No success message needed
     } catch (error) {
       console.error('Error updating timeline status:', error);
-      toast.error('Failed to update status');
+      // Handle error silently
     }
   };
 
-  // Render a more compact version for supplier mode
+  // Both Schreiber and Supplier now use the same timeline view
+  // Just changing the colors slightly for supplier mode
+  const timelineBackground = mode === 'supplier' ? 'bg-blue-50' : 'bg-zinc-100';
+  const timelineBorder = mode === 'supplier' ? 'border-blue-100' : 'border-zinc-200';
+  
+  // We'll still keep the action buttons for supplier mode
+  let actionButtons = null;
+  
   if (mode === 'supplier') {
-    const currentStep = timeline.steps.find(step => step.status === 'in-progress')?.id || '';
-    let stageText = "Reviewing Specification";
-    let actionButton = null;
-    
     if (isSendInProgress) {
-      stageText = "Ready for review";
-      actionButton = (
+      actionButtons = (
         <Button 
           size="sm" 
           variant="default"
           onClick={handleProvideFeedback}
           className="bg-blue-600 hover:bg-blue-700"
         >
-          Begin Providing Feedback
+          Submit for Review
         </Button>
       );
     } else if (isFeedbackInProgress) {
-      stageText = "Providing feedback";
-      
-      // Enhanced with missing fields information
-      const missingFieldsText = missingFields > 0 
-        ? ` (${missingFields} question${missingFields !== 1 ? 's' : ''} need${missingFields === 1 ? 's' : ''} review)` 
-        : '';
-      
-      actionButton = (
+      actionButtons = (
         <div className="flex items-center gap-2">
           {missingFields > 0 && (
             <Button
               size="sm"
               variant="outline"
-              onClick={() => {
-                // Show artifact and scroll to sheet
-                if (!artifact.isVisible) {
-                  setArtifact(current => ({
-                    ...current,
-                    isVisible: true
-                  }));
-                }
-                
-                setTimeout(() => {
-                  const sheetElement = document.querySelector('[data-artifact="sheet"]');
-                  if (sheetElement) {
-                    sheetElement.scrollIntoView({ behavior: 'smooth' });
+              onClick={async () => {
+                try {
+                  // Fetch the latest sheet artifact
+                  const artifactRes = await fetch(`/api/artifacts?chatId=${chatId}&kind=sheet`);
+                  if (artifactRes.ok) {
+                    const artifacts = await artifactRes.json();
+                    if (artifacts && artifacts.length > 0) {
+                      const latestSheet = artifacts[0];
+                      
+                      // Open the artifact panel
+                      setArtifact({
+                        documentId: latestSheet.id || 'sheet-view',
+                        title: latestSheet.title || 'Specification Sheet',
+                        kind: 'sheet',
+                        content: latestSheet.content || '',
+                        isVisible: true,
+                        status: 'idle',
+                        boundingBox: {
+                          top: 0,
+                          left: 0,
+                          width: 0,
+                          height: 0
+                        }
+                      });
+                    }
                   }
-                }, 100);
+                } catch (error) {
+                  console.error('Error fetching sheet:', error);
+                }
               }}
               className="border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-800"
             >
-              Review Missing Fields
+              Open Sheet
             </Button>
           )}
           <Button 
@@ -213,35 +207,16 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
             disabled={missingFields > 0}
             title={missingFields > 0 ? "Please complete all missing fields first" : "Complete your feedback"}
           >
-            Complete Feedback
+            Complete
           </Button>
         </div>
       );
-      
-      // Update stage text with missing fields info
-      if (missingFields > 0) {
-        stageText = `Providing feedback${missingFieldsText}`;
-      }
     }
-    
-    return (
-      <div className="w-full bg-blue-50 border-b border-blue-100 px-4 py-2">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-blue-500" />
-            <h3 className="font-medium">
-              {stageText}
-            </h3>
-          </div>
-          {actionButton}
-        </div>
-      </div>
-    );
   }
   
-  // Default rendering for Schreiber mode
+  // Unified rendering for both Schreiber and Supplier modes
   return (
-    <div className="w-full bg-zinc-100 border-b px-4 py-3">
+    <div className={`w-full ${timelineBackground} border-b ${timelineBorder} px-4 py-3`}>
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-sm font-medium mb-2">Supplier Specification Timeline</h3>
@@ -259,6 +234,13 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
             ))}
           </div>
         </div>
+        
+        {/* Action buttons area */}
+        {actionButtons && (
+          <div className="ml-4">
+            {actionButtons}
+          </div>
+        )}
       </div>
     </div>
   );
