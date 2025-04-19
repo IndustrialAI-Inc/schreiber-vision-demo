@@ -1,12 +1,22 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, createContext, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { UserMode } from '@/lib/types';
+import type { UserMode } from '@/lib/types';
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+
+// This ensures we have stable message rendering even during mode transitions
+export const MessageModeContext = createContext<{
+  messageModeOverride: UserMode | null;
+}>({
+  messageModeOverride: null,
+});
+
+// Hook to get message mode context
+export const useMessageMode = () => useContext(MessageModeContext);
 
 interface UserModeState {
   mode: UserMode;

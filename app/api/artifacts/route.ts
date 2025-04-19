@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDocumentsById } from '@/lib/db/queries';
 import { auth } from '@/app/(auth)/auth';
-import { document } from '@/lib/db/schema';
 
 export async function GET(req: Request) {
   try {

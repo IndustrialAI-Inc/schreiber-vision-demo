@@ -1,7 +1,7 @@
 import { getUserFilesByUserId } from '@/lib/db/queries';
-import { DataStreamWriter, streamText, tool } from 'ai';
+import { type DataStreamWriter, streamText, tool } from 'ai';
 import { myProvider } from '../providers';
-import { Session } from 'next-auth';
+import type { Session } from 'next-auth';
 import { z } from 'zod';
 import { generateUUID } from '@/lib/utils';
 
@@ -55,9 +55,9 @@ export const requestPdf = ({ session, dataStream }: RequestPdfProps) =>
           }
         }
         
-        const selectedIndex = parseInt(indexText.trim());
+        const selectedIndex = Number.parseInt(indexText.trim());
         
-        if (selectedIndex === -1 || isNaN(selectedIndex) || selectedIndex >= pdfFiles.length) {
+        if (selectedIndex === -1 || Number.isNaN(selectedIndex) || selectedIndex >= pdfFiles.length) {
           return {
             message: 'No relevant PDF documents found for your query.',
           };

@@ -1,5 +1,5 @@
 import {
-  UIMessage,
+  type UIMessage,
   appendResponseMessages,
   createDataStreamResponse,
   smoothStream,
@@ -35,10 +35,12 @@ export async function POST(request: Request) {
       id,
       messages,
       selectedChatModel,
+      userMode,
     }: {
       id: string;
       messages: Array<UIMessage>;
       selectedChatModel: string;
+      userMode?: string;
     } = await request.json();
 
     const session = await auth();
@@ -67,6 +69,10 @@ export async function POST(request: Request) {
       }
     }
 
+    // Use the senderMode property from the message if it exists, otherwise use the current userMode
+    const messageSenderMode = (userMessage as any).senderMode || 
+                             (userMode === 'supplier' ? 'supplier' : 'schreiber');
+    
     await saveMessages({
       messages: [
         {
@@ -76,6 +82,7 @@ export async function POST(request: Request) {
           parts: userMessage.parts,
           attachments: userMessage.experimental_attachments ?? [],
           createdAt: new Date(),
+          senderMode: messageSenderMode as 'supplier' | 'schreiber',
         },
       ],
     });
@@ -130,6 +137,7 @@ export async function POST(request: Request) {
                   responseMessages: response.messages,
                 });
 
+                // Assistants don't need a mode, we'll always style them the same
                 await saveMessages({
                   messages: [
                     {
@@ -140,6 +148,7 @@ export async function POST(request: Request) {
                       attachments:
                         assistantMessage.experimental_attachments ?? [],
                       createdAt: new Date(),
+                      senderMode: null, // Explicitly set to null for assistants
                     },
                   ],
                 });

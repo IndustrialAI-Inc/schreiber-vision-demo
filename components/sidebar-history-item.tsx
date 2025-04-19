@@ -1,4 +1,4 @@
-import { Chat } from '@/lib/db/schema';
+import type { Chat } from '@/lib/db/schema';
 import {
   SidebarMenuAction,
   SidebarMenuButton,
@@ -21,7 +21,6 @@ import {
   LockIcon,
   MoreHorizontalIcon,
   ShareIcon,
-  CheckmarkIcon,
   TrashIcon,
 } from './icons';
 import { memo } from 'react';

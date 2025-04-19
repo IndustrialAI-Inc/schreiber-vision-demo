@@ -28,9 +28,7 @@ import {
   type DBMessage,
   type Chat,
   userFile,
-  type UserFile,
   timeline,
-  type Timeline,
 } from './schema';
 import type { ArtifactKind } from '@/components/artifact';
 
@@ -558,7 +556,7 @@ export async function createOrUpdateTimeline({
     console.log('Creating/updating timeline:', { 
       chatId, 
       isVisible: isVisible ?? false, 
-      existingTimeline: existingTimeline ? true : false 
+      existingTimeline: !!existingTimeline 
     });
     
     if (existingTimeline) {

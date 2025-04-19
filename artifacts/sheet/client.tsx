@@ -5,14 +5,12 @@ import {
   RedoIcon,
   SparklesIcon,
   UndoIcon,
-  ShareIcon,
-  CheckCircleFillIcon,
   CheckmarkIcon
 } from '@/components/icons';
 import { SpreadsheetEditor } from '@/components/sheet-editor';
 import { parse, unparse } from 'papaparse';
 import { toast } from 'sonner';
-import { TimelineStep } from '@/hooks/use-supplier-timeline';
+import type { TimelineStep } from '@/hooks/use-supplier-timeline';
 import { mutate } from 'swr';
 
 type Metadata = any;

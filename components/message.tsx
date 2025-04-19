@@ -1,9 +1,9 @@
 'use client';
 
-import { UIMessage } from 'ai';
+import type { UIMessage } from 'ai';
 import cx from 'classnames';
 import { AnimatePresence, motion } from 'framer-motion';
-import { memo, useState, useRef } from 'react';
+import { memo, useState, } from 'react';
 import type { Vote } from '@/lib/db/schema';
 import { DocumentToolCall, DocumentToolResult } from './document';
 import { PencilEditIcon, SparklesIcon } from './icons';
@@ -18,9 +18,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { MessageEditor } from './message-editor';
 import { DocumentPreview } from './document-preview';
 import { MessageReasoning } from './message-reasoning';
-import { UseChatHelpers } from '@ai-sdk/react';
+import type { UseChatHelpers } from '@ai-sdk/react';
 import { useArtifact } from '@/hooks/use-artifact';
 import React from 'react';
+import { useUserMode, useMessageMode } from './mode-toggle';
 
 const PurePreviewMessage = ({
   chatId,
@@ -41,6 +42,22 @@ const PurePreviewMessage = ({
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const { setArtifact } = useArtifact();
+  const { mode: userMode } = useUserMode();
+  const { messageModeOverride } = useMessageMode();
+  
+  // During mode transitions, use the override to prevent flickering/jumping
+  const effectiveUserMode = messageModeOverride || userMode;
+  const isSupplierMode = effectiveUserMode === 'supplier';
+  
+  // Get sender mode directly from the message, with no fallbacks
+  const messageSenderMode = (message as any).senderMode;
+  
+  // Determine message styling based only on the stored sender mode from the database
+  const isSupplierMsg = message.role === 'user' && messageSenderMode === 'supplier';
+  const isSchreiberMsg = message.role === 'user' && messageSenderMode === 'schreiber';
+  
+  // If no mode is set (for older messages), default to the current UI mode
+  const isLegacyUserMsg = message.role === 'user' && !messageSenderMode;
   
   // Function to open PDF in artifact panel
   const openPdfInArtifactPanel = (pdfUrl: string, fileName: string, id: string) => {
@@ -67,7 +84,13 @@ const PurePreviewMessage = ({
     <AnimatePresence initial={false}>
       <motion.div
         data-testid={`message-${role}`}
-        className={`w-full mx-auto max-w-3xl px-4 group/message message ${hasArtifacts ? 'has-artifact' : ''}`}
+        className={cn(
+          'w-full mx-auto max-w-3xl px-4 group/message message flex',
+          {
+            'justify-end': isSchreiberMsg || (isLegacyUserMsg && !isSupplierMode),
+            'justify-start': isSupplierMsg || (isLegacyUserMsg && isSupplierMode) || message.role === 'assistant',
+          }
+        )}
         initial={{ y: 5, opacity: 0 }}
         animate={{ y: 0, opacity: 1, transition: { delay: 0.1 } }}
         data-role={role}
@@ -75,10 +98,11 @@ const PurePreviewMessage = ({
       >
         <div
           className={cn(
-            'flex gap-4 w-full group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl',
+            'flex gap-4',
             {
-              'w-full': mode === 'edit',
-              'group-data-[role=user]/message:w-fit': mode !== 'edit',
+              'w-full justify-end': isSchreiberMsg || (isLegacyUserMsg && !isSupplierMode),
+              'w-auto': isSupplierMsg || (isLegacyUserMsg && isSupplierMode),
+              'w-full': message.role === 'assistant',
             },
           )}
         >
@@ -90,7 +114,13 @@ const PurePreviewMessage = ({
             </div>
           )}
 
-          <div className="flex flex-col gap-4 w-full">
+          <div className={cn(
+            "flex flex-col gap-4",
+            {
+              'w-full': message.role === 'assistant',
+              'max-w-[80%]': message.role === 'user',
+            }
+          )}>
             {message.experimental_attachments && (
               <div
                 data-testid={`message-attachments`}
@@ -122,14 +152,21 @@ const PurePreviewMessage = ({
               if (type === 'text') {
                 if (mode === 'view') {
                   return (
-                    <div key={key} className="flex flex-row gap-2 items-start">
+                    <div key={key} className={cn(
+                      "flex items-start",
+                      {
+                        // For legacy messages with no stored mode, use current UI mode
+                        'flex-row-reverse': isSchreiberMsg || (isLegacyUserMsg && !isSupplierMode),
+                        'flex-row': isSupplierMsg || (isLegacyUserMsg && isSupplierMode) || message.role === 'assistant',
+                      }
+                    )}>
                       {message.role === 'user' && !isReadonly && (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               data-testid="message-edit-button"
                               variant="ghost"
-                              className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100"
+                              className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100 ml-2"
                               onClick={() => {
                                 setMode('edit');
                               }}
@@ -143,13 +180,22 @@ const PurePreviewMessage = ({
 
                       <div
                         data-testid="message-content"
-                        className={cn('flex flex-col gap-4', {
-                          'bg-primary text-primary-foreground px-3 py-2 rounded-xl':
-                            message.role === 'user',
+                        className={cn('flex flex-col gap-4 w-auto', {
+                          // Schreiber user: right, black bubble, white text
+                          'bg-black text-white px-3 py-2 rounded-xl border border-zinc-800': 
+                            isSchreiberMsg || (isLegacyUserMsg && !isSupplierMode),
+                          // Supplier user: left, blue bubble, black text
+                          'bg-blue-50 text-black px-3 py-2 rounded-xl border border-blue-200': 
+                            isSupplierMsg || (isLegacyUserMsg && isSupplierMode),
+                          // Assistant: unchanged
+                          'bg-muted text-black px-3 py-2 rounded-xl border border-zinc-200': 
+                            message.role === 'assistant',
                         })}
                       >
                         <Markdown>{part.text}</Markdown>
                       </div>
+
+                      {/* Edit button is now shown for all user messages regardless of mode */}
                     </div>
                   );
                 }
@@ -275,17 +321,35 @@ const PurePreviewMessage = ({
 export const PreviewMessage = memo(
   PurePreviewMessage,
   (prevProps, nextProps) => {
-    if (prevProps.isLoading !== nextProps.isLoading) return false;
+    // If the message's ID changes, we need to re-render
     if (prevProps.message.id !== nextProps.message.id) return false;
+    
+    // If loading state changes, we need to re-render
+    if (prevProps.isLoading !== nextProps.isLoading) return false;
+    
+    // If message content changes, re-render
     if (!equal(prevProps.message.parts, nextProps.message.parts)) return false;
+    
+    // If the vote changes, re-render
     if (!equal(prevProps.vote, nextProps.vote)) return false;
-
+    
+    // If the message's senderMode changed, we need to re-render
+    // This is critical when mode changes affect message styling
+    if ((prevProps.message as any).senderMode !== (nextProps.message as any).senderMode) return false;
+    
+    // Otherwise, don't re-render
     return true;
   },
 );
 
 export const ThinkingMessage = () => {
   const role = 'assistant';
+  const { mode: userMode } = useUserMode();
+  const { messageModeOverride } = useMessageMode();
+  
+  // During mode transitions, use the override to prevent flickering
+  const effectiveUserMode = messageModeOverride || userMode;
+  const isSupplierMode = effectiveUserMode === 'supplier';
 
   return (
     <motion.div
@@ -297,9 +361,11 @@ export const ThinkingMessage = () => {
     >
       <div
         className={cx(
-          'flex gap-4 group-data-[role=user]/message:px-3 w-full group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2 rounded-xl',
+          'flex gap-4 w-full rounded-xl',
           {
-            'group-data-[role=user]/message:bg-muted': true,
+            'group-data-[role=user]/message:px-3 group-data-[role=user]/message:w-fit group-data-[role=user]/message:ml-auto group-data-[role=user]/message:max-w-2xl group-data-[role=user]/message:py-2': !isSupplierMode,
+            'group-data-[role=user]/message:bg-muted': !isSupplierMode,
+            'bg-white text-black px-3 py-2 border border-gray-200': isSupplierMode
           },
         )}
       >

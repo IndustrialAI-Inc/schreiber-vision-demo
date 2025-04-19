@@ -17,7 +17,6 @@ import {
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
-import { ModeToggle } from './mode-toggle';
 import { useUserMode } from './mode-toggle';
 import { Separator } from './ui/separator';
 

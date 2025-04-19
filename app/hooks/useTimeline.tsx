@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useChat } from 'ai/react';
 
 export type TimelineStep = {
   id: string;

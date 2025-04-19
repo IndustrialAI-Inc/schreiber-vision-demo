@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { parse } from 'papaparse';
 import { useUserMode } from './mode-toggle';
 import { useSupplierTimeline } from '@/hooks/use-supplier-timeline';
-import { UseChatHelpers } from '@ai-sdk/react';
+import type { UseChatHelpers } from '@ai-sdk/react';
 import { ClipboardCheckIcon } from 'lucide-react';
 
 interface SupplierSheetAnalysisProps {

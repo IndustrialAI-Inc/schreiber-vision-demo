@@ -14,8 +14,6 @@ export async function autofillSheet(specId: string, userId: string) {
   await updateDocument({
     id: specId,
     description:
-      `Use the following PDFs to answer the supplier spec sheet. ` +
-      `If info is missing, write "N/A".\n\n` +
-      pdfText.join('\n\n'),
+      `Use the following PDFs to answer the supplier spec sheet. If info is missing, write "N/A".\n\n${pdfText.join('\n\n')}`,
   });
 }

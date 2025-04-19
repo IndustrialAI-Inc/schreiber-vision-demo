@@ -16,10 +16,8 @@ import { toast } from 'sonner';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
 import { SupplierTimeline } from './supplier-timeline';
-import { useUserMode } from './mode-toggle';
-import { SupplierFeedbackInput } from './supplier-feedback-input';
+import { useUserMode, MessageModeContext } from './mode-toggle';
 import { SupplierSheetAnalysis } from './supplier-sheet-analysis';
-import { useArtifact } from '@/hooks/use-artifact';
 import { cn } from '@/lib/utils';
 
 export function Chat({
@@ -39,6 +37,25 @@ export function Chat({
   const { mode } = useUserMode();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
   const [sheetContent, setSheetContent] = useState<string>('');
+  
+  // When switching modes, this state ensures existing messages don't suddenly change position
+  // Messages will always maintain their original mode/position
+  const [messageModeOverride, setMessageModeOverride] = useState<null | 'supplier' | 'schreiber'>(null);
+  
+  // Use this effect to stabilize message appearance during mode transitions
+  useEffect(() => {
+    // When mode changes, briefly lock the message appearance with the previous mode
+    // This prevents message jumping during mode transition
+    const prevMode = messageModeOverride || mode;
+    setMessageModeOverride(prevMode);
+    
+    // After transition animation would be complete, unlock
+    const timer = setTimeout(() => {
+      setMessageModeOverride(null);
+    }, 200); // Typical transition time
+    
+    return () => clearTimeout(timer);
+  }, [mode, messageModeOverride]);
   
   // Fetch sheet content for supplier analysis
   useEffect(() => {
@@ -91,7 +108,7 @@ export function Chat({
     reload,
   } = useChat({
     id,
-    body: { id, selectedChatModel: selectedChatModel },
+    body: { id, selectedChatModel: selectedChatModel, userMode: mode },
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,
@@ -111,16 +128,32 @@ export function Chat({
 
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   
+  // Add a wrapper around append to include the senderMode
+  const appendWithMode = (message: any) => {
+    // Only user messages need a senderMode
+    if (message.role === 'user') {
+      // Add the current mode to the message
+      const messageWithMode = {
+        ...message,
+        senderMode: mode // Current user mode (supplier or schreiber)
+      };
+      return append(messageWithMode);
+    } else {
+      // Assistant messages don't need a senderMode
+      return append({...message});
+    }
+  };
+
   // Handler for when supplier sends feedback
   const handleSendFeedback = (feedback: string) => {
-    append({
+    appendWithMode({
       role: 'user',
       content: `**SUPPLIER FEEDBACK:**\n\n${feedback}`,
     });
   };
 
   return (
-    <>
+    <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
         "flex flex-col min-w-0 h-dvh bg-background"
       )}>
@@ -148,7 +181,7 @@ export function Chat({
           messages={messages}
           setMessages={setMessages}
           reload={reload}
-          isReadonly={isReadonly || (mode === 'supplier')}
+          isReadonly={isReadonly}
           isArtifactVisible={isArtifactVisible}
         />
 
@@ -164,12 +197,14 @@ export function Chat({
             setAttachments={setAttachments}
             messages={messages}
             setMessages={setMessages}
-            append={append}
+            append={appendWithMode}
             disabled={isReadonly}
             supplierMode={mode === 'supplier'}
             className={cn(
               'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base pb-10 dark:border-zinc-700',
-              mode === 'supplier' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-muted border-zinc-200',
+              mode === 'supplier'
+                ? 'bg-blue-50 border-blue-200 text-black'
+                : 'bg-muted border-zinc-200 text-black',
             )}
           />
         </form>
@@ -184,13 +219,13 @@ export function Chat({
         stop={stop}
         attachments={attachments}
         setAttachments={setAttachments}
-        append={append}
+        append={appendWithMode}
         messages={messages}
         setMessages={setMessages}
         reload={reload}
         votes={votes}
         isReadonly={isReadonly}
       />
-    </>
+    </MessageModeContext.Provider>
   );
 }

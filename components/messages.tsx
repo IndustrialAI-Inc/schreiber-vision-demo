@@ -32,30 +32,14 @@ function PureMessages({
     useScrollToBottom<HTMLDivElement>();
   const { mode } = useUserMode();
 
-  // Filter messages for supplier mode - only show artifacts and supplier feedback
+  // Show all messages for all user modes
+  // Each message has its own styling based on its senderMode
   const filteredMessages = useMemo(() => {
-    if (mode !== 'supplier') return messages;
-    
-    return messages.filter(message => {
-      // Always show supplier feedback
-      if (message.role === 'user' && message.content.includes('**SUPPLIER FEEDBACK:**')) {
-        return true;
-      }
-      
-      // Always show the most recent assistant message
-      if (message.role === 'assistant' && messages[messages.length - 1] === message) {
-        return true;
-      }
-      
-      // Show messages with artifacts
-      if (message.role === 'assistant' && 
-          (message as any).artifacts?.some((a: any) => a.kind === 'sheet')) {
-        return true;
-      }
-      
-      return false;
-    });
-  }, [messages, mode]);
+    // Don't filter by mode at all - just show all messages
+    // Each message will be styled based on its own senderMode property
+    console.log('Messages to display:', messages);
+    return messages;
+  }, [messages]);
 
   return (
     <div

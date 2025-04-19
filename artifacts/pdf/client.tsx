@@ -7,7 +7,6 @@ import {
   FileIcon, 
   SparklesIcon,
   EyeIcon,
-  ImageIcon,
   SummarizeIcon
 } from '@/components/icons';
 import { toast } from 'sonner';

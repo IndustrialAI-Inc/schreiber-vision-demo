@@ -2,15 +2,15 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { UserFile } from '@/lib/db/schema';
+import type { UserFile } from '@/lib/db/schema';
 import { TrashIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 
 function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return bytes + ' bytes';
-  else if (bytes < 1048576) return (bytes / 1024).toFixed(2) + ' KB';
-  else return (bytes / 1048576).toFixed(2) + ' MB';
+  if (bytes < 1024) return `${bytes} bytes`;
+  else if (bytes < 1048576) return `${(bytes / 1024).toFixed(2)} KB`;
+  else return `${(bytes / 1048576).toFixed(2)} MB`;
 }
 
 function formatDate(date: Date): string {

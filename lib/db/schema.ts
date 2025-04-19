@@ -12,7 +12,7 @@ import {
   numeric,
   index,
 } from 'drizzle-orm/pg-core';
-import { InferInsertModel, relations, sql } from 'drizzle-orm';
+import { type InferInsertModel, relations, sql } from 'drizzle-orm';
 
 export const user = pgTable('User', {
   id: uuid('id').primaryKey().notNull().defaultRandom(),
@@ -59,6 +59,7 @@ export const message = pgTable('Message_v2', {
   parts: json('parts').notNull(),
   attachments: json('attachments').notNull(),
   createdAt: timestamp('createdAt').notNull(),
+  senderMode: varchar('senderMode', { enum: ['supplier', 'schreiber'] }),
 });
 
 export type DBMessage = InferSelectModel<typeof message>;
