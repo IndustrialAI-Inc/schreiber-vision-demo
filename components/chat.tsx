@@ -161,6 +161,18 @@ export function Chat({
   useEffect(() => {
     async function loadPDFs() {
       try {
+        // Check if this is a page refresh by using sessionStorage
+        const hasPageLoaded = sessionStorage.getItem('chatPageLoaded');
+        
+        if (hasPageLoaded) {
+          // This is a page refresh, don't load PDFs
+          console.log("[CHAT] Page refreshed, not loading PDFs");
+          return;
+        }
+        
+        // Mark that the page has been loaded
+        sessionStorage.setItem('chatPageLoaded', 'true');
+        
         // First try to get files from the user's uploads
         const response = await fetch('/api/files?type=application/pdf');
         
