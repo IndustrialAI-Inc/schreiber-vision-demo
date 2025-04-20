@@ -74,6 +74,7 @@ function PureChatHeader({
         onClick={() => {
           const newMode = mode === 'schreiber' ? 'supplier' : 'schreiber';
           setMode(newMode);
+          setTheme(newMode === 'supplier' ? 'light' : 'dark');
           router.refresh();
         }}
       >

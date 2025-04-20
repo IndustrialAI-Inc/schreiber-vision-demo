@@ -191,7 +191,7 @@ function PureMultimodalInput({
     <div className="relative w-full flex flex-col gap-4">
       {messages.length === 0 &&
         attachments.length === 0 &&
-        uploadQueue.length === 0 && (
+        uploadQueue.length === 0 && !supplierMode && (
           <SuggestedActions append={append} chatId={chatId} disabled={disabled} />
         )}
 
@@ -235,7 +235,7 @@ function PureMultimodalInput({
         value={input}
         onChange={handleInput}
         className={cx(
-          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base pb-10 dark:border-zinc-700 bg-amber-50 border-amber-200 text-amber-900',
+          'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base pb-10 dark:border-zinc-700 bg-amber-50 border-amber-200 text-amber-900 dark:text-white',
           className,
         )}
         rows={2}
