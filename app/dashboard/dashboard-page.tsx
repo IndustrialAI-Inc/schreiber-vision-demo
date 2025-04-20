@@ -14,6 +14,7 @@ import DocumentApprovalFunnel from "@/components/dashboard/funnelChart";
 import BarChartComponent from "@/components/dashboard/barChart";
 import VerticalBarChart from "@/components/dashboard/verticalBarChart";
 import SpecStatusChart from "@/components/dashboard/barChartLabel";
+import PieChartFixComponent from "@/components/dashboard/pieChartFix";
 
 const DashboardPage = () => {
   return (
@@ -91,7 +92,8 @@ const DashboardPage = () => {
                 </div>
               </CardContent>
             </Card>
-            <PieChartComponent />
+            {/* <PieChartComponent /> */}
+            <PieChartFixComponent />
 
             <Card className="bg-fulldark50 border-bright20 flex flex-col justify-center min-h-[170px] backdrop-blur-sm pt-6">
               <CardContent className="flex flex-col gap-4 h-full">
@@ -134,9 +136,9 @@ const DashboardPage = () => {
             {/* <BarChartComponent /> */}
             <SpecStatusChart />
             <AreaChartComponent />
-            <VerticalBarChart />
+            {/* <VerticalBarChart /> */}
 
-            <Card className="bg-fulldark50 border-bright20 flex flex-col justify-center min-h-[170px] backdrop-blur-sm col-span-2 pt-6">
+            {/* <Card className="bg-fulldark50 border-bright20 flex flex-col justify-center min-h-[170px] backdrop-blur-sm col-span-2 pt-6">
               <CardContent className="flex flex-col gap-4 h-full">
                 <div className="flex flex-row justify-between items-center">
                   <CardTitle className="text-xl font-medium text-bright">
@@ -146,7 +148,7 @@ const DashboardPage = () => {
                 </div>
                 <DocumentApprovalFunnel />
               </CardContent>
-            </Card>
+            </Card> */}
           </div>
         </div>
       </div>
