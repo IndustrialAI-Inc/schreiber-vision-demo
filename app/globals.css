@@ -13,9 +13,20 @@
     --color-fulldark50: #18181B80;
     --color-mainred: #D01E28;
     --color-mainblue: #2573A3;
-    --color-mainblue80: #2573A3EE;
+    --color-mainblue90: #2573A3DD;
+    --color-mainblue80: #2573A3BB;
     --color-mainblue70: #2573A399;
     --color-mainblue60: #2573A350;
+    --color-chart-1: #2573A3;
+    --color-chart-2: #D01E28;
+    --color-chart-3: #37A794;
+    --color-chart-4: #8C4DA0;
+    --color-chart-5: #E6A317;
+    --color-chart-6: #5D9247;
+    --color-chart-7: #D05E96;
+    --color-chart-8: #6B7280;
+    --color-chart-9: #A3582D;
+    --color-chart-10: #1A78C2;
 }
 
 @media (prefers-color-scheme: dark) {

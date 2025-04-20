@@ -18,6 +18,17 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 
+// SALMANS AND ASSOCIATES INCORPORATED	84
+// SCHREIBER FOODS	77
+// CALIFORNIA CUSTOM FRUITS AND FLAVORS INC	63
+// LYONS MAGNUS, LLC	43
+// WIXON INC	35
+// GIVAUDAN FLAVORS CORPORATION	32
+// GOSSNER FOODS INC	31
+// ONLY WHAT YOU NEED, INC	28
+// HILMAR CHEESE CO INC	28
+// SCHREIBER MEXICO	25
+
 const chartData = [
   {
     supplier: "salmans",
@@ -29,7 +40,14 @@ const chartData = [
     amount: 63,
     fill: "var(--color-mainblue)",
   },
-  { supplier: "wixon", amount: 35, fill: "var(--color-dark)" },
+  { supplier: "wixon", amount: 35, fill: "var(--color-chart-1)" },
+  { supplier: "schreiberFoods", amount: 77, fill: "var(--color-chart-9)" },
+  { supplier: "lyonsMagnus", amount: 43, fill: "var(--color-chart-3)" },
+  { supplier: "givaudanFlavors", amount: 32, fill: "var(--color-chart-4)" },
+  { supplier: "gossnerFoods", amount: 31, fill: "var(--color-chart-5)" },
+  { supplier: "onlyWhatYouNeed", amount: 28, fill: "var(--color-chart-6)" },
+  { supplier: "hilmar", amount: 28, fill: "var(--color-chart-7)" },
+  { supplier: "schreiberMexico", amount: 25, fill: "var(--color-chart-8)" },
 ];
 
 const chartConfig = {
@@ -46,6 +64,34 @@ const chartConfig = {
   },
   wixon: {
     label: "Wixon Inc",
+    color: "hsl(var(--chart-3))",
+  },
+  schreiberFoods: {
+    label: "Schreiber Foods",
+    color: "hsl(var(--chart-3))",
+  },
+  lyonsMagnus: {
+    label: "Lyons Magnus",
+    color: "hsl(var(--chart-3))",
+  },
+  givaudanFlavors: {
+    label: "Givaudan Flavors Corporation",
+    color: "hsl(var(--chart-3))",
+  },
+  gossnerFoods: {
+    label: "Gossner Foods",
+    color: "hsl(var(--chart-3))",
+  },
+  onlyWhatYouNeed: {
+    label: "Only What You Need",
+    color: "hsl(var(--chart-3))",
+  },
+  hilmar: {
+    label: "Hilmar Cheese CO INC",
+    color: "hsl(var(--chart-3))",
+  },
+  schreiberMexico: {
+    label: "Schreiber Mexico",
     color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig;
@@ -67,7 +113,7 @@ export default function PieChartComponent() {
           </div>
           <MoreHorizontal className="h-5 w-5 text-bright" />
         </div>
-        <ChartContainer config={chartConfig} className="mx-auto max-h-[300px]">
+        <ChartContainer config={chartConfig} className="mx-auto max-h-[1000px]">
           <PieChart>
             <ChartTooltip
               cursor={false}
@@ -112,7 +158,7 @@ export default function PieChartComponent() {
             </Pie>
             <ChartLegend
               content={<ChartLegendContent nameKey="supplier" />}
-              className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/2 [&>*]:justify-center"
+              className="-translate-y-2 flex-wrap gap-2 [&>*]:justify-center"
             />
           </PieChart>
         </ChartContainer>

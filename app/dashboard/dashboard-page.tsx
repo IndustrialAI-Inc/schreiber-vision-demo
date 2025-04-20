@@ -8,12 +8,12 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import ChatInterface from "@/components/dashboard/chat";
 import PieChartComponent from "@/components/dashboard/pieChart";
 import AreaChartComponent from "@/components/dashboard/areaChart";
 import DocumentApprovalFunnel from "@/components/dashboard/funnelChart";
 import BarChartComponent from "@/components/dashboard/barChart";
 import VerticalBarChart from "@/components/dashboard/verticalBarChart";
+import SpecStatusChart from "@/components/dashboard/barChartLabel";
 
 const DashboardPage = () => {
   return (
@@ -131,7 +131,8 @@ const DashboardPage = () => {
               </CardContent>
             </Card>
 
-            <BarChartComponent />
+            {/* <BarChartComponent /> */}
+            <SpecStatusChart />
             <AreaChartComponent />
             <VerticalBarChart />
 

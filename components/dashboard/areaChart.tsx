@@ -16,13 +16,22 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+// const chartData = [
+//   { month: "January", desktop: 186, mobile: 80 },
+//   { month: "February", desktop: 305, mobile: 200 },
+//   { month: "March", desktop: 237, mobile: 120 },
+//   { month: "April", desktop: 73, mobile: 190 },
+//   { month: "May", desktop: 209, mobile: 130 },
+//   { month: "June", desktop: 214, mobile: 140 },
+// ];
+
 const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
+  { month: "January", desktop: 15 },
+  { month: "February", desktop: 30 },
+  { month: "March", desktop: 25 },
+  { month: "April", desktop: 35 },
+  { month: "May", desktop: 32 },
+  { month: "June", desktop: 40 },
 ];
 
 const chartConfig = {
@@ -46,7 +55,7 @@ export default function AreaChartComponent() {
               Total specs
             </CardTitle>
             <CardDescription>
-              Showing total visitors for the last 6 months
+              Showing total specs for the last 6 months
             </CardDescription>
           </div>
           <MoreHorizontal className="h-5 w-5 text-bright" />
@@ -58,6 +67,7 @@ export default function AreaChartComponent() {
             margin={{
               left: 12,
               right: 12,
+              top: 24,
             }}
           >
             <CartesianGrid vertical={false} />

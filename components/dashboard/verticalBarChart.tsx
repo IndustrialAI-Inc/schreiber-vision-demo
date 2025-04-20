@@ -11,19 +11,34 @@ import {
 } from "recharts";
 import { Card, CardContent, CardTitle } from "@/components/ui/card";
 
+// const data = [
+//   { name: "Spec in progress", item1: 4, item2: 3 },
+//   { name: "Waiting for Schreiber approval", item1: 5, item2: 4 },
+//   { name: "Waiting for Supplier approval", item1: 6, item2: 5 },
+//   { name: "Fully approved", item1: 4, item2: 6 },
+//   // { name: "5", item1: 5, item2: 3 },
+//   // { name: "6", item1: 7, item2: 6 },
+//   // { name: "7", item1: 5, item2: 8 },
+//   // { name: "8", item1: 6, item2: 5 },
+//   // { name: "9", item1: 7, item2: 6 },
+//   // { name: "10", item1: 8, item2: 7 },
+//   // { name: "11", item1: 7, item2: 8 },
+//   // { name: "12", item1: 8, item2: 7 },
+// ];
+
 const data = [
-  { name: "1", item1: 4, item2: 3 },
-  { name: "2", item1: 5, item2: 4 },
-  { name: "3", item1: 6, item2: 5 },
-  { name: "4", item1: 4, item2: 6 },
-  { name: "5", item1: 5, item2: 3 },
-  { name: "6", item1: 7, item2: 6 },
-  { name: "7", item1: 5, item2: 8 },
-  { name: "8", item1: 6, item2: 5 },
-  { name: "9", item1: 7, item2: 6 },
-  { name: "10", item1: 8, item2: 7 },
-  { name: "11", item1: 7, item2: 8 },
-  { name: "12", item1: 8, item2: 7 },
+  { name: "Spec in progress", item1: 4 },
+  { name: "Waiting", item1: 5 },
+  { name: "Waiting ", item1: 6},
+  { name: "Fully approved", item1: 4},
+  // { name: "5", item1: 5, item2: 3 },
+  // { name: "6", item1: 7, item2: 6 },
+  // { name: "7", item1: 5, item2: 8 },
+  // { name: "8", item1: 6, item2: 5 },
+  // { name: "9", item1: 7, item2: 6 },
+  // { name: "10", item1: 8, item2: 7 },
+  // { name: "11", item1: 7, item2: 8 },
+  // { name: "12", item1: 8, item2: 7 },
 ];
 
 const VerticalBarChart = () => {
@@ -48,7 +63,7 @@ const VerticalBarChart = () => {
         <div className="h-48">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={data}>
-              <XAxis dataKey="name" hide />
+              <XAxis dataKey="name" tick={{fontSize: 5}}/>
               <YAxis hide />
               <Tooltip
                 contentStyle={{
