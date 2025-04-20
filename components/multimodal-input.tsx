@@ -113,11 +113,39 @@ function PureMultimodalInput({
     
     window.history.replaceState({}, '', `/chat/${chatId}`);
 
-    handleSubmit(undefined, {
-      experimental_attachments: attachments,
-    });
-
-    setAttachments([]);
+    // Enhanced logging for message submission
+    try {
+      // Only include attachments in the first message
+      const isFirstMessage = messages.length === 0;
+      
+      console.log("[SUBMIT] Starting message submission:", {
+        isFirstMessage,
+        attachmentsCount: attachments.length,
+        includeAttachments: isFirstMessage && attachments.length > 0
+      });
+      
+      // Only include attachments if this is the first message
+      if (isFirstMessage && attachments.length > 0) {
+        console.log("[SUBMIT] First message - submitting with attachments");
+        handleSubmit(undefined, {
+          experimental_attachments: attachments
+        });
+      } else {
+        console.log("[SUBMIT] Not first message or no attachments - submitting without attachments");
+        handleSubmit();
+      }
+      
+      console.log("[SUBMIT] Message submission completed");
+    } catch (error) {
+      console.error("[SUBMIT] Error submitting message:", error);
+      // Show error to user with more details
+      if (error instanceof Error) {
+        toast.error(`Error sending message: ${error.message}`);
+      } else {
+        toast.error("Error sending message");
+      }
+    }
+    
     setLocalStorageInput('');
     resetHeight();
 

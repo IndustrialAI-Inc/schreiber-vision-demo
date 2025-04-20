@@ -32,17 +32,18 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
-    const {
-      id,
-      messages,
-      selectedChatModel,
-      userMode,
-    }: {
-      id: string;
-      messages: Array<UIMessage>;
-      selectedChatModel: string;
-      userMode?: string;
-    } = await request.json();
+    // Start with safer parsing of the request
+    const body = await request.json();
+    
+    // Extract with type checking and defaults
+    const id = body.id as string;
+    const messages = (body.messages || []) as Array<UIMessage>;
+    const selectedChatModel = (body.selectedChatModel || 'chat-model') as string;
+    const userMode = body.userMode as string | undefined;
+    
+    if (!id || !Array.isArray(messages)) {
+      return new Response('Invalid request format', { status: 400 });
+    }
 
     const session = await auth();
 
@@ -74,27 +75,54 @@ export async function POST(request: Request) {
     const messageSenderMode = (userMessage as any).senderMode || 
                              (userMode === 'supplier' ? 'supplier' : 'schreiber');
     
-    await saveMessages({
-      messages: [
-        {
-          chatId: id,
-          id: userMessage.id,
-          role: 'user',
-          parts: userMessage.parts,
-          attachments: userMessage.experimental_attachments ?? [],
-          createdAt: new Date(),
-          senderMode: messageSenderMode as 'supplier' | 'schreiber',
-        },
-      ],
+    // Add detailed logging for debugging attachments
+    console.log("[API] User message received:", {
+      id: userMessage.id,
+      role: userMessage.role,
+      parts: userMessage.parts,
+      hasAttachments: !!userMessage.experimental_attachments,
+      attachmentsCount: userMessage.experimental_attachments?.length || 0,
+      senderMode: messageSenderMode,
     });
+    
+    if (userMessage.experimental_attachments?.length > 0) {
+      console.log("[API] Attachments details:", JSON.stringify(userMessage.experimental_attachments));
+    }
+    
+    // Store the user message with any attachments
+    try {
+      await saveMessages({
+        messages: [
+          {
+            chatId: id,
+            id: userMessage.id,
+            role: 'user',
+            parts: userMessage.parts,
+            attachments: userMessage.experimental_attachments ?? [],
+            createdAt: new Date(),
+            senderMode: messageSenderMode as 'supplier' | 'schreiber',
+          },
+        ],
+      });
+      console.log("[API] Message saved to database successfully");
+    } catch (error) {
+      console.error("[API] Error saving user message to database:", error);
+      // Continue anyway - don't fail the whole request if DB save fails
+    }
 
+    console.log("[API] Starting AI stream with model:", selectedChatModel);
+    console.log("[API] Total messages in conversation:", messages.length);
+    
     return createDataStreamResponse({
       execute: (dataStream) => {
-        const result = streamText({
-          model: myProvider.languageModel(selectedChatModel),
-          system: systemPrompt({ selectedChatModel }),
-          messages,
-          maxSteps: 5,
+        console.log("[API] Executing stream text with model:", selectedChatModel);
+        
+        try {
+          const result = streamText({
+            model: myProvider.languageModel(selectedChatModel),
+            system: systemPrompt({ selectedChatModel }),
+            messages,
+            maxSteps: 5,
           experimental_activeTools:
             selectedChatModel === 'chat-model-reasoning'
               ? []
@@ -166,19 +194,53 @@ export async function POST(request: Request) {
           },
         });
 
+        console.log("[API] Stream initiated successfully");
+        
         result.consumeStream();
 
         result.mergeIntoDataStream(dataStream, {
           sendReasoning: true,
         });
+        
+        } catch (error) {
+          console.error("[API] Error in streamText:", error);
+          dataStream.writeData({ type: 'error', content: 'Error generating response' });
+          throw error;
+        }
       },
-      onError: () => {
-        return 'Oops, an error occurred!';
+      onError: (error) => {
+        console.error('[API] onError handler triggered:', error);
+        return 'Oops, an error occurred processing your request. Please try again.';
       },
     });
   } catch (error) {
+    console.error('[API] Catastrophic chat API error:', error);
+    
+    // Try to get more details about the error
+    let errorDetails = 'Unknown error';
+    if (error instanceof Error) {
+      errorDetails = `${error.name}: ${error.message}`;
+      if (error.stack) {
+        console.error('[API] Error stack:', error.stack);
+      }
+    } else if (typeof error === 'string') {
+      errorDetails = error;
+    } else if (error && typeof error === 'object') {
+      errorDetails = JSON.stringify(error);
+    }
+    
+    console.error('[API] Error details:', errorDetails);
+    
+    // Return a more informative error message in development
+    if (process.env.NODE_ENV === 'development') {
+      return new Response(`Error: ${errorDetails}`, {
+        status: 500,
+      });
+    }
+    
+    // Generic error for production
     return new Response('An error occurred while processing your request!', {
-      status: 404,
+      status: 500,
     });
   }
 }

@@ -106,6 +106,7 @@ export function Chat({
     status,
     stop,
     reload,
+    error
   } = useChat({
     id,
     body: { id, selectedChatModel: selectedChatModel, userMode: mode },
@@ -115,31 +116,124 @@ export function Chat({
     generateId: generateUUID,
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
+      console.log("[CHAT] Chat finished successfully");
     },
-    onError: () => {
-      toast.error('An error occurred, please try again!');
+    onError: (error) => {
+      console.error("[CHAT] Error from useChat:", error);
+      toast.error(`Error: ${error?.message || 'An error occurred, please try again!'}`);
     },
   });
+  
+  // Add debug logging for message state
+  useEffect(() => {
+    if (messages.length > 0) {
+      console.log(`[CHAT] Messages updated (${messages.length} total):`, 
+        messages.map(m => ({
+          role: m.role,
+          content: typeof m.content === 'string' ? m.content.substring(0, 30) + '...' : 'Non-string content',
+          partsCount: m.parts?.length || 0,
+          hasAttachments: !!m.experimental_attachments,
+          attachmentsCount: m.experimental_attachments?.length || 0
+        }))
+      );
+    }
+    
+    // Show detailed error if any
+    if (error) {
+      console.error('[CHAT] Current error state:', error);
+    }
+  }, [messages, error]);
 
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
     fetcher,
   );
 
+  // Dynamic attachments from user's uploaded PDFs
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
   
-  // Add a wrapper around append to include the senderMode
+  // Load PDFs when component mounts
+  useEffect(() => {
+    async function loadPDFs() {
+      try {
+        // First try to get files from the user's uploads
+        const response = await fetch('/api/files?type=application/pdf');
+        
+        if (response.ok) {
+          const files = await response.json();
+          
+          if (files && files.length > 0) {
+            console.log("[CHAT] Found user PDFs:", files);
+            
+            // Use the actual file URLs from Vercel Blob storage
+            const pdfAttachments = files.map(file => ({
+              name: file.fileName,
+              url: file.fileUrl, // This is an absolute URL to Vercel Blob
+              contentType: file.fileType
+            }));
+            
+            setAttachments(pdfAttachments);
+            console.log("[CHAT] Using user's uploaded PDFs:", pdfAttachments);
+            return;
+          }
+        }
+        
+        // Fallback to examples if no user PDFs found (these URLs would need to be valid)
+        console.log("[CHAT] No user PDFs found, using fallbacks");
+        // // NOTE: These examples would need to be replaced with real, publicly accessible PDFs
+        // setAttachments([
+        //   {
+        //     name: "technical_spec.pdf",
+        //     url: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Sample_PDF.pdf", // Public sample PDF
+        //     contentType: "application/pdf",
+        //   }
+        // ]);
+      } catch (error) {
+        console.error("[CHAT] Error loading PDFs:", error);
+        // Fallback to empty attachments on error
+        setAttachments([]);
+      }
+    }
+    
+    loadPDFs();
+  }, []);
+  
+  // Add a wrapper around append to include the senderMode and attachments
   const appendWithMode = (message: any) => {
-    // Only user messages need a senderMode
+    // Only user messages need a senderMode and attachments
     if (message.role === 'user') {
-      // Add the current mode to the message
-      const messageWithMode = {
-        ...message,
-        senderMode: mode // Current user mode (supplier or schreiber)
-      };
-      return append(messageWithMode);
+      try {
+        console.log("[APPEND] Before processing message:", JSON.stringify(message));
+        
+        // Only add attachments to the first message in the conversation
+        const isFirstMessage = messages.length === 0;
+        
+        // Create the message with proper mode
+        const messageWithMode = {
+          ...message,
+          senderMode: mode, // Current user mode (supplier or schreiber)
+          // Only include attachments if this is the first message and we have attachments
+          ...(isFirstMessage && attachments.length > 0 
+              ? { experimental_attachments: attachments } 
+              : {})
+        };
+        
+        if (isFirstMessage && attachments.length > 0) {
+          console.log("[APPEND] First message - adding attachments:", attachments.length);
+        } else {
+          console.log("[APPEND] Not first message or no attachments - skipping attachments");
+        }
+        
+        console.log("[APPEND] Final message to send:", JSON.stringify(messageWithMode));
+        return append(messageWithMode);
+      } catch (error) {
+        console.error("[APPEND] Error appending user message:", error);
+        toast.error("Error sending message");
+        return null;
+      }
     } else {
       // Assistant messages don't need a senderMode
+      console.log("[APPEND] Assistant message:", message.content);
       return append({...message});
     }
   };
