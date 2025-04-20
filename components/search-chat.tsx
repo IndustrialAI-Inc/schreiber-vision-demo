@@ -1,29 +1,32 @@
-
-// @ts-nocheck
 'use client';
 
 import type { Attachment, UIMessage } from 'ai';
 import { useChat } from '@ai-sdk/react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { SearchMultimodalInput } from '@/components/search-multimodal-input';
 import type { Vote } from '@/lib/db/schema';
 import { fetcher, generateUUID } from '@/lib/utils';
 import { Artifact } from './artifact';
-import { MultimodalInput } from './multimodal-input';
 import { Messages } from './messages';
 import type { VisibilityType } from './visibility-selector';
 import { useArtifactSelector } from '@/hooks/use-artifact';
 import { toast } from 'sonner';
 import { unstable_serialize } from 'swr/infinite';
 import { getChatHistoryPaginationKey } from './sidebar-history';
-import { SupplierTimeline } from './supplier-timeline';
-import { useUserMode, MessageModeContext } from './mode-toggle';
-import { SupplierSheetAnalysis } from './supplier-sheet-analysis';
+import { createContext } from 'react';
+import { useUserMode } from './mode-toggle';
 import { cn } from '@/lib/utils';
-import { useSearchParams } from 'next/navigation';
+import { MessageReasoning } from './message-reasoning';
 
-export function ChatSearch({
+// Create a local message mode context for search page
+const MessageModeContext = createContext<{
+  messageModeOverride: 'supplier' | 'schreiber' | null;
+}>({
+  messageModeOverride: null,
+});
+
+export function SearchChat({
   id,
   initialMessages,
   selectedChatModel,
@@ -39,15 +42,12 @@ export function ChatSearch({
   const { mutate } = useSWRConfig();
   const { mode } = useUserMode();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
-  const [sheetContent, setSheetContent] = useState<string>('');
+  const [query, setQuery] = useState('');
   const [inputPosition, setInputPosition] = useState<'top' | 'bottom'>('top');
-  
-  // Check for schreiberApproval query parameter
-  const searchParams = useSearchParams();
-  const isSchreiberApproval = searchParams.get('schreiberApproval') === 'true';
-  
-  // When switching modes, this state ensures existing messages don't suddenly change position
-  // Messages will always maintain their original mode/position
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const reasoningRef = useRef<HTMLDivElement>(null);
+
+  // Message mode override for consistent styling
   const [messageModeOverride, setMessageModeOverride] = useState<null | 'supplier' | 'schreiber'>(null);
   
   const {
@@ -60,23 +60,33 @@ export function ChatSearch({
     status,
     stop,
     reload,
-    error
+    error,
+    reasoning,
   } = useChat({
     id,
-    body: { id, selectedChatModel: selectedChatModel, userMode: mode },
+    body: { id, selectedChatModel, userMode: mode },
     initialMessages,
     experimental_throttle: 100,
     sendExtraMessageFields: true,
     generateId: generateUUID,
     onFinish: () => {
       mutate(unstable_serialize(getChatHistoryPaginationKey));
-      console.log("[CHAT] Chat finished successfully");
+      console.log("[SEARCH] Search completed successfully");
     },
     onError: (error) => {
-      console.error("[CHAT] Error from useChat:", error);
+      console.error("[SEARCH] Error:", error);
       toast.error(`Error: ${error?.message || 'An error occurred, please try again!'}`);
     },
+    experimental_sendReasoningMessages: true,
+    api: '/search/api/search', // Uses our dedicated search endpoint with DeepSeek model
   });
+  
+  // Focus the search input when the page loads
+  useEffect(() => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  }, []);
   
   // Move input to bottom after first message
   useEffect(() => {
@@ -86,65 +96,23 @@ export function ChatSearch({
       setInputPosition('top');
     }
   }, [messages.length]);
-  
-  // Use this effect to stabilize message appearance during mode transitions
+
+  // When switching modes, this state ensures existing messages don't suddenly change position
   useEffect(() => {
-    // When mode changes, briefly lock the message appearance with the previous mode
-    // This prevents message jumping during mode transition
     const prevMode = messageModeOverride || mode;
     setMessageModeOverride(prevMode);
     
-    // After transition animation would be complete, unlock
     const timer = setTimeout(() => {
       setMessageModeOverride(null);
-    }, 200); // Typical transition time
+    }, 200);
     
     return () => clearTimeout(timer);
   }, [mode, messageModeOverride]);
-  
-  // Fetch sheet content for supplier analysis
-  useEffect(() => {
-    if (mode === 'supplier' && id) {
-      // Check if we're in feedback mode before fetching
-      const checkTimelineAndFetch = async () => {
-        try {
-          const timelineRes = await fetch(`/api/timeline?chatId=${id}`);
-          const timeline = await timelineRes.json();
-          
-          // Only fetch sheet if we're in feedback mode
-          const isFeedbackInProgress = timeline?.steps?.some(
-            (step: {id: string, status: string}) => 
-              step.id === 'feedback' && step.status === 'in-progress'
-          );
-          
-          if (isFeedbackInProgress) {
-            // Attempt to fetch the latest sheet artifact for this chat
-            fetch(`/api/artifacts?chatId=${id}&kind=sheet`)
-              .then(res => res.json())
-              .then(data => {
-                if (data && data.length > 0) {
-                  // Get the latest sheet
-                  const latestSheet = data[0];
-                  setSheetContent(latestSheet.content || '');
-                }
-              })
-              .catch(err => {
-                console.error('Error fetching sheet content:', err);
-              });
-          }
-        } catch (error) {
-          console.error('Error checking timeline status:', error);
-        }
-      };
-      
-      checkTimelineAndFetch();
-    }
-  }, [id, mode]);
 
-  // Add debug logging for message state
+  // Log message state for debugging
   useEffect(() => {
     if (messages.length > 0) {
-      console.log(`[CHAT] Messages updated (${messages.length} total):`, 
+      console.log(`[SEARCH] Messages updated (${messages.length} total):`, 
         messages.map(m => ({
           role: m.role,
           content: typeof m.content === 'string' ? m.content.substring(0, 30) + '...' : 'Non-string content',
@@ -155,9 +123,8 @@ export function ChatSearch({
       );
     }
     
-    // Show detailed error if any
     if (error) {
-      console.error('[CHAT] Current error state:', error);
+      console.error('[SEARCH] Current error state:', error);
     }
   }, [messages, error]);
 
@@ -173,36 +140,35 @@ export function ChatSearch({
   useEffect(() => {
     async function loadPDFs() {
       try {
-        // Don't use sessionStorage to determine if PDFs should be loaded
-        // This was preventing PDFs from being loaded on page refresh
-        
-        // First try to get files from the user's uploads
+        // Fetch all PDFs from Vercel Blob storage
+        console.log("[SEARCH] Fetching PDFs from Vercel Blob storage...");
         const response = await fetch('/api/files?type=application/pdf');
         
         if (response.ok) {
           const files = await response.json();
+          console.log("[SEARCH] API response:", files);
           
           if (files && files.length > 0) {
-            console.log("[CHAT] Found user PDFs:", files);
+            console.log("[SEARCH] Found PDFs in Vercel Blob:", files);
             
-            // Use the actual file URLs from Vercel Blob storage
+            // Convert all PDFs from Vercel Blob to attachments format
             const pdfAttachments = files.map(file => ({
               name: file.fileName,
-              url: file.fileUrl, // This is an absolute URL to Vercel Blob
+              url: file.fileUrl, // This is an absolute URL to Vercel Blob storage
               contentType: file.fileType
             }));
             
+            // Set attachments for first message
             setAttachments(pdfAttachments);
-            console.log("[CHAT] Using user's uploaded PDFs:", pdfAttachments);
-            return;
+            console.log("[SEARCH] Set attachments for first message");
+          } else {
+            console.log("[SEARCH] No PDFs found in API response");
           }
+        } else {
+          console.error("[SEARCH] API response was not OK:", response.status);
         }
-        
-        console.log("[CHAT] No user PDFs found");
-        setAttachments([]);
       } catch (error) {
-        console.error("[CHAT] Error loading PDFs:", error);
-        // Fallback to empty attachments on error
+        console.error("[SEARCH] Error loading PDFs:", error);
         setAttachments([]);
       }
     }
@@ -210,80 +176,108 @@ export function ChatSearch({
     loadPDFs();
   }, []);
   
+  // Add reasoning section above message handling when it's available
+  const hasReasoning = reasoning && reasoning.length > 0 && status === 'loading';
+  
   // Add a wrapper around append to include the senderMode and attachments
-  const appendWithMode = (message: any) => {
+  const appendWithMode = async (message: any) => {
     // Only user messages need a senderMode and attachments
     if (message.role === 'user') {
       try {
-        console.log("[APPEND] Before processing message:", JSON.stringify(message));
+        console.log("[SEARCH APPEND] Before processing message:", JSON.stringify(message));
         
         // Only add attachments to the first message in the conversation
         const isFirstMessage = messages.length === 0;
         
-        // Create the message with proper mode
-        const messageWithMode = {
-          ...message,
-          senderMode: mode, // Current user mode (supplier or schreiber)
-          // Always include attachments if this is the first message and we have attachments
-          ...(isFirstMessage && attachments.length > 0 
-              ? { experimental_attachments: attachments } 
-              : {})
-        };
+        // Always include PDFs for the first message
+        let pdfAttachments = attachments;
         
-        // Check if this appears to be a search query - in that case modify the content
-        if (typeof messageWithMode.content === 'string') {
-          // If we're in search mode (using the SearchMultimodalInput component with isSearchMode=true)
-          // Add the prompt to use requestPdf tool if in search mode
-          if (isSearchMode) {
-            // Extract original query if it has the "Search query:" prefix
-            let originalQuery = messageWithMode.content;
-            if (messageWithMode.content.startsWith('Search query:')) {
-              const match = messageWithMode.content.match(/Search query: (.*?)(\n|$)/);
-              if (match && match[1]) {
-                originalQuery = match[1].trim();
+        // If this is the first message, make sure we have PDFs
+        if (isFirstMessage && (!attachments || attachments.length === 0)) {
+          try {
+            // Direct fetch for PDFs
+            const response = await fetch('/api/files?type=application/pdf');
+            
+            if (response.ok) {
+              const files = await response.json();
+              
+              if (files && files.length > 0) {
+                // Convert all PDFs to attachments
+                pdfAttachments = files.map(file => ({
+                  name: file.fileName,
+                  url: file.fileUrl,
+                  contentType: file.fileType
+                }));
+                
+                setAttachments(pdfAttachments);
+                console.log("[SEARCH APPEND] Got PDF attachments directly:", pdfAttachments.length);
               }
             }
-            
-            // Format the search query with proper instructions
-            messageWithMode.content = `Search query: ${originalQuery}
+          } catch (error) {
+            console.error("[SEARCH APPEND] Error fetching PDFs:", error);
+          }
+        }
+        
+        // Create message with mode and attachments
+        const messageWithMode = {
+          ...message,
+          senderMode: mode,
+          ...(isFirstMessage && pdfAttachments?.length > 0 
+            ? { experimental_attachments: pdfAttachments } 
+            : {})
+        };
+        
+        console.log("[SEARCH APPEND] Submitting message with prompt to use requestPdf tool and search PDFs");
+        
+        // Modify the message content to instruct AI to use requestPdf
+        // Extract original query from message content if it contains "Search query:" prefix
+        let originalQuery = messageWithMode.content;
+        if (typeof messageWithMode.content === 'string') {
+          if (messageWithMode.content.startsWith('Search query:')) {
+            // Extract the actual query
+            const match = messageWithMode.content.match(/Search query: (.*?)(\n|$)/);
+            if (match && match[1]) {
+              originalQuery = match[1].trim();
+            }
+          }
+          
+          // Format the search query with proper instructions
+          messageWithMode.content = `Search query: ${originalQuery}
 
 Think deeply about this query to identify the most relevant PDF documents from my repository. 
 After analyzing the query, ALWAYS use the requestPdf tool to fetch and display the most relevant PDF document.
 If there are multiple relevant documents, prioritize showing the one that's most directly related to my query.`;
-          }
         }
         
-        if (isFirstMessage && attachments.length > 0) {
-          console.log("[APPEND] First message - adding attachments:", attachments);
-        } else if (isFirstMessage) {
-          console.log("[APPEND] First message but no attachments available");
-        } else {
-          console.log("[APPEND] Not first message - skipping attachments");
-        }
+        console.log("[SEARCH APPEND] Final message:", JSON.stringify(messageWithMode));
+        const result = await append(messageWithMode);
+        return result;
         
-        console.log("[APPEND] Final message to send:", JSON.stringify(messageWithMode));
-        return append(messageWithMode);
       } catch (error) {
-        console.error("[APPEND] Error appending user message:", error);
-        toast.error("Error sending message");
-        // Return a rejected promise instead of null to maintain type compatibility
-        return Promise.reject(error);
+        console.error("[SEARCH APPEND] Error appending message:", error);
+        toast.error("Error sending search query");
+        return null;
       }
+    } else {
+      return append({...message});
     }
-    
-    // For non-user messages, just pass through
-    return append(message);
   };
-  
-  // Whether this is being used in search mode (based on props)
-  const isSearchMode = true;
 
-  // Handler for when supplier sends feedback
-  const handleSendFeedback = (feedback: string) => {
-    appendWithMode({
-      role: 'user',
-      content: `**SUPPLIER FEEDBACK:**\n\n${feedback}`,
-    });
+  const handleSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim() || status === 'loading') return;
+    
+    try {
+      await appendWithMode({
+        role: 'user',
+        content: query,
+      });
+      
+      // Clear input after sending
+      setQuery('');
+    } catch (err) {
+      console.error('Error during search:', err);
+    }
   };
 
   return (
@@ -296,8 +290,8 @@ If there are multiple relevant documents, prioritize showing the one that's most
           <div className="sticky top-0 z-10 max-w-3xl mx-auto w-full">
             <SearchMultimodalInput
               chatId={id}
-              input={input}
-              setInput={setInput}
+              input={query}
+              setInput={setQuery}
               status={status}
               stop={stop}
               attachments={attachments}
@@ -308,20 +302,21 @@ If there are multiple relevant documents, prioritize showing the one that's most
               handleSubmit={handleSubmit}
               isSearchMode={true}
               disabled={isReadonly}
-              supplierMode={mode === 'supplier'}
+              supplierMode={false}
             />
           </div>
         )}
 
-        {mode === 'supplier' && sheetContent && (
-          <SupplierSheetAnalysis
-            chatId={id}
-            sheetContent={sheetContent}
-            append={append}
-          />
+        {/* Display reasoning during search */}
+        {hasReasoning && (
+          <div className="mx-auto max-w-3xl w-full px-4">
+            <div ref={reasoningRef} className="px-4 py-2 bg-muted/50 my-3 rounded-md shadow-sm">
+              <MessageReasoning isLoading={true} reasoning={reasoning} />
+            </div>
+          </div>
         )}
 
-        <div className="mx-auto max-w-3xl w-full">
+        <div className="flex-grow overflow-auto mx-auto max-w-3xl w-full">
           <Messages
             chatId={id}
             status={status}
@@ -331,7 +326,7 @@ If there are multiple relevant documents, prioritize showing the one that's most
             reload={reload}
             isReadonly={isReadonly}
             isArtifactVisible={isArtifactVisible}
-            isSchreiberApproval={isSchreiberApproval}
+            isSchreiberApproval={false}
           />
         </div>
 
@@ -340,8 +335,8 @@ If there are multiple relevant documents, prioritize showing the one that's most
           <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 max-w-3xl mx-auto w-full">
             <SearchMultimodalInput
               chatId={id}
-              input={input}
-              setInput={setInput}
+              input={query}
+              setInput={setQuery}
               status={status}
               stop={stop}
               attachments={attachments}
@@ -352,7 +347,7 @@ If there are multiple relevant documents, prioritize showing the one that's most
               handleSubmit={handleSubmit}
               isSearchMode={true}
               disabled={isReadonly}
-              supplierMode={mode === 'supplier'}
+              supplierMode={false}
             />
           </div>
         )}
@@ -373,7 +368,7 @@ If there are multiple relevant documents, prioritize showing the one that's most
         reload={reload}
         votes={votes}
         isReadonly={isReadonly}
-        isSchreiberApproval={isSchreiberApproval}
+        isSchreiberApproval={false}
       />
     </MessageModeContext.Provider>
   );

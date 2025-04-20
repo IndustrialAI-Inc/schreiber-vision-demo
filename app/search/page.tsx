@@ -1,43 +1,17 @@
-import { cookies } from 'next/headers';
-
-
-import { DEFAULT_CHAT_MODEL } from '@/lib/ai/models';
+import { redirect } from 'next/navigation';
 import { generateUUID } from '@/lib/utils';
-import { DataStreamHandler } from '@/components/data-stream-handler';
-import { ChatSearch } from '@/components/chat-search';
-export default async function Page() {
+import { auth } from '@/app/(auth)/auth';
+
+export default async function SearchRedirectPage() {
+  // Generate a new search ID
   const id = generateUUID();
-
-  const cookieStore = await cookies();
-  const modelIdFromCookie = cookieStore.get('chat-model');
-
-  if (!modelIdFromCookie) {
-    return (
-      <>
-        <ChatSearch
-          key={id}
-          id={id}
-          initialMessages={[]}
-          selectedChatModel={DEFAULT_CHAT_MODEL}
-          selectedVisibilityType="private"
-          isReadonly={false}
-        />
-        <DataStreamHandler id={id} />
-      </>
-    );
+  
+  // Ensure user is authenticated
+  const session = await auth();
+  if (!session?.user) {
+    redirect('/login');
   }
-
-  return (
-    <>
-      <ChatSearch
-        key={id}
-        id={id}
-        initialMessages={[]}
-        selectedChatModel={modelIdFromCookie.value}
-        selectedVisibilityType="private"
-        isReadonly={false}
-      />
-      <DataStreamHandler id={id} />
-    </>
-  );
+  
+  // Redirect to search/[id]
+  redirect(`/search/${id}`);
 }

@@ -24,7 +24,7 @@ import { SuggestedActions } from './suggested-actions';
 import equal from 'fast-deep-equal';
 import type { UseChatHelpers } from '@ai-sdk/react';
 
-function PureMultimodalInput({
+function PureSearchModalMultimodalInput({
   chatId,
   input,
   setInput,
@@ -246,9 +246,7 @@ function PureMultimodalInput({
         data-testid="multimodal-input"
         ref={textareaRef}
         placeholder={
-          isSearchMode 
-            ? 'Type your search query...' 
-            : (supplierMode ? 'Send supplier feedback...' : 'Send a message...')
+'Type your search query...' 
         }
         value={input}
         onChange={handleInput}
@@ -302,8 +300,8 @@ function PureMultimodalInput({
   );
 }
 
-export const MultimodalInput = memo(
-  PureMultimodalInput,
+export const SearchModalMultimodalInput = memo(
+  PureSearchModalMultimodalInput,
   (prevProps, nextProps) => {
     if (prevProps.input !== nextProps.input) return false;
     if (prevProps.status !== nextProps.status) return false;
