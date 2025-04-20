@@ -195,12 +195,13 @@ const PureSpreadsheetEditor = ({
   return (
     <div className="flex flex-col size-full gap-2">
       <div className="p-2 mx-2 flex justify-between items-center border rounded-md">
-        <Button 
-          onClick={toggleEmptyAnswers}
-          variant="outline"
-          className="flex !border-0 items-center gap-1"
-        >
-          {hideEmptyAnswers ? (
+        {!isDark && (
+          <Button 
+            onClick={toggleEmptyAnswers}
+            variant="outline"
+            className="flex !border-0 items-center gap-1"
+          >
+            {hideEmptyAnswers ? (
             <>
               <Eye size={16} />
               <span>Show All Rows</span>
@@ -212,7 +213,8 @@ const PureSpreadsheetEditor = ({
             </>
           )}
         </Button>
-        <div className="text-sm text-muted-foreground">
+        )}
+        <div className="text-sm ml-auto text-muted-foreground">
           {displayedRows.length} rows {hideEmptyAnswers ? '(unanswered questions)' : '(all)'}
         </div>
       </div>
