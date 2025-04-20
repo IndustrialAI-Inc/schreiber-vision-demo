@@ -161,17 +161,8 @@ export function Chat({
   useEffect(() => {
     async function loadPDFs() {
       try {
-        // Check if this is a page refresh by using sessionStorage
-        const hasPageLoaded = sessionStorage.getItem('chatPageLoaded');
-        
-        if (hasPageLoaded) {
-          // This is a page refresh, don't load PDFs
-          console.log("[CHAT] Page refreshed, not loading PDFs");
-          return;
-        }
-        
-        // Mark that the page has been loaded
-        sessionStorage.setItem('chatPageLoaded', 'true');
+        // Don't use sessionStorage to determine if PDFs should be loaded
+        // This was preventing PDFs from being loaded on page refresh
         
         // First try to get files from the user's uploads
         const response = await fetch('/api/files?type=application/pdf');
@@ -195,16 +186,8 @@ export function Chat({
           }
         }
         
-        // Fallback to examples if no user PDFs found (these URLs would need to be valid)
-        console.log("[CHAT] No user PDFs found, using fallbacks");
-        // // NOTE: These examples would need to be replaced with real, publicly accessible PDFs
-        // setAttachments([
-        //   {
-        //     name: "technical_spec.pdf",
-        //     url: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Sample_PDF.pdf", // Public sample PDF
-        //     contentType: "application/pdf",
-        //   }
-        // ]);
+        console.log("[CHAT] No user PDFs found");
+        setAttachments([]);
       } catch (error) {
         console.error("[CHAT] Error loading PDFs:", error);
         // Fallback to empty attachments on error
@@ -229,16 +212,18 @@ export function Chat({
         const messageWithMode = {
           ...message,
           senderMode: mode, // Current user mode (supplier or schreiber)
-          // Only include attachments if this is the first message and we have attachments
+          // Always include attachments if this is the first message and we have attachments
           ...(isFirstMessage && attachments.length > 0 
               ? { experimental_attachments: attachments } 
               : {})
         };
         
         if (isFirstMessage && attachments.length > 0) {
-          console.log("[APPEND] First message - adding attachments:", attachments.length);
+          console.log("[APPEND] First message - adding attachments:", attachments);
+        } else if (isFirstMessage) {
+          console.log("[APPEND] First message but no attachments available");
         } else {
-          console.log("[APPEND] Not first message or no attachments - skipping attachments");
+          console.log("[APPEND] Not first message - skipping attachments");
         }
         
         console.log("[APPEND] Final message to send:", JSON.stringify(messageWithMode));
@@ -246,13 +231,13 @@ export function Chat({
       } catch (error) {
         console.error("[APPEND] Error appending user message:", error);
         toast.error("Error sending message");
-        return null;
+        // Return a rejected promise instead of null to maintain type compatibility
+        return Promise.reject(error);
       }
-    } else {
-      // Assistant messages don't need a senderMode
-      console.log("[APPEND] Assistant message:", message.content);
-      return append({...message});
     }
+    
+    // For non-user messages, just pass through
+    return append(message);
   };
 
   // Handler for when supplier sends feedback
