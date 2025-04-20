@@ -19,6 +19,7 @@ import { SupplierTimeline } from './supplier-timeline';
 import { useUserMode, MessageModeContext } from './mode-toggle';
 import { SupplierSheetAnalysis } from './supplier-sheet-analysis';
 import { cn } from '@/lib/utils';
+import { useSearchParams } from 'next/navigation';
 
 export function Chat({
   id,
@@ -37,6 +38,10 @@ export function Chat({
   const { mode } = useUserMode();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
   const [sheetContent, setSheetContent] = useState<string>('');
+  
+  // Check for schreiberApproval query parameter
+  const searchParams = useSearchParams();
+  const isSchreiberApproval = searchParams.get('schreiberApproval') === 'true';
   
   // When switching modes, this state ensures existing messages don't suddenly change position
   // Messages will always maintain their original mode/position
@@ -277,6 +282,7 @@ export function Chat({
           reload={reload}
           isReadonly={isReadonly}
           isArtifactVisible={isArtifactVisible}
+          isSchreiberApproval={isSchreiberApproval}
         />
 
         <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl flex-col">
@@ -319,6 +325,7 @@ export function Chat({
         reload={reload}
         votes={votes}
         isReadonly={isReadonly}
+        isSchreiberApproval={isSchreiberApproval}
       />
     </MessageModeContext.Provider>
   );

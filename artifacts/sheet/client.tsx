@@ -12,6 +12,7 @@ import { parse, unparse } from 'papaparse';
 import { toast } from 'sonner';
 import type { TimelineStep } from '@/hooks/use-supplier-timeline';
 import { mutate } from 'swr';
+import { useSchreiberSubmit } from '@/hooks/use-schreiber-submit';
 
 type Metadata = any;
 
@@ -113,6 +114,10 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
 
               // Show loading toast
               const loadingToast = toast.loading('Submitting to Schreiber team...');
+              
+              // Set the Schreiber submit state
+              const setSubmitted = useSchreiberSubmit.getState().setSubmitted;
+              setSubmitted(chatId);
               
               console.log('Starting send to Schreiber with chatId:', chatId);
               

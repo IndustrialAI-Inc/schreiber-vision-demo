@@ -71,6 +71,7 @@ function PureArtifact({
   reload,
   votes,
   isReadonly,
+  isSchreiberApproval,
 }: {
   chatId: string;
   input: string;
@@ -86,6 +87,7 @@ function PureArtifact({
   handleSubmit: UseChatHelpers['handleSubmit'];
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
+  isSchreiberApproval?: boolean;
 }) {
   const { artifact, setArtifact, metadata, setMetadata } = useArtifact();
 
@@ -321,13 +323,14 @@ function PureArtifact({
               <div className="flex flex-col h-full justify-between items-center gap-4">
                 <ArtifactMessages
                   chatId={chatId}
-                  status={status}
-                  votes={votes}
                   messages={messages}
                   setMessages={setMessages}
+                  votes={votes}
                   reload={reload}
+                  status={status}
                   isReadonly={isReadonly}
                   artifactStatus={artifact.status}
+                  isSchreiberApproval={isSchreiberApproval}
                 />
 
                 <form className="flex flex-row gap-2 relative items-end w-full px-4 pb-4">

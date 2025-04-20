@@ -118,7 +118,11 @@ export function SupplierAlert() {
                 className={`text-xs ${styles.button}`}
                 onClick={() => {
                   if (pendingTasks[0].chatId) {
-                    router.push(`/chat/${pendingTasks[0].chatId}`);
+                    // Add schreiberApproval=true query param when in Schreiber mode
+                    const url = mode === 'schreiber' 
+                      ? `/chat/${pendingTasks[0].chatId}?schreiberApproval=true`
+                      : `/chat/${pendingTasks[0].chatId}?supplier=true`;
+                    router.push(url);
                   }
                 }}
               >
