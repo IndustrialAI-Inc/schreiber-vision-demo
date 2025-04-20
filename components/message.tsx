@@ -177,25 +177,7 @@ const PurePreviewMessage = ({
                         'flex-row': isSupplierMsg || (isLegacyUserMsg && isSupplierMode) || message.role === 'assistant',
                       }
                     )}>
-                      {message.role === 'user' && !isReadonly && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button
-                              data-testid="message-edit-button"
-                              variant="ghost"
-                              className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100 ml-2"
-                              onClick={() => {
-                                setMode('edit');
-                              }}
-                            >
-                              <PencilEditIcon />
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>Edit message</TooltipContent>
-                        </Tooltip>
-                      )}
-
-                      <div
+                        <div
                         data-testid="message-content"
                         className={cn('flex flex-col gap-4 w-auto', {
                           // Schreiber user: right, black bubble in light mode, white bubble in dark mode
@@ -213,6 +195,25 @@ const PurePreviewMessage = ({
                       >
                         <Markdown>{part.text}</Markdown>
                       </div>
+
+                      {message.role === 'user' && !isReadonly && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              data-testid="message-edit-button"
+                              variant="ghost"
+                              className="px-2 mx-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100 ml-2"
+                              onClick={() => {
+                                setMode('edit');
+                              }}
+                            >
+                              <PencilEditIcon />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>Edit message</TooltipContent>
+                        </Tooltip>
+                      )}
+
 
                       {/* Edit button is now shown for all user messages regardless of mode */}
                     </div>
