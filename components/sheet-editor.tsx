@@ -34,13 +34,21 @@ const PureSpreadsheetEditor = ({
   const isDark = theme === 'dark';
   const [hideEmptyAnswers, setHideEmptyAnswers] = useState(false);
   const [editCell, setEditCell] = useState<{ rowIndex: number; colIndex: number } | null>(null);
+  
+  // Animation state to control the fill-in effect
+  const [animationStarted, setAnimationStarted] = useState(false);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+  
+  // Use this to ensure content starts empty when streaming begins
+  const displayContent = !animationStarted && status === 'streaming' && isCurrentVersion ? '' : content;
 
   // Store the locked-in question IDs when filter is first activated
   const [lockedQuestionIds, setLockedQuestionIds] = useState<number[]>([]);
 
   const parseData = useMemo(() => {
     // Parse the CSV content with proper quote handling to prevent comma-splitting within fields
-    const result = parse<string[]>(content, { 
+    // Use empty content when streaming to start with empty cells
+    const result = parse<string[]>(displayContent, { 
       skipEmptyLines: false,
       quoteChar: '"', // Use double quotes for field encapsulation
       escapeChar: '"', // Escape quotes with another quote
@@ -78,7 +86,7 @@ const PureSpreadsheetEditor = ({
     }
     
     return paddedData;
-  }, [content]);
+  }, [displayContent]);
 
   // Define column headers for the custom table with fixed widths
   const tableHeaders = useMemo(() => {
@@ -110,6 +118,31 @@ const PureSpreadsheetEditor = ({
   useEffect(() => {
     setLocalRows(tableData);
   }, [tableData]);
+  
+  // Handle animation timing
+  useEffect(() => {
+    // When streaming starts, content is empty, and animation hasn't started
+    if (status === 'streaming' && isCurrentVersion && !animationStarted) {
+      // After a delay, start the animation to fill in cells
+      const timer = setTimeout(() => {
+        // First, update the display content by triggering animation
+        setAnimationStarted(true);
+        
+        // Then allow the animation to run
+        setTimeout(() => {
+          setShouldAnimate(true);
+        }, 100);
+      }, 800); // Delay before the cells start filling in
+      
+      return () => clearTimeout(timer);
+    } else if (status !== 'streaming') {
+      // Reset animation state when not streaming
+      setAnimationStarted(false);
+      setShouldAnimate(false);
+    }
+  }, [status, isCurrentVersion, animationStarted]);
+  
+
 
   // Get the displayedRows based on filter state and locked question IDs
   const displayedRows = useMemo(() => {
@@ -483,7 +516,10 @@ const PureSpreadsheetEditor = ({
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: 1 }}
                                     exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.15 }}
+                                    transition={{ 
+                                      duration: 0.3,
+                                      delay: shouldAnimate ? Math.min(0.2 + (row.id * 0.03) + (cellIndex * 0.02), 2) : 0
+                                    }}
                                   >
                                     {cell}
                                   </motion.div>
