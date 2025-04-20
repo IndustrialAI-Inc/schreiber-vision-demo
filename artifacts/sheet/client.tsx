@@ -93,11 +93,99 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
     },
   ],
   get toolbar() {
-    const mode = typeof localStorage !== 'undefined' ? localStorage.getItem('userMode') : null;
-    // Only show feedback-related actions for suppliers in feedback mode
-    if (mode === 'supplier') {
+    // Create a simple function to force supplier mode with a query parameter
+    // Add ?supplier=true to the URL to force supplier mode
+    const forceSupplierMode = typeof window !== 'undefined' && 
+      new URLSearchParams(window.location.search).get('supplier') === 'true';
+    
+    // If supplier mode is forced via query parameter
+    if (forceSupplierMode) {
       return [
-        // You can add feedback-specific toolbar items here if needed
+        {
+          description: 'Submit to Schreiber',
+          icon: <CheckmarkIcon />,
+          onClick: async ({ chatId }: Record<string, any>) => {
+            try {
+              if (!chatId) {
+                toast.error('Missing chat ID');
+                return;
+              }
+
+              // Show loading toast
+              const loadingToast = toast.loading('Submitting to Schreiber team...');
+              
+              console.log('Starting send to Schreiber with chatId:', chatId);
+              
+              const steps = [
+                {
+                  id: 'prepare',
+                  label: 'Prepare specifications',
+                  status: 'completed',
+                  timestamp: new Date().toISOString(),
+                },
+                {
+                  id: 'review',
+                  label: 'Internal review',
+                  status: 'completed',
+                  timestamp: new Date().toISOString(),
+                },
+                {
+                  id: 'send',
+                  label: 'Send to Schreiber',
+                  status: 'in-progress',
+                  timestamp: new Date().toISOString(),
+                },
+                {
+                  id: 'feedback',
+                  label: 'Supplier feedback',
+                  status: 'pending',
+                },
+                {
+                  id: 'finalize',
+                  label: 'Finalize specifications',
+                  status: 'pending',
+                },
+              ];
+              
+              console.log('Sending timeline data:', { chatId, steps });
+              
+              const response = await fetch('/api/timeline', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  chatId,
+                  isVisible: true,
+                  steps,
+                }),
+              });
+              
+              // Dismiss loading toast
+              toast.dismiss(loadingToast);
+              
+              if (!response.ok) {
+                const errorText = await response.text();
+                console.error('API error:', response.status, errorText);
+                throw new Error(`Failed to update timeline: ${response.status} ${errorText}`);
+              }
+              
+              const result = await response.json();
+              console.log('Timeline create/update result:', result);
+              
+              mutate('/api/timeline');
+              if (chatId) {
+                mutate(`/api/timeline?chatId=${chatId}`);
+              }
+              
+              toast.success('Sent to Schreiber team for approval', {
+                duration: 5000,
+                style: { backgroundColor: '#10b981', color: 'white' }
+              });
+            } catch (error) {
+              console.error('Error updating timeline:', error);
+              toast.error(`Failed to send specification: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            }
+          },
+        }
       ];
     }
     // Otherwise, show the normal toolbar for non-suppliers
@@ -286,7 +374,10 @@ export const sheetArtifact = new Artifact<'sheet', Metadata>({
               mutate(`/api/timeline?chatId=${chatId}`);
             }
             
-            toast.success('Specification sent to supplier for review');
+            toast.success('Specification sent to supplier for review', {
+              duration: 5000,
+              style: { backgroundColor: '#3b82f6', color: 'white' }
+            });
           } catch (error) {
             console.error('Error updating timeline:', error);
             toast.error(`Failed to send specification: ${error instanceof Error ? error.message : 'Unknown error'}`);
