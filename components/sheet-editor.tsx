@@ -276,6 +276,12 @@ const PureSpreadsheetEditor = ({
                       const isAnswerCol = cellIndex === 2;
                       const isUnanswered = isAnswerCol && (!cell || cell.trim() === '');
                       
+                      // Check if this is the first row or if the previous row is answered (not unanswered)
+                      const rowIndex = displayedRows.findIndex(r => r.id === row.id);
+                      const prevRow = rowIndex > 0 ? displayedRows[rowIndex - 1] : null;
+                      const isPrevRowAnswered = prevRow ? (prevRow.cells[2] && prevRow.cells[2].trim() !== '') : true;
+                      const isFirstRow = rowIndex === 0 || (hideEmptyAnswers && isPrevRowAnswered && isUnanswered);
+                      
                       return (
                         <td
                           key={cellIndex}
@@ -291,7 +297,18 @@ const PureSpreadsheetEditor = ({
                               : isDark ? "rgba(10, 10, 10, 1)" : "rgba(255, 255, 255, 1)",
                             borderColor: hideEmptyAnswers && isUnanswered 
                               ? isDark ? "rgba(127, 29, 29, 0.6)" : "rgba(239, 68, 68, 1)" 
-                              : isDark ? "rgba(26, 27, 26, 1)" : "rgba(226, 232, 240, 1)"
+                              : isDark ? "rgba(26, 27, 26, 1)" : "rgba(226, 232, 240, 1)",
+                            // Use individual border properties for unanswered cells
+                            ...(hideEmptyAnswers && isUnanswered ? {
+                              borderRightWidth: '0.5px',
+                              borderRightStyle: 'solid',
+                              borderRightColor: isDark ? 'rgba(127, 29, 29, 0.6)' : 'rgba(239, 68, 68, 1)',
+                              ...(isFirstRow ? {
+                                borderTopWidth: '0.5px',
+                                borderTopStyle: 'solid',
+                                borderTopColor: isDark ? 'rgba(127, 29, 29, 0.6)' : 'rgba(239, 68, 68, 1)',
+                              } : {})
+                            } : {})
                           }}
                           onClick={() => setEditCell({ rowIndex: row.id, colIndex: cellIndex })}
                         >
@@ -331,7 +348,7 @@ const PureSpreadsheetEditor = ({
                   </tr>
                 ))
               ) : (
-                // For small datasets, use animations but only for the first 10 rows
+                // For small datasets, use animations but only for the first 100 rows
                 <AnimatePresence mode="sync" initial={false}>
                   {displayedRows.slice(0, 100).map((row, rowIdx) => {
                     const shouldAnimate = rowIdx < 10;
@@ -340,11 +357,16 @@ const PureSpreadsheetEditor = ({
                         key={row.id}
                         className={cn('bg-white dark:bg-zinc-900')}
                         layout={false}
-                        initial={shouldAnimate ? { opacity: 0 } : false}
+                        initial={shouldAnimate ? { 
+                          opacity: 0, 
+                          y: -10 
+                        } : false}
                         animate={shouldAnimate ? { 
                           opacity: 1,
+                          y: 0,
                           transition: {
-                            duration: 0.1 
+                            opacity: { duration: 0.2 },
+                            y: { duration: 0.3, delay: rowIdx * 0.05 }
                           }
                         } : { opacity: 1 }}
                         exit={shouldAnimate ? { 
@@ -370,6 +392,12 @@ const PureSpreadsheetEditor = ({
                           const isAnswerCol = cellIndex === 2;
                           const isUnanswered = isAnswerCol && (!cell || cell.trim() === '');
                           
+                          // Check if this is the first row or if the previous row is answered (not unanswered)
+                          const rowIndex = displayedRows.findIndex(r => r.id === row.id);
+                          const prevRow = rowIndex > 0 ? displayedRows[rowIndex - 1] : null;
+                          const isPrevRowAnswered = prevRow ? (prevRow.cells[2] && prevRow.cells[2].trim() !== '') : true;
+                          const isFirstRow = rowIndex === 0 || (hideEmptyAnswers && isPrevRowAnswered && isUnanswered);
+                          
                           return (
                             <motion.td
                               key={cellIndex}
@@ -390,6 +418,17 @@ const PureSpreadsheetEditor = ({
                               transition={{ duration: 0.3 }}
                               style={{ 
                                 width: cellIndex < tableHeaders.length - 1 ? tableHeaders[cellIndex + 1]?.width || '100%' : '150px',
+                                // Use individual border properties to avoid React styling warnings
+                                ...(hideEmptyAnswers && isUnanswered ? {
+                                  borderRightWidth: '0.5px',
+                                  borderRightStyle: 'solid',
+                                  borderRightColor: isDark ? 'rgba(127, 29, 29, 0.6)' : 'rgba(239, 68, 68, 1)',
+                                  ...(isFirstRow ? {
+                                    borderTopWidth: '0.5px',
+                                    borderTopStyle: 'solid',
+                                    borderTopColor: isDark ? 'rgba(127, 29, 29, 0.6)' : 'rgba(239, 68, 68, 1)',
+                                  } : {})
+                                } : {})
                               }}
                               onClick={() => setEditCell({ rowIndex: row.id, colIndex: cellIndex })}
                             >
