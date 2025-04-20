@@ -39,8 +39,12 @@ const PureSpreadsheetEditor = ({
   const [lockedQuestionIds, setLockedQuestionIds] = useState<number[]>([]);
 
   const parseData = useMemo(() => {
-    // Parse the CSV content
-    const result = parse<string[]>(content, { skipEmptyLines: false });
+    // Parse the CSV content with proper quote handling to prevent comma-splitting within fields
+    const result = parse<string[]>(content, { 
+      skipEmptyLines: false,
+      quoteChar: '"', // Use double quotes for field encapsulation
+      escapeChar: '"', // Escape quotes with another quote
+    });
     
     // Check if first row is a header row (contains "ID", "Question", "Answer", "Source")
     let dataToProcess = result.data;
@@ -246,28 +250,14 @@ const PureSpreadsheetEditor = ({
             </tr>
           </thead>
           <tbody>
-              <AnimatePresence mode="sync" initial={false}>
-                {displayedRows.map((row, rowIdx) => {
-                  return (
-                    <motion.tr
-                      key={row.id}
-                      className={cn('bg-white dark:bg-zinc-900')}
-                      layout={false}
-                      initial={{ opacity: 0 }}
-                      animate={{ 
-                        opacity: 1,
-                        transition: {
-                          duration: 0.15,
-                          delay: rowIdx * 0.03
-                        }
-                      }}
-                      exit={{ 
-                        opacity: 0,
-                        transition: { 
-                          duration: 0.05
-                        }
-                      }}
-                    >
+              {/* Performance optimization - completely disable animations for large datasets */}
+              {displayedRows.length > 100 ? (
+                // Regular table rows without animations for large datasets
+                displayedRows.slice(0, 350).map((row) => (
+                  <tr
+                    key={row.id}
+                    className={cn('bg-white dark:bg-zinc-900')}
+                  >
                     {/* Row Number Cell */}
                     <td 
                       className={cn(
@@ -280,27 +270,22 @@ const PureSpreadsheetEditor = ({
                       {row.rowNumber || ''}
                     </td>
                     
-                    {/* Data Cells */}
-                    {row.cells.map((cell, cellIndex) => {
+                    {/* Data Cells - limit to only the first 4 columns */}
+                    {row.cells.slice(0, 4).map((cell, cellIndex) => {
                       // Highlight unanswered answer cells in red when in unanswered mode
                       const isAnswerCol = cellIndex === 2;
                       const isUnanswered = isAnswerCol && (!cell || cell.trim() === '');
                       
-                      // Check if this is the first row or if the previous row is answered (not unanswered)
-                      const rowIndex = displayedRows.findIndex(r => r.id === row.id);
-                      const prevRow = rowIndex > 0 ? displayedRows[rowIndex - 1] : null;
-                      const isPrevRowAnswered = prevRow ? (prevRow.cells[2] && prevRow.cells[2].trim() !== '') : true;
-                      const isFirstRow = rowIndex === 0 || (hideEmptyAnswers && isPrevRowAnswered && isUnanswered);
                       return (
-                        <motion.td
+                        <td
                           key={cellIndex}
                           className={cn(
                             "px-4 py-2 h-[20px] overflow-hidden text-ellipsis whitespace-nowrap relative box-border",
                             isDark ? "border-b-[0.5px] border-[#1A1B1A] text-[#FAFAF9]" : "border-b-[0.5px] border-slate-200",
                             cellIndex > 0 ? isDark ? "border-l-[0.5px] border-[#1A1B1A]" : "border-l-[0.5px]" : ""
                           )}
-                          initial={false}
-                          animate={{
+                          style={{ 
+                            width: cellIndex < tableHeaders.length - 1 ? tableHeaders[cellIndex + 1]?.width || '100%' : '150px',
                             backgroundColor: hideEmptyAnswers && isUnanswered 
                               ? isDark ? "rgba(64, 17, 17, 0.6)" : "rgba(254, 226, 226, 1)" 
                               : isDark ? "rgba(10, 10, 10, 1)" : "rgba(255, 255, 255, 1)",
@@ -308,86 +293,169 @@ const PureSpreadsheetEditor = ({
                               ? isDark ? "rgba(127, 29, 29, 0.6)" : "rgba(239, 68, 68, 1)" 
                               : isDark ? "rgba(26, 27, 26, 1)" : "rgba(226, 232, 240, 1)"
                           }}
-                          transition={{ duration: 0.3 }}
-                          style={{ 
-                            width: cellIndex < tableHeaders.length - 1 ? tableHeaders[cellIndex + 1]?.width || 'auto' : '150px',
-                            // Use individual border properties to avoid React styling warnings
-                            ...(hideEmptyAnswers && isUnanswered ? {
-                              borderRightWidth: '0.5px',
-                              borderRightStyle: 'solid',
-                              borderRightColor: isDark ? 'rgba(127, 29, 29, 0.6)' : 'rgba(239, 68, 68, 1)',
-                              ...(isFirstRow ? {
-                                borderTopWidth: '0.5px',
-                                borderTopStyle: 'solid',
-                                borderTopColor: isDark ? 'rgba(127, 29, 29, 0.6)' : 'rgba(239, 68, 68, 1)',
-                              } : {})
-                            } : {})
-                          }}
                           onClick={() => setEditCell({ rowIndex: row.id, colIndex: cellIndex })}
                         >
-                          <AnimatePresence mode="wait">
-                            {editCell && editCell.rowIndex === row.id && editCell.colIndex === cellIndex ? (
-                              <motion.div
-                                key="input"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                                className="size-full absolute inset-0"
-                              >
-                                <input
-                                  type="text"
-                                  className="size-full absolute inset-0 bg-transparent focus:outline-1 focus:ring-1 px-4 py-2 border-0"
-                                  value={cell}
-                                  autoFocus
-                                  onChange={(e) => {
-                                    const updatedRows = [...localRows];
-                                    if (updatedRows[row.id] && Array.isArray(updatedRows[row.id].cells)) {
-                                      updatedRows[row.id].cells[cellIndex] = e.target.value;
-                                      setLocalRows(updatedRows);
-                                    }
-                                  }}
-                                  onBlur={() => {
-                                    // Only update if we're still editing this cell
-                                    if (editCell && editCell.rowIndex === row.id && editCell.colIndex === cellIndex &&
-                                        localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
-                                      const currentRowId = row.id;
-                                      const currentCellIndex = cellIndex;
-                                      const currentValue = localRows[row.id].cells[cellIndex] || '';
-                                      // Set editCell to null before calling handleCellEdit to break potential circular updates
-                                      setEditCell(null);
-                                      handleCellEdit(currentRowId, currentCellIndex, currentValue);
-                                    }
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
-                                      // Set editCell to null before calling handleCellEdit
-                                      const value = localRows[row.id].cells[cellIndex] || '';
-                                      setEditCell(null);
-                                      handleCellEdit(row.id, cellIndex, value);
-                                    }
-                                  }}
-                                />
-                              </motion.div>
-                            ) : (
-                              <motion.div
-                                key="text"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
-                                transition={{ duration: 0.15 }}
-                              >
-                                {cell}
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </motion.td>
+                          {editCell && editCell.rowIndex === row.id && editCell.colIndex === cellIndex ? (
+                            <input
+                              type="text"
+                              className="size-full absolute inset-0 bg-transparent focus:outline-1 focus:ring-1 px-4 py-2 border-0"
+                              value={cell}
+                              autoFocus
+                              onChange={(e) => {
+                                const updatedRows = [...localRows];
+                                if (updatedRows[row.id] && Array.isArray(updatedRows[row.id].cells)) {
+                                  updatedRows[row.id].cells[cellIndex] = e.target.value;
+                                  setLocalRows(updatedRows);
+                                }
+                              }}
+                              onBlur={() => {
+                                if (editCell && editCell.rowIndex === row.id && editCell.colIndex === cellIndex &&
+                                    localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
+                                  handleCellEdit(row.id, cellIndex, localRows[row.id].cells[cellIndex] || '');
+                                  setEditCell(null);
+                                }
+                              }}
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter' && localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
+                                  handleCellEdit(row.id, cellIndex, localRows[row.id].cells[cellIndex] || '');
+                                  setEditCell(null);
+                                }
+                              }}
+                            />
+                          ) : (
+                            cell
+                          )}
+                        </td>
                       );
                     })}
-                  </motion.tr>
-                );
-              })}
-              </AnimatePresence>
+                  </tr>
+                ))
+              ) : (
+                // For small datasets, use animations but only for the first 10 rows
+                <AnimatePresence mode="sync" initial={false}>
+                  {displayedRows.slice(0, 100).map((row, rowIdx) => {
+                    const shouldAnimate = rowIdx < 10;
+                    return (
+                      <motion.tr
+                        key={row.id}
+                        className={cn('bg-white dark:bg-zinc-900')}
+                        layout={false}
+                        initial={shouldAnimate ? { opacity: 0 } : false}
+                        animate={shouldAnimate ? { 
+                          opacity: 1,
+                          transition: {
+                            duration: 0.1 
+                          }
+                        } : { opacity: 1 }}
+                        exit={shouldAnimate ? { 
+                          opacity: 0,
+                          transition: { duration: 0.05 }
+                        } : { opacity: 0 }}
+                      >
+                        {/* Row Number Cell */}
+                        <td 
+                          className={cn(
+                            "px-4 py-2 h-[20px] sticky left-0 z-[1] overflow-visible text-clip whitespace-normal",
+                            isDark ? "border-b-[0.5px] border-r-[0.5px] border-[#1A1B1A] bg-[#0A0A0A] text-[#FAFAF9] shadow-[2px_0_8px_-2px_rgba(0,0,0,0.15)]" : 
+                                  "border-b-[0.5px] border-r-[0.5px] border-slate-200 bg-white shadow-[2px_0_8px_-2px_rgba(0,0,0,0.05)]"
+                          )}
+                          style={{ width: tableHeaders[0]?.width || '50px' }}
+                        >
+                          {row.rowNumber || ''}
+                        </td>
+                        
+                        {/* Data Cells - limit to only the first 4 columns */}
+                        {row.cells.slice(0, 4).map((cell, cellIndex) => {
+                          // Highlight unanswered answer cells in red when in unanswered mode
+                          const isAnswerCol = cellIndex === 2;
+                          const isUnanswered = isAnswerCol && (!cell || cell.trim() === '');
+                          
+                          return (
+                            <motion.td
+                              key={cellIndex}
+                              className={cn(
+                                "px-4 py-2 h-[20px] overflow-hidden text-ellipsis whitespace-nowrap relative box-border",
+                                isDark ? "border-b-[0.5px] border-[#1A1B1A] text-[#FAFAF9]" : "border-b-[0.5px] border-slate-200",
+                                cellIndex > 0 ? isDark ? "border-l-[0.5px] border-[#1A1B1A]" : "border-l-[0.5px]" : ""
+                              )}
+                              initial={false}
+                              animate={{
+                                backgroundColor: hideEmptyAnswers && isUnanswered 
+                                  ? isDark ? "rgba(64, 17, 17, 0.6)" : "rgba(254, 226, 226, 1)" 
+                                  : isDark ? "rgba(10, 10, 10, 1)" : "rgba(255, 255, 255, 1)",
+                                borderColor: hideEmptyAnswers && isUnanswered 
+                                  ? isDark ? "rgba(127, 29, 29, 0.6)" : "rgba(239, 68, 68, 1)" 
+                                  : isDark ? "rgba(26, 27, 26, 1)" : "rgba(226, 232, 240, 1)"
+                              }}
+                              transition={{ duration: 0.3 }}
+                              style={{ 
+                                width: cellIndex < tableHeaders.length - 1 ? tableHeaders[cellIndex + 1]?.width || '100%' : '150px',
+                              }}
+                              onClick={() => setEditCell({ rowIndex: row.id, colIndex: cellIndex })}
+                            >
+                              <AnimatePresence mode="wait">
+                                {editCell && editCell.rowIndex === row.id && editCell.colIndex === cellIndex ? (
+                                  <motion.div
+                                    key="input"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                    className="size-full absolute inset-0"
+                                  >
+                                    <input
+                                      type="text"
+                                      className="size-full absolute inset-0 bg-transparent focus:outline-1 focus:ring-1 px-4 py-2 border-0"
+                                      value={cell}
+                                      autoFocus
+                                      onChange={(e) => {
+                                        const updatedRows = [...localRows];
+                                        if (updatedRows[row.id] && Array.isArray(updatedRows[row.id].cells)) {
+                                          updatedRows[row.id].cells[cellIndex] = e.target.value;
+                                          setLocalRows(updatedRows);
+                                        }
+                                      }}
+                                      onBlur={() => {
+                                        if (editCell && editCell.rowIndex === row.id && editCell.colIndex === cellIndex &&
+                                            localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
+                                          const currentRowId = row.id;
+                                          const currentCellIndex = cellIndex;
+                                          const currentValue = localRows[row.id].cells[cellIndex] || '';
+                                          // Set editCell to null before calling handleCellEdit to break potential circular updates
+                                          setEditCell(null);
+                                          handleCellEdit(currentRowId, currentCellIndex, currentValue);
+                                        }
+                                      }}
+                                      onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && localRows[row.id] && Array.isArray(localRows[row.id].cells)) {
+                                          // Set editCell to null before calling handleCellEdit
+                                          const value = localRows[row.id].cells[cellIndex] || '';
+                                          setEditCell(null);
+                                          handleCellEdit(row.id, cellIndex, value);
+                                        }
+                                      }}
+                                    />
+                                  </motion.div>
+                                ) : (
+                                  <motion.div
+                                    key="text"
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    exit={{ opacity: 0 }}
+                                    transition={{ duration: 0.15 }}
+                                  >
+                                    {cell}
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </motion.td>
+                          );
+                        })}
+                      </motion.tr>
+                    );
+                  })}
+                </AnimatePresence>
+              )}
           </tbody>
         </table>
       </div>
