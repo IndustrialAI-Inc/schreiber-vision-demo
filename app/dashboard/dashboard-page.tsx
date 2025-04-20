@@ -42,7 +42,7 @@ const DashboardPage = () => {
               </div>
               <Button className="gap-2 bg-zinc-800 border border-bright rounded-[12px] hover:bg-zinc-700 text-bright">
                 <PlusCircle className="h-4 w-4" />
-                Create doc
+                Create spec
               </Button>
             </div>
           </div>

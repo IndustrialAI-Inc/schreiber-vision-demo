@@ -177,13 +177,32 @@ const PurePreviewMessage = ({
                         'flex-row': isSupplierMsg || (isLegacyUserMsg && isSupplierMode) || message.role === 'assistant',
                       }
                     )}>
+                        <div
+                        data-testid="message-content"
+                        className={cn('flex flex-col gap-4 w-auto', {
+                          // Schreiber user: right, black bubble in light mode, white bubble in dark mode
+                          'px-3 py-2 rounded-xl border': true,
+                          'bg-black text-white dark:bg-white dark:text-black border-zinc-800 dark:border-zinc-200': 
+                            isSchreiberMsg || (isLegacyUserMsg && !isSupplierMode),
+                          // Supplier user: left, blue bubble in light mode, darker blue in dark mode
+                          'bg-blue-50 text-black dark:bg-blue-900 dark:text-white border-blue-200 dark:border-blue-700': 
+                            isSupplierMsg || (isLegacyUserMsg && isSupplierMode),
+                          // Assistant: changes based on theme
+                          'bg-muted px-3 py-2 rounded-xl border': message.role === 'assistant',
+                          'text-foreground': message.role === 'assistant',
+                          'border-zinc-200 dark:border-zinc-800': message.role === 'assistant',
+                        })}
+                      >
+                        <Markdown>{part.text}</Markdown>
+                      </div>
+
                       {message.role === 'user' && !isReadonly && (
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <Button
                               data-testid="message-edit-button"
                               variant="ghost"
-                              className="px-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100 ml-2"
+                              className="px-2 mx-2 h-fit rounded-full text-muted-foreground opacity-0 group-hover/message:opacity-100 ml-2"
                               onClick={() => {
                                 setMode('edit');
                               }}
@@ -195,22 +214,6 @@ const PurePreviewMessage = ({
                         </Tooltip>
                       )}
 
-                      <div
-                        data-testid="message-content"
-                        className={cn('flex flex-col gap-4 w-auto', {
-                          // Schreiber user: right, black bubble, white text
-                          'bg-black text-white px-3 py-2 rounded-xl border border-zinc-800': 
-                            isSchreiberMsg || (isLegacyUserMsg && !isSupplierMode),
-                          // Supplier user: left, blue bubble, black text
-                          'bg-blue-50 text-black px-3 py-2 rounded-xl border border-blue-200': 
-                            isSupplierMsg || (isLegacyUserMsg && isSupplierMode),
-                          // Assistant: unchanged
-                          'bg-muted text-black px-3 py-2 rounded-xl border border-zinc-200': 
-                            message.role === 'assistant',
-                        })}
-                      >
-                        <Markdown>{part.text}</Markdown>
-                      </div>
 
                       {/* Edit button is now shown for all user messages regardless of mode */}
                     </div>

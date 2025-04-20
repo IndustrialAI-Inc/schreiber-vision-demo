@@ -139,8 +139,8 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
 
   // Both Schreiber and Supplier now use the same timeline view
   // Just changing the colors slightly for supplier mode
-  const timelineBackground = mode === 'supplier' ? 'bg-blue-50' : 'bg-zinc-100';
-  const timelineBorder = mode === 'supplier' ? 'border-blue-100' : 'border-zinc-200';
+    const timelineBackground = mode === 'supplier' ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-zinc-100 dark:bg-zinc-900/50';
+  const timelineBorder = mode === 'supplier' ? 'border-blue-100 dark:border-blue-900' : 'border-zinc-200 dark:border-zin200';
   
   // We'll still keep the action buttons for supplier mode
   let actionButtons = null;
