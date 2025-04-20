@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useActionState, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from '@/components/toast';
 
 import { AuthForm } from '@/components/auth-form';
@@ -15,34 +15,37 @@ export default function Page() {
 
   const [email, setEmail] = useState('');
   const [isSuccessful, setIsSuccessful] = useState(false);
-
-  const [state, formAction] = useActionState<LoginActionState, FormData>(
-    login,
-    {
-      status: 'idle',
-    },
-  );
+  const [isPending, setIsPending] = useState(false);
+  const [status, setStatus] = useState<LoginActionState>({
+    status: 'idle',
+  });
 
   useEffect(() => {
-    if (state.status === 'failed') {
+    if (status.status === 'failed') {
       toast({
         type: 'error',
         description: 'Invalid credentials!',
       });
-    } else if (state.status === 'invalid_data') {
+    } else if (status.status === 'invalid_data') {
       toast({
         type: 'error',
         description: 'Failed validating your submission!',
       });
-    } else if (state.status === 'success') {
+    } else if (status.status === 'success') {
       setIsSuccessful(true);
       router.refresh();
     }
-  }, [state.status]);
+  }, [status.status, router]);
 
-  const handleSubmit = (formData: FormData) => {
+  const handleSubmit = async (formData: FormData) => {
     setEmail(formData.get('email') as string);
-    formAction(formData);
+    setIsPending(true);
+    try {
+      const result = await login(status, formData);
+      setStatus(result);
+    } finally {
+      setIsPending(false);
+    }
   };
 
   return (
@@ -55,7 +58,7 @@ export default function Page() {
           </p>
         </div>
         <AuthForm action={handleSubmit} defaultEmail={email}>
-          <SubmitButton isSuccessful={isSuccessful}>Sign in</SubmitButton>
+          <SubmitButton isSuccessful={isSuccessful} isPending={isPending}>Sign in</SubmitButton>
           <p className="text-center text-sm text-gray-600 mt-4 dark:text-zinc-400">
             {"Don't have an account? "}
             <Link

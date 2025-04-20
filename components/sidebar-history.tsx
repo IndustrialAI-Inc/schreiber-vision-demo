@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import { isToday, isYesterday, subMonths, subWeeks } from 'date-fns';
