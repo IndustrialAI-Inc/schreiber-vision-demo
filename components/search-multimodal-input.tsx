@@ -12,7 +12,6 @@ import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { SidebarToggle } from '@/components/sidebar-toggle';
 import { PreviewAttachment } from '@/components/preview-attachment';
 import { SuggestedActions } from '@/components/suggested-actions';
 
@@ -132,17 +131,19 @@ export function SearchMultimodalInput({
     if (isSearchMode) {
       // Search mode - Simple input that will be processed by appendWithMode
       console.log("[SEARCH] Submitting search query:", input);
+      
+      // Store the current input and clear immediately
+      const currentInput = input.trim();
+      setInput(''); // Clear input before submission for immediate feedback
+      
       try {
         await append({
           role: 'user',
-          content: input, // Send just the raw query, appendWithMode will format it
+          content: currentInput, // Send just the raw query, appendWithMode will format it
         });
         
-        // Use special URL for search
-        window.history.replaceState({}, '', `/search/${chatId}`);
-        
-        // Reset input after submitting
-        setInput('');
+        // Keep URL simple
+        window.history.replaceState({}, '', `/search`);
       } catch (error) {
         console.error("[SEARCH] Error submitting search:", error);
         toast.error("Error submitting search");
@@ -274,6 +275,7 @@ export function SearchMultimodalInput({
             'bg-amber-50 text-amber-900 dark:bg-zinc-800 dark:text-white',
             'focus:ring-1 focus:ring-amber-300 dark:focus:ring-zinc-600',
             'placeholder:text-amber-800/70 dark:placeholder:text-zinc-400',
+            'w-full',
             className,
           )}
           rows={1}
@@ -297,8 +299,6 @@ export function SearchMultimodalInput({
           autoComplete="off"
           disabled={disabled || status === 'loading'}
         />
-
-        <SidebarToggle className="absolute left-5 top-1/2 transform -translate-y-1/2 text-amber-900 dark:text-zinc-200" />
         
         {/* Submit/Stop buttons */}
         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center">
@@ -311,7 +311,7 @@ export function SearchMultimodalInput({
                 stop();
               }}
             >
-              <StopIcon size={14} />
+              <StopIcon size={14} className="text-amber-900 dark:text-white" />
             </Button>
           ) : (
             <Button
@@ -333,6 +333,7 @@ export function SearchMultimodalInput({
                 strokeLinejoin="round"
                 width={14}
                 height={14}
+                className="text-amber-900 dark:text-white"
               >
                 <path d="M12 19V5" />
                 <path d="m5 12 7-7 7 7" />
@@ -458,7 +459,7 @@ export function SearchMultimodalInput({
               setMessages((messages) => messages);
             }}
           >
-            <StopIcon size={14} />
+            <StopIcon size={14} className="text-amber-900 dark:text-white" />
           </Button>
         ) : (
           <Button
@@ -491,6 +492,7 @@ function ArrowUpIcon({ size = 24, ...props }: { size?: number } & React.SVGAttri
       strokeLinejoin="round"
       width={size}
       height={size}
+      className="text-amber-900 dark:text-white"
       {...props}
     >
       <path d="m5 12 7-7 7 7" />

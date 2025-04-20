@@ -210,3 +210,30 @@
 .supplier-mode form {
   margin-top: auto;
 }
+
+/* Search page specific styles */
+.search-page {
+  background-color: var(--background);
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.dark .search-page {
+  background-color: rgb(24, 24, 27); /* bg-zinc-900 */
+}
+
+/* Fix for the search page to ensure a consistent dark background */
+.dark body {
+  background-color: rgb(24, 24, 27);
+}
+
+/* Remove sidebar styling for search pages */
+.remove-sidebar-style.group\/sidebar-wrapper {
+  background-color: transparent !important;
+}
+
+.remove-sidebar-style .has-\[\[data-variant\=inset\]\]\:bg-sidebar {
+  background-color: transparent !important;
+}

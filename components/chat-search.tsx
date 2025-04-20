@@ -22,6 +22,7 @@ import { useUserMode, MessageModeContext } from './mode-toggle';
 import { SupplierSheetAnalysis } from './supplier-sheet-analysis';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation';
+import { SuggestedSearches } from './suggested-searches';
 
 export function ChatSearch({
   id,
@@ -289,7 +290,7 @@ If there are multiple relevant documents, prioritize showing the one that's most
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
-        "flex flex-col min-w-0 h-dvh bg-background dark:bg-zinc-900"
+        "flex flex-col min-w-0 min-h-dvh bg-background dark:bg-zinc-900 overflow-visible"
       )}>
         {/* Top search input - only shown when inputPosition is 'top' */}
         {inputPosition === 'top' && (
@@ -321,23 +322,32 @@ If there are multiple relevant documents, prioritize showing the one that's most
           />
         )}
 
-        <div className="mx-auto max-w-3xl w-full">
-          <Messages
-            chatId={id}
-            status={status}
-            votes={votes}
-            messages={messages}
-            setMessages={setMessages}
-            reload={reload}
-            isReadonly={isReadonly}
-            isArtifactVisible={isArtifactVisible}
-            isSchreiberApproval={isSchreiberApproval}
-          />
+        <div className="mx-auto max-w-3xl w-full overflow-visible pb-24">
+          {messages.length === 0 ? (
+            <SuggestedSearches
+              chatId={id}
+              append={appendWithMode}
+              disabled={isReadonly || status === 'loading'}
+              setInput={setInput}
+            />
+          ) : (
+            <Messages
+              chatId={id}
+              status={status}
+              votes={votes}
+              messages={messages}
+              setMessages={setMessages}
+              reload={reload}
+              isReadonly={isReadonly}
+              isArtifactVisible={isArtifactVisible}
+              isSchreiberApproval={isSchreiberApproval}
+            />
+          )}
         </div>
 
         {/* Bottom search input - only shown when inputPosition is 'bottom' */}
         {inputPosition === 'bottom' && (
-          <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 max-w-3xl mx-auto w-full">
+          <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
             <SearchMultimodalInput
               chatId={id}
               input={input}

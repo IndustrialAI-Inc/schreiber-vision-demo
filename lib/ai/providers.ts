@@ -39,6 +39,12 @@ export const myProvider = isTestEnvironment
       }),
           model: groq("deepseek-r1-distill-llama-70b"),
         }),
+        "o4-mini": wrapLanguageModel({
+      middleware: extractReasoningMiddleware({
+        tagName: "think",
+      }),
+          model: openai("o4-mini"),
+        }),
       },
       imageModels: {
         'small-model': xai.image('grok-2-image'),

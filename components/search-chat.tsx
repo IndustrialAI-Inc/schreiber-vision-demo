@@ -18,6 +18,7 @@ import { createContext } from 'react';
 import { useUserMode } from './mode-toggle';
 import { cn } from '@/lib/utils';
 import { MessageReasoning } from './message-reasoning';
+import { SuggestedSearches } from './suggested-searches';
 
 // Create a local message mode context for search page
 const MessageModeContext = createContext<{
@@ -92,6 +93,9 @@ export function SearchChat({
   useEffect(() => {
     if (messages.length > 0) {
       setInputPosition('bottom');
+      
+      // Keep URL simple - don't include ID in URL
+      window.history.replaceState({}, '', `/search`);
     } else {
       setInputPosition('top');
     }
@@ -267,14 +271,15 @@ If there are multiple relevant documents, prioritize showing the one that's most
     e.preventDefault();
     if (!query.trim() || status === 'loading') return;
     
+    // Store current query and immediately clear input field
+    const currentQuery = query;
+    setQuery('');
+    
     try {
       await appendWithMode({
         role: 'user',
-        content: query,
+        content: currentQuery,
       });
-      
-      // Clear input after sending
-      setQuery('');
     } catch (err) {
       console.error('Error during search:', err);
     }
@@ -283,7 +288,7 @@ If there are multiple relevant documents, prioritize showing the one that's most
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
-        "flex flex-col min-w-0 h-dvh bg-background dark:bg-zinc-900"
+        "flex flex-col min-w-0 min-h-dvh bg-background dark:bg-zinc-900 overflow-visible search-page"
       )}>
         {/* Top search input - only shown when inputPosition is 'top' */}
         {inputPosition === 'top' && (
@@ -316,23 +321,32 @@ If there are multiple relevant documents, prioritize showing the one that's most
           </div>
         )}
 
-        <div className="flex-grow overflow-auto mx-auto max-w-3xl w-full">
-          <Messages
-            chatId={id}
-            status={status}
-            votes={votes}
-            messages={messages}
-            setMessages={setMessages}
-            reload={reload}
-            isReadonly={isReadonly}
-            isArtifactVisible={isArtifactVisible}
-            isSchreiberApproval={false}
-          />
+        <div className="flex-grow mx-auto max-w-3xl w-full pb-24">
+          {messages.length === 0 ? (
+            <SuggestedSearches
+              chatId={id}
+              append={appendWithMode}
+              disabled={isReadonly || status === 'loading'}
+              setInput={setQuery}
+            />
+          ) : (
+            <Messages
+              chatId={id}
+              status={status}
+              votes={votes}
+              messages={messages}
+              setMessages={setMessages}
+              reload={reload}
+              isReadonly={isReadonly}
+              isArtifactVisible={isArtifactVisible}
+              isSchreiberApproval={false}
+            />
+          )}
         </div>
 
         {/* Bottom search input - only shown when inputPosition is 'bottom' */}
         {inputPosition === 'bottom' && (
-          <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 max-w-3xl mx-auto w-full">
+          <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
             <SearchMultimodalInput
               chatId={id}
               input={query}

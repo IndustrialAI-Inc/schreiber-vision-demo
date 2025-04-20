@@ -1,8 +1,8 @@
 
-import { AppSidebar } from '@/components/app-sidebar';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
 import { auth } from '@/app/(auth)/auth';
+import { ChatHeader } from '@/components/chat-header';
 
 export default async function SearchLayout({
   children,
@@ -18,12 +18,20 @@ export default async function SearchLayout({
       enableSystem
       disableTransitionOnChange
     >
-      <SidebarProvider>
-        <main className="flex flex-grow h-svh">
-          <SidebarInset className="flex flex-col flex-grow">
-            {children}
-          </SidebarInset>
-        </main>
+      <SidebarProvider className="remove-sidebar-style">
+        <div className="search-page bg-background dark:bg-zinc-900 min-h-screen w-full flex">
+          <main className="flex flex-col flex-grow w-full">
+            <ChatHeader
+              chatId="search"
+              selectedModelId="chat-model"
+              selectedVisibilityType="public"
+              isReadonly={false}
+            />
+            <SidebarInset className="flex flex-col flex-grow w-full bg-background dark:bg-zinc-900">
+              {children}
+            </SidebarInset>
+          </main>
+        </div>
       </SidebarProvider>
     </ThemeProvider>
   );
