@@ -5,12 +5,13 @@ import {
 } from 'ai';
 import { xai } from '@ai-sdk/xai';
 import { openai } from '@ai-sdk/openai';
+import { groq } from '@ai-sdk/groq';
 import { isTestEnvironment } from '../constants';
 import {
   artifactModel,
   chatModel,
   reasoningModel,
-  titleModel,
+  titleModel
 } from './models.test';
 
 export const myProvider = isTestEnvironment
@@ -19,7 +20,7 @@ export const myProvider = isTestEnvironment
         'chat-model': chatModel,
         'chat-model-reasoning': reasoningModel,
         'title-model': titleModel,
-        'artifact-model': artifactModel,
+        'artifact-model': artifactModel
       },
     })
   : customProvider({
@@ -32,6 +33,12 @@ export const myProvider = isTestEnvironment
         }),
         'title-model': openai('gpt-4.1-mini'),
         'artifact-model': openai('gpt-4.1'),
+        "deepseek-r1-distill-llama-70b": wrapLanguageModel({
+      middleware: extractReasoningMiddleware({
+        tagName: "think",
+      }),
+          model: groq("deepseek-r1-distill-llama-70b"),
+        }),
       },
       imageModels: {
         'small-model': xai.image('grok-2-image'),

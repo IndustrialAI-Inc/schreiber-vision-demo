@@ -4,6 +4,7 @@ import type { User } from 'next-auth';
 import { useRouter } from 'next/navigation';
 
 import { FolderIcon, PlusIcon } from '@/components/icons';
+import { SearchIcon } from '@/components/icons-search';
 import { SidebarHistory } from '@/components/sidebar-history';
 import { SidebarUserNav } from '@/components/sidebar-user-nav';
 import { Button } from '@/components/ui/button';
@@ -74,6 +75,19 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               <FolderIcon className="h-4 w-4" />
               <span className="text-sm font-medium hover:bg-muted rounded-md cursor-pointer px-1">
                 Repository
+              </span>
+            </Link>
+
+            <Link
+              href="/search"
+              onClick={() => {
+                setOpenMobile(false);
+              }}
+              className="flex flex-row gap-2 items-center"
+            >
+              <SearchIcon className="h-4 w-4" />
+              <span className="text-sm font-medium hover:bg-muted rounded-md cursor-pointer px-1">
+                PDF Search
               </span>
             </Link>
             
