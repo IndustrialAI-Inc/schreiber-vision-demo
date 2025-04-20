@@ -5,10 +5,17 @@ import { LoaderIcon } from './icons';
 export const PreviewAttachment = ({
   attachment,
   isUploading = false,
+  forceHide = false
 }: {
   attachment: Attachment;
   isUploading?: boolean;
+  forceHide?: boolean;
 }) => {
+  // When forceHide is true, render nothing
+  if (forceHide) {
+    return null;
+  }
+  
   const { name, url, contentType } = attachment;
 
   return (

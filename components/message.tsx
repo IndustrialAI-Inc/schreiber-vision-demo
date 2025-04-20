@@ -204,8 +204,8 @@ const PurePreviewMessage = ({
                           // Supplier user: left, blue bubble, black text
                           'bg-blue-50 text-black px-3 py-2 rounded-xl border border-blue-200': 
                             isSupplierMsg || (isLegacyUserMsg && isSupplierMode),
-                          // Assistant: unchanged
-                          'bg-muted text-black px-3 py-2 rounded-xl border border-zinc-200': 
+                          // Assistant: use foreground color that works in both light/dark mode, no border
+                          'bg-muted text-foreground px-3 py-2 rounded-xl': 
                             message.role === 'assistant',
                         })}
                       >

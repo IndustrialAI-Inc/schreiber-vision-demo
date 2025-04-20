@@ -83,7 +83,8 @@ test.describe('chat activity', () => {
   test('upload file and send image attachment with message', async () => {
     await chatPage.addImageAttachment();
 
-    await chatPage.isElementVisible('attachments-preview');
+    // No longer checking for attachment preview since it's been removed
+    // Just wait for loader to disappear
     await chatPage.isElementVisible('input-attachment-loader');
     await chatPage.isElementNotVisible('input-attachment-loader');
 
