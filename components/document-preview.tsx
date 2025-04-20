@@ -137,9 +137,12 @@ export function DocumentPreview({
   } else if (previewDocument) {
     document = previewDocument;
   } else if (artifact.status === 'streaming') {
+    // Convert dashboard kind to text for database compatibility
+    const documentKind = artifact.kind === 'dashboard' ? 'text' as const : artifact.kind;
+    
     document = {
       title: artifact.title,
-      kind: artifact.kind,
+      kind: documentKind,
       content: artifact.content,
       id: artifact.documentId,
       createdAt: new Date(),

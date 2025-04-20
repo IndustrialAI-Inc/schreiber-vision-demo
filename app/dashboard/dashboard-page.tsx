@@ -27,7 +27,7 @@ const DashboardPage = () => {
             <div>
               <h1 className="text-2xl font-bold">Good morning, Erica</h1>
               <p className="text-zinc-400 mt-1">
-                Here's an overview of your statistics and status
+                Here&apos;s an overview of your statistics and status
               </p>
             </div>
             <div className="flex gap-3">

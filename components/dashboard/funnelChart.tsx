@@ -55,7 +55,7 @@ const DocumentApprovalFunnel = () => {
         <ResponsiveContainer width="100%" height="100%">
           <FunnelChart margin={{ top: 10, right: 120, bottom: 10, left: 10 }}>
             <Tooltip
-              formatter={(value) => [`${value} documents`, "Count"]}
+              formatter={(value: number) => [`${value} documents`, "Count"]}
               contentStyle={{
                 backgroundColor: "#1f2937",
                 borderRadius: "0.375rem",
@@ -83,7 +83,7 @@ const DocumentApprovalFunnel = () => {
                 dataKey="value"
                 className="text-xs font-bold"
                 offset={10}
-                formatter={(value) => `${value} docs`}
+                formatter={(value: number) => `${value} docs`}
               />
             </Funnel>
           </FunnelChart>
