@@ -161,14 +161,26 @@ export function Chat({
   useEffect(() => {
     async function loadPDFs() {
       try {
-        // Get files only from the user's uploads in Vercel Blob storage
+        // Check if this is a page refresh by using sessionStorage
+        const hasPageLoaded = sessionStorage.getItem('chatPageLoaded');
+        
+        if (hasPageLoaded) {
+          // This is a page refresh, don't load PDFs
+          console.log("[CHAT] Page refreshed, not loading PDFs");
+          return;
+        }
+        
+        // Mark that the page has been loaded
+        sessionStorage.setItem('chatPageLoaded', 'true');
+        
+        // First try to get files from the user's uploads
         const response = await fetch('/api/files?type=application/pdf');
         
         if (response.ok) {
           const files = await response.json();
           
           if (files && files.length > 0) {
-            console.log("[CHAT] Found PDFs in Vercel Blob storage:", files);
+            console.log("[CHAT] Found user PDFs:", files);
             
             // Use the actual file URLs from Vercel Blob storage
             const pdfAttachments = files.map(file => ({
@@ -178,17 +190,24 @@ export function Chat({
             }));
             
             setAttachments(pdfAttachments);
-            console.log("[CHAT] Using Vercel Blob PDFs:", pdfAttachments);
+            console.log("[CHAT] Using user's uploaded PDFs:", pdfAttachments);
             return;
           }
         }
         
-        // No PDFs found in Vercel Blob storage
-        console.log("[CHAT] No PDFs found in Vercel Blob storage");
-        setAttachments([]);
-        
+        // Fallback to examples if no user PDFs found (these URLs would need to be valid)
+        console.log("[CHAT] No user PDFs found, using fallbacks");
+        // // NOTE: These examples would need to be replaced with real, publicly accessible PDFs
+        // setAttachments([
+        //   {
+        //     name: "technical_spec.pdf",
+        //     url: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Sample_PDF.pdf", // Public sample PDF
+        //     contentType: "application/pdf",
+        //   }
+        // ]);
       } catch (error) {
-        console.error("[CHAT] Error loading PDFs from Vercel Blob:", error);
+        console.error("[CHAT] Error loading PDFs:", error);
+        // Fallback to empty attachments on error
         setAttachments([]);
       }
     }
@@ -217,38 +236,7 @@ export function Chat({
         };
         
         if (isFirstMessage && attachments.length > 0) {
-          const pdfCount = attachments.filter(a => a.contentType === 'application/pdf').length;
-          console.log(`[APPEND] First message - adding ${attachments.length} attachments (${pdfCount} PDFs):`);
-          
-          // Log details about each PDF
-          attachments.forEach((attachment, index) => {
-            if (attachment.contentType === 'application/pdf') {
-              console.log(`[APPEND] PDF ${index + 1}: "${attachment.name}" - ${attachment.url.substring(0, 50)}...`);
-            }
-          });
-          
-          // Always modify content when PDFs are present - for both single and multiple PDFs
-          if (pdfCount > 0 && typeof message.content === 'string') {
-            // Generate a numbered list of PDFs with their names
-            const pdfList = attachments
-              .filter(a => a.contentType === 'application/pdf')
-              .map((a, index) => `${index + 1}. "${a.name}"`)
-              .join("\n");
-              
-            // Create a very explicit message with formatting to ensure the model notices
-            let modifier = `🚨 CRITICAL INSTRUCTION 🚨\n\nThis message contains EXACTLY ${pdfCount} PDF document${pdfCount !== 1 ? 's' : ''}. \nYou MUST examine ALL ${pdfCount} of them:\n\n${pdfList}\n\nVERY IMPORTANT: When responding to questions about PDFs, ALWAYS acknowledge ALL ${pdfCount} PDFs and report on their contents. Do NOT focus on just one PDF.\n\n-------------------\n\n`;
-            
-            message.content = modifier + message.content;
-            console.log(`[APPEND] Modified message with detailed list of ${pdfCount} PDFs`);
-          }
-          
-          // Add a toast notification to show the user how many PDFs were attached
-          if (pdfCount > 0) {
-            toast.success(`Added ${pdfCount} PDF document${pdfCount !== 1 ? 's' : ''} to your message`, {
-              description: pdfCount > 1 ? "All documents will be analyzed together" : undefined,
-              duration: 5000,
-            });
-          }
+          console.log("[APPEND] First message - adding attachments:", attachments.length);
         } else {
           console.log("[APPEND] Not first message or no attachments - skipping attachments");
         }
