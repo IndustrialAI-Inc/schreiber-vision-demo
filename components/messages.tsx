@@ -35,11 +35,90 @@ function PureMessages({
   // Show all messages for all user modes
   // Each message has its own styling based on its senderMode
   const filteredMessages = useMemo(() => {
-    // Don't filter by mode at all - just show all messages
-    // Each message will be styled based on its own senderMode property
-    console.log('Messages to display:', messages);
+    if (mode === 'supplier') {
+      // In supplier mode, we want to find the sheet creation message
+      const sheetCreationMessageIndex = messages.findIndex(message => {
+        // Look for assistant messages with tool invocations
+        if (message.role === 'assistant') {
+          // Check for parts that might contain tool invocations
+          const hasTool = message.parts?.some(part => 
+            part.type === 'tool-invocation' && 
+            part.toolInvocation?.toolName === 'createDocument' &&
+            part.toolInvocation?.args?.kind === 'sheet'
+          );
+          return hasTool;
+        }
+        return false;
+      });
+
+      // If we found a sheet creation message
+      if (sheetCreationMessageIndex !== -1) {
+        const sheetCreationMessage = messages[sheetCreationMessageIndex];
+        
+        // First, check if there are any user messages after the sheet creation
+        // This would indicate the user has started a conversation
+        const hasUserMessagesAfterSheet = messages.slice(sheetCreationMessageIndex + 1)
+          .some(msg => msg.role === 'user');
+        
+        // If user has already sent messages after the sheet was created,
+        // only filter out messages before the sheet creation
+        if (hasUserMessagesAfterSheet) {
+          // Show the modified sheet creation message plus all messages after it
+          const laterMessages = messages.slice(sheetCreationMessageIndex + 1);
+          
+          // Create our modified sheet message with the welcome text
+          const toolParts = sheetCreationMessage.parts?.filter(part => 
+            part.type === 'tool-invocation'
+          ) || [];
+          
+          const newParts = [
+            { type: 'step-start' as const },
+            {
+              type: 'text' as const,
+              text: "Welcome! Please review and complete the specification sheet. Fill out any remaining questions to the best of your knowledge. If you need any clarification or have questions about any of the items, please don't hesitate to ask. I'm here to help make this process as smooth as possible for you."
+            },
+            ...toolParts
+          ];
+          
+          const modifiedMessage = {
+            ...sheetCreationMessage,
+            parts: newParts
+          };
+          
+          // Return the modified sheet message + all messages that came after
+          return [modifiedMessage, ...laterMessages];
+        } else {
+          // If no conversation has started yet, just show the welcome message
+          // Create our modified sheet message with the welcome text
+          const toolParts = sheetCreationMessage.parts?.filter(part => 
+            part.type === 'tool-invocation'
+          ) || [];
+          
+          const newParts = [
+            { type: 'step-start' as const },
+            {
+              type: 'text' as const,
+              text: "Welcome! Please review and complete the specification sheet. Fill out any remaining questions to the best of your knowledge. If you need any clarification or have questions about any of the items, please don't hesitate to ask. I'm here to help make this process as smooth as possible for you."
+            },
+            ...toolParts
+          ];
+          
+          const modifiedMessage = {
+            ...sheetCreationMessage,
+            parts: newParts
+          };
+          
+          return [modifiedMessage];
+        }
+      }
+      
+      // If no sheet creation message found, return empty array
+      return [];
+    }
+    
+    // For Schreiber mode, show all messages
     return messages;
-  }, [messages]);
+  }, [messages, mode]);
 
   return (
     <div
