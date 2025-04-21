@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { memo } from 'react';
 import type { UseChatHelpers } from '@ai-sdk/react';
 import { SearchIcon } from './icons-search';
+import { Search } from 'lucide-react';
 
 interface SuggestedSearchesProps {
   chatId: string;
@@ -115,7 +116,8 @@ function PureSuggestedSearches({
         transition={{ delay: 0.4 }}
         className="mb-6"
       >
-        <SearchIcon size={40} className="text-amber-800 dark:text-amber-400" />
+        {/* <SearchIcon size={40} className="text-amber-800 dark:text-amber-400" /> */}
+        {/* <Search className="size-8" /> */}
       </motion.div>
       
       <motion.div
@@ -154,9 +156,9 @@ function PureSuggestedSearches({
               variant="outline"
               onClick={() => handleSearchClick(suggestedSearch.query)}
               disabled={disabled}
-              className="text-left border border-amber-200 dark:border-zinc-700 bg-amber-50/50 dark:bg-zinc-800/50 hover:bg-amber-100 dark:hover:bg-zinc-700 rounded-xl px-4 py-3.5 text-sm flex-col w-full h-auto justify-start items-start"
+              className="text-left border border-amber-200 dark:border-zinc-700 bg-fulldark50 hover:bg-amber-100 dark:hover:bg-zinc-700 rounded-xl px-4 py-3.5 text-sm flex-col w-full h-auto justify-start items-start"
             >
-              <span className="font-medium text-amber-900 dark:text-amber-300">{suggestedSearch.title}</span>
+              <span className="font-medium text-amber-900 dark:text-bright">{suggestedSearch.title}</span>
               <span className="text-zinc-500 dark:text-zinc-400">
                 {suggestedSearch.label}
               </span>

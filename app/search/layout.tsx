@@ -20,14 +20,14 @@ export default async function SearchLayout({
     >
       <SidebarProvider className="remove-sidebar-style">
         <div className="search-page bg-background dark:bg-zinc-900 min-h-screen w-full flex">
-          <main className="flex flex-col flex-grow w-full">
+          <main className="flex flex-col flex-grow w-full bg-none">
             <SearchHeader
               chatId="search"
               selectedModelId="chat-model"
               selectedVisibilityType="public"
               isReadonly={false}
             />
-            <SidebarInset className="flex flex-col flex-grow w-full bg-background dark:bg-zinc-900">
+            <SidebarInset className="flex flex-col flex-grow w-full bg-none">
               {children}
             </SidebarInset>
           </main>

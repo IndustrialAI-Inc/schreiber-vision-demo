@@ -279,7 +279,7 @@ export function SearchChat({
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
-        "flex flex-col min-w-0 min-h-dvh bg-background dark:bg-zinc-900 overflow-visible search-page"
+        "flex flex-col min-w-0 min-h-dvh bg-none overflow-visible search-page bg-[url(/images/dark-background.webp)] bg-cover bg-top-right bg-fixed"
       )}>
         {/* Top search input - only shown when inputPosition is 'top' */}
         {inputPosition === 'top' && (
@@ -338,7 +338,7 @@ export function SearchChat({
 
         {/* Bottom search input - only shown when inputPosition is 'bottom' */}
         {inputPosition === 'bottom' && (
-          <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
+          <div className="sticky bottom-0 z-10 border-t border-border backdrop-blur-sm dark:bg-none mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
             {/* Only show search pills in the bottom input when there are messages */}
             {messages.length > 0 && (
               <SearchPills 
@@ -353,7 +353,7 @@ export function SearchChat({
                   });
                 }}
                 disabled={isReadonly || status === 'loading'}
-                className="bg-background/80 dark:bg-zinc-900/80 backdrop-blur-sm"
+                className="bg-none backdrop-blur-sm"
               />
             )}
             <SearchMultimodalInput

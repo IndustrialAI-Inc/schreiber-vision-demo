@@ -265,7 +265,7 @@ export function SearchMultimodalInput({
   // Search mode renders a specialized header input that matches SearchModalMultimodalInput style
   if (isSearchMode) {
     return (
-      <div className="relative w-full p-3 border-b border-border bg-background dark:bg-zinc-900">
+      <div className="relative w-full p-3 border-b border-border bg-none">
         <Textarea
           data-testid="search-multimodal-input"
           ref={textareaRef}

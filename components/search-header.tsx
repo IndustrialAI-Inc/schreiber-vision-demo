@@ -46,7 +46,7 @@ function PureSearchHeader({
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex sticky top-0 bg-zinc-900 py-1.5 items-center px-2 md:px-2 gap-2">
+    <header className="flex sticky top-0 bg-none py-1.5 items-center px-2 md:px-2 gap-2">
       <SidebarToggle />
 
       {/* Different header for search mode */}
@@ -108,7 +108,7 @@ function PureSearchHeader({
             />
           )}
 
-          <Button
+          {/* <Button
             className="bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-800 dark:hover:bg-zinc-200 text-zinc-50 dark:text-zinc-900 hidden md:flex py-1.5 px-2 h-fit md:h-[34px] order-4 md:ml-auto"
             onClick={() => {
               const newMode = mode === 'schreiber' ? 'supplier' : 'schreiber';
@@ -118,7 +118,7 @@ function PureSearchHeader({
             }}
           >
             {mode === 'supplier' ? 'Schreiber Mode' : 'Supplier Mode'}
-          </Button>
+          </Button> */}
         </>
       )}
     </header>
