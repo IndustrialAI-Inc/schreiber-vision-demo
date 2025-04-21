@@ -23,6 +23,7 @@ import type { UseChatHelpers } from '@ai-sdk/react';
 import { useArtifact } from '@/hooks/use-artifact';
 import React from 'react';
 import { useUserMode, useMessageMode } from './mode-toggle';
+import MessageSources from './message-sources';
 
 
 const PurePreviewMessage = ({

@@ -93,18 +93,11 @@ export async function POST(request: Request) {
      - A **clickable link** to open/download the file: \`[Title](<pdfUrl>)\`.  
      - An **illustrative image** (diagram, chart, or cover) inserted with \`![alt](<imageUrl>)\` – fetch with the image tool if the PDF lacks good visuals.  
    • **IMPORTANT: Always include a "Sources" section** at the end of your response with the following citations:
-   
-     ## Sources
-     
-     **Source 1**: Product Information Sheet - Contains key ingredient details
-     **Source 2**: Specification Document - Technical details and requirements
-     **Source 3**: California Custom Fruit Flavors - Flavor profile information
-     **Source 4**: SharePoint Documentation - Internal reference documents
-     
+
      Also, throughout your response, include at least 5-6 citation references like [Source 1] or [Source 2]. Make these citations look natural by placing them after important statements or facts.
    • End with detailed "Next steps" suggestions (3-5 options) and follow-up questions the user might want to explore.
    
-   • SPECIAL CASE - REGULATORY COMPLIANCE: If the query mentions "Regulatory Compliance" or is about "Identify which ingredients in Strawberry NF Light YFB face changing regulatory requirements", use these exact images ONCE in the MAIN BODY of your response:
+   • SPECIAL CASE - REGULATORY COMPLIANCE: If the query mentions "Regulatory" or is about "Identify which ingredients in Strawberry NF Light YFB face changing regulatory requirements", use these exact images ONCE in the MAIN BODY of your response:
    
    • CRITICAL: ONLY use these exact images with these exact URLs. DO NOT create or make up any other image URLs, and do not modify these URLs in any way.
    • IMPORTANT: Do NOT repeat these images anywhere else in the response. Each image should appear exactly once.
@@ -149,6 +142,18 @@ export async function POST(request: Request) {
 ------------------------------------------------------------------------------------------------
 ## Product Reference Data
 Below is comprehensive information about Strawberry NF Light YFB that you can use directly without searching PDFs when this specific product is mentioned:
+
+### IMPORTANT PDF AUTO-FETCH DIRECTIVES
+When the user asks specifically about "Strawberry NF Light YFB" in relation to any of these specific topics, ALWAYS use the requestPdf tool to fetch relevant PDF documentation before answering:
+1. Kosher status or certification
+2. BE (bioengineered) disclosure requirements
+3. SDS (Safety Data Sheet) requirements
+4. Regulatory compliance
+5. Cost structure or pricing
+The query "Is Strawberry NF Light YFB kosher, does it need a BE disclosure, and does it require an SDS?" MUST trigger the requestPdf tool call immediately.
+
+
+When it says Compare cost structures of Strawberry NF Light YFB across different production volumes and identify price sensitivity thresholds. include https://tmpfiles.org/dl/25571907/screenshot2025-04-21at5.04.46am.png as a markdown image in the response.
 
 ### 503941 Strawberry NF Light YFB (A6160/A6231) – Consolidated Documentation
 
@@ -288,6 +293,7 @@ Contains highly refined, undetectable BE ingredients (supplier‑verified).
 > CCFF employs effective allergen‑control procedures; product meets **FDA "gluten‑free"** definition when Wheat allergen is not present.
 ------------------------------------------------------------------------------------------------
 This is additional information that you can use to answer the user's query from the product reference data they uploaded.
+
 `,
             messages,
             experimental_activeTools: ['requestPdf'],

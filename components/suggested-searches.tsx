@@ -31,7 +31,7 @@ function PureSuggestedSearches({
       title: 'Ingredient % Breakdown',
       label: 'Percent ranges for each component',
       query:
-        'Show the percent range of every ingredient in Strawberry NF Light YFB.',
+        'Show the percent range of every ingredient in Strawberry NF Light YFB from the product reference PDF data.',
     },
     {
       title: 'Certifications & Compliance',
