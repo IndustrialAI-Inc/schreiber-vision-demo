@@ -6,7 +6,7 @@ import { parse, unparse } from 'papaparse';
 import { cn } from '@/lib/utils';
 import 'react-data-grid/lib/styles.css';
 import { Button } from '@/components/ui/button';
-import { EyeOff, Eye } from 'lucide-react';
+import { EyeOff, Eye, CircleAlert } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 
@@ -256,7 +256,7 @@ const PureSpreadsheetEditor = ({
         "overflow-auto w-full h-[calc(100%-50px)]",
         isDark ? "border-0" : "border-[0.5px] border-slate-200"
       )}>
-        <table className="border-separate border-spacing-0 w-full table-fixed">
+        <table id='table' className="border-separate border-spacing-0 w-full table-fixed">
           <thead>
             <tr className={cn(
               "font-semibold h-[20px] sticky top-0 z-[3]",
@@ -328,7 +328,7 @@ const PureSpreadsheetEditor = ({
                           style={{ 
                             width: cellIndex < tableHeaders.length - 1 ? tableHeaders[cellIndex + 1]?.width || '100%' : '150px',
                             backgroundColor: hideEmptyAnswers && isUnanswered 
-                              ? isDark ? "rgba(64, 17, 17, 0.6)" : "rgba(254, 226, 226, 1)" 
+                              ? isDark ? "rgba(64, 17, 17, 0.6)" : "rgb(255, 250, 250)"
                               : isDark ? "rgba(10, 10, 10, 1)" : "rgba(255, 255, 255, 1)",
                             borderColor: hideEmptyAnswers && isUnanswered 
                               ? isDark ? "rgba(127, 29, 29, 0.6)" : "rgba(239, 68, 68, 1)" 
@@ -444,10 +444,10 @@ const PureSpreadsheetEditor = ({
                               initial={false}
                               animate={{
                                 backgroundColor: hideEmptyAnswers && isUnanswered 
-                                  ? isDark ? "rgba(64, 17, 17, 0.6)" : "rgba(254, 226, 226, 1)" 
+                                  ? isDark ? "rgba(64, 17, 17, 0.6)" : "rgb(255, 250, 250)" 
                                   : isDark ? "rgba(10, 10, 10, 1)" : "rgba(255, 255, 255, 1)",
                                 borderColor: hideEmptyAnswers && isUnanswered 
-                                  ? isDark ? "rgba(127, 29, 29, 0.6)" : "rgba(239, 68, 68, 1)" 
+                                  ? isDark ? "rgba(127, 29, 29, 0.6)" : "rgb(224, 39, 39)" 
                                   : isDark ? "rgba(26, 27, 26, 1)" : "rgba(226, 232, 240, 1)"
                               }}
                               transition={{ duration: 0.3 }}
@@ -525,6 +525,9 @@ const PureSpreadsheetEditor = ({
                                   </motion.div>
                                 )}
                               </AnimatePresence>
+                              {hideEmptyAnswers && isUnanswered && (
+                                <CircleAlert color="var(--color-mainred)" className='text-red-50 size-4 absolute right-2 top-3' />
+                              )}
                             </motion.td>
                           );
                         })}

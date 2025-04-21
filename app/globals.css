@@ -210,3 +210,20 @@
 .supplier-mode form {
   margin-top: auto;
 }
+
+/* table animation */
+.cell-highlight-0 {
+    background-color: yellow;
+}
+.cell-highlight-1 {
+    background-color: green;
+}
+.cell-highlight-2 {
+    background-color: blue;
+}
+.cell-highlight-3 {
+    background-color: pink;
+}
+.cell-highlight-4 {
+    background-color: brown;
+}

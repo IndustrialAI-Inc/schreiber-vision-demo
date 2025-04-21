@@ -244,7 +244,7 @@ export function SidebarHistory({ user }: { user: User | undefined }) {
                 return (
                   <div className="flex flex-col gap-6">
                     {mode === 'supplier' && (
-                      <div className="px-2 py-1 text-xs text-orange-500 font-semibold">
+                      <div className="px-2 py-1 text-xs text-mainred font-semibold">
                         Showing {filteredChats.length} specification{filteredChats.length !== 1 ? 's' : ''} for review
                       </div>
                     )}
