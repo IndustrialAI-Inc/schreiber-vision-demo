@@ -34,16 +34,10 @@ export const myProvider = isTestEnvironment
         'title-model': openai('gpt-4.1-mini'),
         'artifact-model': openai('gpt-4.1'),
         "deepseek-r1-distill-llama-70b": wrapLanguageModel({
-      middleware: extractReasoningMiddleware({
-        tagName: "think",
-      }),
+          middleware: extractReasoningMiddleware({
+            tagName: "think",
+          }),
           model: groq("deepseek-r1-distill-llama-70b"),
-        }),
-        "o4-mini": wrapLanguageModel({
-      middleware: extractReasoningMiddleware({
-        tagName: "think",
-      }),
-          model: openai("o4-mini"),
         }),
       },
       imageModels: {

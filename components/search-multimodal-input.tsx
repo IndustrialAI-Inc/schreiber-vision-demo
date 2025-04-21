@@ -106,6 +106,9 @@ export function SearchMultimodalInput({
     setInput(event.target.value);
     if (!isSearchMode && textareaRef.current) {
       adjustHeight();
+    } else if (isSearchMode && textareaRef.current) {
+      // Ensure textarea height adjusts for search mode too
+      adjustHeight();
     }
   };
   

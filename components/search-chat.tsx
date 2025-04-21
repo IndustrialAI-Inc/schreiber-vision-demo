@@ -67,7 +67,7 @@ export function SearchChat({
     id,
     body: { id, selectedChatModel, userMode: mode },
     initialMessages,
-    experimental_throttle: 100,
+    experimental_throttle: 200,
     sendExtraMessageFields: true,
     generateId: generateUUID,
     onFinish: () => {
@@ -233,20 +233,11 @@ export function SearchChat({
         
         console.log("[SEARCH APPEND] Submitting message with prompt to use requestPdf tool and search PDFs");
         
-        // Modify the message content to instruct AI to use requestPdf
-        // Extract original query from message content if it contains "Search query:" prefix
+        // Prepare message with instructions to use requestPdf tool
         let originalQuery = messageWithMode.content;
-        if (typeof messageWithMode.content === 'string') {
-          if (messageWithMode.content.startsWith('Search query:')) {
-            // Extract the actual query
-            const match = messageWithMode.content.match(/Search query: (.*?)(\n|$)/);
-            if (match && match[1]) {
-              originalQuery = match[1].trim();
-            }
-          }
-          
-          // Format the search query with proper instructions
-          messageWithMode.content = `Search query: ${originalQuery}
+        if (typeof messageWithMode.content === 'string') {          
+          // Format the search query with proper instructions, but don't show "Search query:" in the UI
+          messageWithMode.content = `${originalQuery}
 
 Think deeply about this query to identify the most relevant PDF documents from my repository. 
 After analyzing the query, ALWAYS use the requestPdf tool to fetch and display the most relevant PDF document.
@@ -273,7 +264,7 @@ If there are multiple relevant documents, prioritize showing the one that's most
     
     // Store current query and immediately clear input field
     const currentQuery = query;
-    setQuery('');
+    setQuery(''); // Clear input immediately for better UX
     
     try {
       await appendWithMode({
@@ -282,6 +273,12 @@ If there are multiple relevant documents, prioritize showing the one that's most
       });
     } catch (err) {
       console.error('Error during search:', err);
+    }
+    
+    // Clear input again to ensure it's empty after the search
+    setQuery('');
+    if (searchInputRef.current) {
+      searchInputRef.current.value = '';
     }
   };
 

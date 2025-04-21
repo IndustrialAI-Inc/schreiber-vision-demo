@@ -51,7 +51,8 @@ export async function POST(request: Request) {
             Think deeply and carefully about the user's search query to understand what they're looking for.
             Use the requestPdf tool to find and display relevant PDFs from their repository.
             Always explain your reasoning process as you analyze the query and search for documents.
-            After finding a relevant document, summarize its contents and explain why it's relevant to the query.`,
+            After finding a relevant document, summarize its contents and explain why it's relevant to the query.
+            Remember that user messages should be treated as direct search queries without needing any prefix.`,
             messages,
             experimental_activeTools: ['requestPdf'],
             experimental_transform: smoothStream({ chunking: 'word' }),
