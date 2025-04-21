@@ -262,8 +262,6 @@ export function Chat({
           isReadonly={isReadonly}
         />
 
-        <SupplierTimeline chatId={id} />
-
         {mode === 'supplier' && sheetContent && (
           <SupplierSheetAnalysis
             chatId={id}

@@ -12,6 +12,7 @@ import { memo } from 'react';
 import { Tooltip, TooltipContent, TooltipTrigger } from './ui/tooltip';
 import { type VisibilityType, VisibilitySelector } from './visibility-selector';
 import { useUserMode } from './mode-toggle';
+import { SupplierTimeline } from './supplier-timeline';
 
 function PureChatHeader({
   chatId,
@@ -32,7 +33,8 @@ function PureChatHeader({
   const { width: windowWidth } = useWindowSize();
 
   return (
-    <header className="flex top-0 bg-none py-1.5 items-center px-2 md:px-2 gap-2 absolute z-20 top-0 w-full">
+    <div className=''>
+    <div className="flex top-0 bg-none py-1.5 items-center px-2 md:px-2 gap-2 absolute z-20 top-0 w-full">
       <SidebarToggle />
 
       {(!open || windowWidth < 768) && (
@@ -80,7 +82,9 @@ function PureChatHeader({
       >
         {mode === 'supplier' ? 'Schreiber Mode' : 'Supplier Mode'}
       </Button>
-    </header>
+    </div>
+          <SupplierTimeline chatId={chatId} />
+    </div>
   );
 }
 

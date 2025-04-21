@@ -219,7 +219,7 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
   
   // Unified rendering for both Schreiber and Supplier modes
   return (
-    <div className={`w-full ${timelineBackground} border-b ${timelineBorder} px-4 py-5 h-[170px] absolute top-0 z-10 backdrop-blur-xl`}>
+    <div className={`w-full ${timelineBackground} border-b ${timelineBorder} px-4 py-5 h-[170px] backdrop-blur-xl`}>
       <div className="flex justify-center items-center h-full">
         <div>
           <h3 className="text-lg font-medium pb-2 mb-4 text-center">Supplier Specification Timeline</h3>
