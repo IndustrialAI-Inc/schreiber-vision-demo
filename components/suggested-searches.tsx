@@ -115,7 +115,7 @@ function PureSuggestedSearches({
         transition={{ delay: 0.4 }}
         className="mb-6"
       >
-        <SearchIcon size={40} className="text-amber-800 dark:text-amber-400" />
+        <SearchIcon size={40} className="text-amber-600 dark:text-amber-400" />
       </motion.div>
       
       <motion.div
@@ -123,7 +123,7 @@ function PureSuggestedSearches({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.5 }}
-        className="text-2xl font-semibold text-center mb-2"
+        className="text-2xl font-semibold text-center mb-2 text-white"
       >
         Endeavor AI Search
       </motion.div>
@@ -133,7 +133,7 @@ function PureSuggestedSearches({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.6 }}
-        className="text-base text-zinc-600 dark:text-zinc-400 text-center mb-8"
+        className="text-base text-gray-200 text-center mb-8"
       >
         Type a search query above or try one of these examples:
       </motion.div>
@@ -154,10 +154,10 @@ function PureSuggestedSearches({
               variant="outline"
               onClick={() => handleSearchClick(suggestedSearch.query)}
               disabled={disabled}
-              className="text-left border border-amber-200 dark:border-zinc-700 bg-amber-50/50 dark:bg-zinc-800/50 hover:bg-amber-100 dark:hover:bg-zinc-700 rounded-xl px-4 py-3.5 text-sm flex-col w-full h-auto justify-start items-start"
+              className="text-left border border-white/30 dark:border-zinc-700 bg-white/20 dark:bg-zinc-800/50 hover:bg-white/30 dark:hover:bg-zinc-700 rounded-xl px-4 py-3.5 text-sm flex-col w-full h-auto justify-start items-start"
             >
-              <span className="font-medium text-amber-900 dark:text-amber-300">{suggestedSearch.title}</span>
-              <span className="text-zinc-500 dark:text-zinc-400">
+              <span className="font-medium text-white">{suggestedSearch.title}</span>
+              <span className="text-gray-200 dark:text-zinc-300">
                 {suggestedSearch.label}
               </span>
             </Button>

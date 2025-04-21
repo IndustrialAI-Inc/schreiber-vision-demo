@@ -41,7 +41,7 @@ export function SearchPills({
             size="sm"
             onClick={() => onPillClick(query)}
             disabled={disabled}
-            className="rounded-full bg-amber-50/70 hover:bg-amber-100 dark:bg-zinc-800 dark:hover:bg-zinc-700 border-amber-200 dark:border-zinc-700 px-3 py-1 h-7 text-xs whitespace-nowrap text-amber-900 dark:text-amber-300 shadow-sm"
+            className="rounded-full bg-white/20 hover:bg-white/30 dark:bg-zinc-800 dark:hover:bg-zinc-700 border-white/30 dark:border-zinc-700 px-3 py-1 h-7 text-xs whitespace-nowrap text-white shadow-sm"
           >
             {query}
           </Button>

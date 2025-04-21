@@ -79,7 +79,7 @@ export function SearchChat({
       console.error("[SEARCH] Error:", error);
       toast.error(`Error: ${error?.message || 'An error occurred, please try again!'}`);
     },
-    experimental_sendReasoningMessages: true,
+    experimental_sendReasoningMessages: false, // Hide reasoning in the final response
     api: '/search/api/search', // Uses our dedicated search endpoint with DeepSeek model
   });
   
@@ -279,11 +279,11 @@ export function SearchChat({
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
-        "flex flex-col min-w-0 min-h-dvh bg-background dark:bg-zinc-900 overflow-visible search-page"
+        "flex flex-col min-w-0 min-h-dvh bg-background bg-[url(/images/dark-background.webp)] bg-cover bg-top-right bg-fixed overflow-visible search-page"
       )}>
         {/* Top search input - only shown when inputPosition is 'top' */}
         {inputPosition === 'top' && (
-          <div className="sticky top-0 z-10 max-w-3xl mx-auto w-full">
+          <div className="sticky top-0 z-10 max-w-3xl mx-auto w-full px-4 py-4 bg-background/60 backdrop-blur-md dark:bg-zinc-900/40 rounded-b-xl">
             <SearchMultimodalInput
               chatId={id}
               input={query}
@@ -313,7 +313,7 @@ export function SearchChat({
           </div>
         )}
 
-        <div className="flex-grow mx-auto max-w-3xl w-full pb-24">
+        <div className="flex-grow mx-auto max-w-3xl w-full pb-24 px-4">
           {messages.length === 0 ? (
             <SuggestedSearches
               chatId={id}
@@ -338,7 +338,7 @@ export function SearchChat({
 
         {/* Bottom search input - only shown when inputPosition is 'bottom' */}
         {inputPosition === 'bottom' && (
-          <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
+          <div className="sticky bottom-0 z-10 border-t border-border bg-background/60 backdrop-blur-md dark:bg-zinc-900/40 mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
             {/* Only show search pills in the bottom input when there are messages */}
             {messages.length > 0 && (
               <SearchPills 
@@ -353,7 +353,7 @@ export function SearchChat({
                   });
                 }}
                 disabled={isReadonly || status === 'loading'}
-                className="bg-background/80 dark:bg-zinc-900/80 backdrop-blur-sm"
+                className="bg-background/60 dark:bg-zinc-900/40 backdrop-blur-md"
               />
             )}
             <SearchMultimodalInput
