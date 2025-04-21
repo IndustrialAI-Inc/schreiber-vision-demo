@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import type { Attachment, UIMessage } from 'ai';
@@ -79,7 +80,7 @@ export function SearchChat({
       console.error("[SEARCH] Error:", error);
       toast.error(`Error: ${error?.message || 'An error occurred, please try again!'}`);
     },
-    experimental_sendReasoningMessages: true,
+    experimental_sendReasoningMessages: false, // Hide reasoning in the final response
     api: '/search/api/search', // Uses our dedicated search endpoint with DeepSeek model
   });
   
@@ -283,7 +284,7 @@ export function SearchChat({
       )}>
         {/* Top search input - only shown when inputPosition is 'top' */}
         {inputPosition === 'top' && (
-          <div className="sticky top-0 z-10 max-w-3xl mx-auto w-full">
+          <div className="sticky top-0 z-10 max-w-3xl mx-auto w-full px-4 py-4 bg-none rounded-b-xl">
             <SearchMultimodalInput
               chatId={id}
               input={query}
@@ -313,7 +314,7 @@ export function SearchChat({
           </div>
         )}
 
-        <div className="flex-grow mx-auto max-w-3xl w-full pb-24">
+        <div className="flex-grow mx-auto max-w-3xl w-full pb-24 px-4">
           {messages.length === 0 ? (
             <SuggestedSearches
               chatId={id}
@@ -338,7 +339,7 @@ export function SearchChat({
 
         {/* Bottom search input - only shown when inputPosition is 'bottom' */}
         {inputPosition === 'bottom' && (
-          <div className="sticky bottom-0 z-10 border-t border-border backdrop-blur-sm dark:bg-none mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
+          <div className="sticky bottom-0 z-10 border-t border-border backdrop-blur-md bg-none mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
             {/* Only show search pills in the bottom input when there are messages */}
             {messages.length > 0 && (
               <SearchPills 

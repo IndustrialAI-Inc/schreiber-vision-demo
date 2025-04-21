@@ -11,25 +11,25 @@
   border-radius: 9999px;
   font-size: 0.75rem;
   font-weight: 500;
-  background-color: #FFEDD5;
-  color: #9A3412;
-  border: 1px solid #FED7AA;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: #FFFFFF;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   margin: 0 0.125rem;
   cursor: pointer;
 }
 
 .dark .citations-styled [data-sourceref] {
-  background-color: rgba(154, 52, 18, 0.2);
-  color: #FDBA74;
-  border-color: rgba(154, 52, 18, 0.3);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .citations-styled [data-sourceref]:hover {
-  background-color: #FED7AA;
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .dark .citations-styled [data-sourceref]:hover {
-  background-color: rgba(154, 52, 18, 0.3);
+  background-color: rgba(255, 255, 255, 0.25);
 }
 
 /* Citation examples styling */
@@ -54,19 +54,19 @@
   font-size: 0.65rem;
   vertical-align: super;
   font-weight: 500;
-  color: #9A3412;
-  background-color: #FFEDD5;
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.2);
   padding: 0 0.2rem;
   border-radius: 3px;
-  border: 1px solid #FED7AA;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   margin-left: 0.125rem;
   cursor: pointer;
 }
 
 .dark .citations-styled p:nth-of-type(3n+2):after {
-  background-color: rgba(154, 52, 18, 0.2);
-  color: #FDBA74;
-  border-color: rgba(154, 52, 18, 0.3);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .citations-styled p:nth-of-type(3n+3):after {
@@ -75,19 +75,19 @@
   font-size: 0.65rem;
   vertical-align: super;
   font-weight: 500;
-  color: #9A3412;
-  background-color: #FFEDD5;
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.2);
   padding: 0 0.2rem;
   border-radius: 3px;
-  border: 1px solid #FED7AA;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   margin-left: 0.125rem;
   cursor: pointer;
 }
 
 .dark .citations-styled p:nth-of-type(3n+3):after {
-  background-color: rgba(154, 52, 18, 0.2);
-  color: #FDBA74;
-  border-color: rgba(154, 52, 18, 0.3);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .citations-styled p:nth-of-type(3n+1):after {
@@ -96,19 +96,19 @@
   font-size: 0.65rem;
   vertical-align: super;
   font-weight: 500;
-  color: #9A3412;
-  background-color: #FFEDD5;
+  color: #FFFFFF;
+  background-color: rgba(255, 255, 255, 0.2);
   padding: 0 0.2rem;
   border-radius: 3px;
-  border: 1px solid #FED7AA;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   margin-left: 0.125rem;
   cursor: pointer;
 }
 
 .dark .citations-styled p:nth-of-type(3n+1):after {
-  background-color: rgba(154, 52, 18, 0.2);
-  color: #FDBA74;
-  border-color: rgba(154, 52, 18, 0.3);
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 :root {

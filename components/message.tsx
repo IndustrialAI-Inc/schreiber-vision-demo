@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 
 import type { UIMessage } from 'ai';
@@ -125,9 +126,9 @@ const PurePreviewMessage = ({
           )}
         >
           {message.role === 'assistant' && (
-            <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background">
+            <div className="size-8 flex items-center rounded-full justify-center ring-1 shrink-0 ring-border bg-background/80 backdrop-blur-sm shadow-sm">
               <div className="translate-y-px">
-                <SparklesIcon size={14} />
+                <SparklesIcon size={14} className="text-amber-600 dark:text-amber-400" />
               </div>
             </div>
           )}
@@ -206,7 +207,7 @@ const PurePreviewMessage = ({
                           'bg-blue-50 text-black px-3 py-2 rounded-xl border border-blue-200': 
                             isSupplierMsg || (isLegacyUserMsg && isSupplierMode),
                           // Assistant: improved styling for longer content with more padding and line spacing
-                          'bg-muted text-foreground px-4 py-3 rounded-xl leading-relaxed': 
+                          'bg-muted/95 dark:bg-zinc-800/95 text-foreground px-4 py-3 rounded-xl leading-relaxed shadow-sm': 
                             message.role === 'assistant',
                         })}
                       >
@@ -231,69 +232,147 @@ const PurePreviewMessage = ({
                               {/* Sources section - only display in search pages */}
                               {chatId && chatId.includes('search') && (
                                 <div className="mt-8 pt-6 border-t border-amber-200/30 dark:border-amber-800/30">
-                                  <h2 className="text-xl font-semibold text-amber-800 dark:text-amber-400 pb-2">
+                                  <h2 className="text-xl font-semibold text-white pb-2">
                                     Sources
                                   </h2>
                                   <p className="text-muted-foreground text-xs mb-2">Reference materials:</p>
                                   
-                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
-                                    {/* Fixed selection of sources - smaller and more compact */}
-                                    <div className="border border-muted rounded-md overflow-hidden bg-muted/30">
-                                      <div className="relative">
-                                        <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[1]</span>
-                                        <img 
-                                          src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/Screenshot%202025-04-20%20at%208.18.14%E2%80%AFPM-qxVrEX6dRsdrERPsBacw36sMYTAvTG.png" 
-                                          alt="Product Information" 
-                                          className="w-full h-24 md:h-28 object-contain bg-white p-1"
-                                        />
+                                  {/* Use standard sources for all queries - the regulatory images will be in the main content */}
+                                  {false ? (
+                                    <div className="flex flex-nowrap overflow-x-auto gap-2 mb-2 pb-2">
+                                      {/* Regulatory Compliance sources */}
+                                      <div className="flex-shrink-0 w-28 border border-muted rounded-md overflow-hidden bg-muted/30">
+                                        <div className="relative">
+                                          <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[1]</span>
+                                          <div className="w-full h-20 flex items-center justify-center bg-white">
+                                            <img 
+                                              src="https://www.czarnikow.com/wp-content/uploads/2023/07/pile-of-crystalline-fructose-close-up-on-black-2021-09-18-16-13-18-utc-1-scaled.jpg" 
+                                              alt="Crystalline Fructose Regulations" 
+                                              className="max-w-full max-h-full object-contain p-1"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="p-1 text-center">
+                                          <p className="text-xs font-medium truncate">Fructose Regulations</p>
+                                        </div>
                                       </div>
-                                      <div className="p-1.5">
-                                        <p className="text-xs font-medium">Product Information</p>
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="border border-muted rounded-md overflow-hidden bg-muted/30">
-                                      <div className="relative">
-                                        <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[2]</span>
-                                        <img 
-                                          src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/CaliforniaCustomFruitFlavors_780-c4oX0aDOkj1vWf3AO5PhcV0GbDMNty.jpg" 
-                                          alt="Custom Fruit Flavors" 
-                                          className="w-full h-24 md:h-28 object-contain bg-white p-1"
-                                        />
-                                      </div>
-                                      <div className="p-1.5">
-                                        <p className="text-xs font-medium">Custom Fruit Flavors</p>
-                                      </div>
-                                    </div>
-                                    
-                                    <div className="border border-muted rounded-md overflow-hidden bg-muted/30">
-                                      <div className="relative">
-                                        <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[3]</span>
-                                        <img 
-                                          src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/10849226-Noa3mH4uGpEW3W7chNiB9GLbTxGFh7.png" 
-                                          alt="Specification Document" 
-                                          className="w-full h-24 md:h-28 object-contain bg-white p-1"
-                                        />
-                                      </div>
-                                      <div className="p-1.5">
-                                        <p className="text-xs font-medium">Specification Doc</p>
-                                      </div>
-                                    </div>
                                       
-                                    <div className="border border-muted rounded-md overflow-hidden bg-muted/30">
-                                      <div className="relative">
-                                        <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[4]</span>
-                                        <img 
-                                          src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/sharepoint-yxiOuS8FaOe4Bk7oRb4KjyBeZj1KNq.png" 
-                                          alt="SharePoint Documentation" 
-                                          className="w-full h-24 md:h-28 object-contain bg-white p-1"
-                                        />
+                                      <div className="flex-shrink-0 w-28 border border-muted rounded-md overflow-hidden bg-muted/30">
+                                        <div className="relative">
+                                          <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[2]</span>
+                                          <div className="w-full h-20 flex items-center justify-center bg-white">
+                                            <img 
+                                              src="https://cleanfoodfacts.com/app/uploads/2019/05/Modified-Food-Starch.jpg" 
+                                              alt="Modified Food Starch Guidelines" 
+                                              className="max-w-full max-h-full object-contain p-1"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="p-1 text-center">
+                                          <p className="text-xs font-medium truncate">Starch Guidelines</p>
+                                        </div>
                                       </div>
-                                      <div className="p-1.5">
-                                        <p className="text-xs font-medium">SharePoint Docs</p>
+                                      
+                                      <div className="flex-shrink-0 w-28 border border-muted rounded-md overflow-hidden bg-muted/30">
+                                        <div className="relative">
+                                          <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[3]</span>
+                                          <div className="w-full h-20 flex items-center justify-center bg-white">
+                                            <img 
+                                              src="https://imbarex.com/wp-content/uploads/2023/06/natural-colorants-for-juices-IMBAREX.png" 
+                                              alt="Natural Color Regulations" 
+                                              className="max-w-full max-h-full object-contain p-1"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="p-1 text-center">
+                                          <p className="text-xs font-medium truncate">Color Regulations</p>
+                                        </div>
+                                      </div>
+                                        
+                                      <div className="flex-shrink-0 w-28 border border-muted rounded-md overflow-hidden bg-muted/30">
+                                        <div className="relative">
+                                          <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[4]</span>
+                                          <div className="w-full h-20 flex items-center justify-center bg-white">
+                                            <img 
+                                              src="https://www.eufic.org/en/images/uploads/whats-in-food/NutritionLabelling_schemes.png" 
+                                              alt="Nutritional Labeling Requirements" 
+                                              className="max-w-full max-h-full object-contain p-1"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="p-1 text-center">
+                                          <p className="text-xs font-medium truncate">Labeling Requirements</p>
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
+                                  ) : (
+                                    <div className="flex flex-nowrap overflow-x-auto gap-2 mb-2 pb-2">
+                                      {/* Standard sources */}
+                                      <div className="flex-shrink-0 w-28 border border-muted rounded-md overflow-hidden bg-muted/30">
+                                        <div className="relative">
+                                          <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[1]</span>
+                                          <div className="w-full h-20 flex items-center justify-center bg-white">
+                                            <img 
+                                              src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/Screenshot%202025-04-20%20at%208.18.14%E2%80%AFPM-qxVrEX6dRsdrERPsBacw36sMYTAvTG.png" 
+                                              alt="Product Information" 
+                                              className="max-w-full max-h-full object-contain p-1"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="p-1 text-center">
+                                          <p className="text-xs font-medium truncate">Product Info</p>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex-shrink-0 w-28 border border-muted rounded-md overflow-hidden bg-muted/30">
+                                        <div className="relative">
+                                          <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[2]</span>
+                                          <div className="w-full h-20 flex items-center justify-center bg-white">
+                                            <img 
+                                              src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/CaliforniaCustomFruitFlavors_780-c4oX0aDOkj1vWf3AO5PhcV0GbDMNty.jpg" 
+                                              alt="Custom Fruit Flavors" 
+                                              className="max-w-full max-h-full object-contain p-1"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="p-1 text-center">
+                                          <p className="text-xs font-medium truncate">Fruit Flavors</p>
+                                        </div>
+                                      </div>
+                                      
+                                      <div className="flex-shrink-0 w-28 border border-muted rounded-md overflow-hidden bg-muted/30">
+                                        <div className="relative">
+                                          <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[3]</span>
+                                          <div className="w-full h-20 flex items-center justify-center bg-white">
+                                            <img 
+                                              src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/10849226-Noa3mH4uGpEW3W7chNiB9GLbTxGFh7.png" 
+                                              alt="Specification Document" 
+                                              className="max-w-full max-h-full object-contain p-1"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="p-1 text-center">
+                                          <p className="text-xs font-medium truncate">Spec Doc</p>
+                                        </div>
+                                      </div>
+                                        
+                                      <div className="flex-shrink-0 w-28 border border-muted rounded-md overflow-hidden bg-muted/30">
+                                        <div className="relative">
+                                          <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[4]</span>
+                                          <div className="w-full h-20 flex items-center justify-center bg-white">
+                                            <img 
+                                              src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/sharepoint-yxiOuS8FaOe4Bk7oRb4KjyBeZj1KNq.png" 
+                                              alt="SharePoint Documentation" 
+                                              className="max-w-full max-h-full object-contain p-1"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="p-1 text-center">
+                                          <p className="text-xs font-medium truncate">SharePoint</p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </>

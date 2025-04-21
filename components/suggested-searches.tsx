@@ -116,8 +116,6 @@ function PureSuggestedSearches({
         transition={{ delay: 0.4 }}
         className="mb-6"
       >
-        {/* <SearchIcon size={40} className="text-amber-800 dark:text-amber-400" /> */}
-        {/* <Search className="size-8" /> */}
       </motion.div>
       
       <motion.div
@@ -125,7 +123,7 @@ function PureSuggestedSearches({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.5 }}
-        className="text-2xl font-semibold text-center mb-2"
+        className="text-2xl font-semibold text-center mb-2 text-white"
       >
         Endeavor AI Search
       </motion.div>
@@ -135,7 +133,7 @@ function PureSuggestedSearches({
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 10 }}
         transition={{ delay: 0.6 }}
-        className="text-base text-zinc-600 dark:text-zinc-400 text-center mb-8"
+        className="text-base text-gray-200 text-center mb-8"
       >
         Type a search query above or try one of these examples:
       </motion.div>
