@@ -5,6 +5,7 @@ import { useCopyToClipboard } from 'usehooks-ts';
 import type { Vote } from '@/lib/db/schema';
 
 import { CopyIcon, ThumbDownIcon, ThumbUpIcon } from './icons';
+import { Copy, ThumbsDown, ThumbsUp } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Tooltip,
@@ -39,7 +40,7 @@ export function PureMessageActions({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              className="py-1 px-2 h-fit text-muted-foreground"
+              className="p-1.5 h-fit text-muted-foreground"
               variant="outline"
               onClick={async () => {
                 const textFromParts = message.parts
@@ -57,7 +58,7 @@ export function PureMessageActions({
                 toast.success('Copied to clipboard!');
               }}
             >
-              <CopyIcon />
+              <Copy className="h-3 w-3" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Copy</TooltipContent>
@@ -67,7 +68,7 @@ export function PureMessageActions({
           <TooltipTrigger asChild>
             <Button
               data-testid="message-upvote"
-              className="py-1 px-2 h-fit text-muted-foreground !pointer-events-auto"
+              className="p-1.5 h-fit text-muted-foreground !pointer-events-auto"
               disabled={vote?.isUpvoted}
               variant="outline"
               onClick={async () => {
@@ -110,7 +111,7 @@ export function PureMessageActions({
                 });
               }}
             >
-              <ThumbUpIcon />
+              <ThumbsUp className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Upvote Response</TooltipContent>
@@ -120,7 +121,7 @@ export function PureMessageActions({
           <TooltipTrigger asChild>
             <Button
               data-testid="message-downvote"
-              className="py-1 px-2 h-fit text-muted-foreground !pointer-events-auto"
+              className="p-1.5 h-fit text-muted-foreground !pointer-events-auto"
               variant="outline"
               disabled={vote && !vote.isUpvoted}
               onClick={async () => {
@@ -163,7 +164,7 @@ export function PureMessageActions({
                 });
               }}
             >
-              <ThumbDownIcon />
+              <ThumbsDown className="h-4 w-4" />
             </Button>
           </TooltipTrigger>
           <TooltipContent>Downvote Response</TooltipContent>

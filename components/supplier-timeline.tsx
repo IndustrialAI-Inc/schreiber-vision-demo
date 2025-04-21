@@ -1,6 +1,7 @@
 'use client';
 
 import { CheckCircleFillIcon, ClockRewind } from '@/components/icons';
+import { CircleCheck, Send } from 'lucide-react';
 import { useSupplierTimeline } from '@/hooks/use-supplier-timeline';
 import { formatDistanceToNow } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -139,8 +140,8 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
 
   // Both Schreiber and Supplier now use the same timeline view
   // Just changing the colors slightly for supplier mode
-    const timelineBackground = mode === 'supplier' ? 'bg-blue-50 dark:bg-blue-950/30' : 'bg-zinc-100 dark:bg-zinc-900/50';
-  const timelineBorder = mode === 'supplier' ? 'border-blue-100 dark:border-blue-900' : 'border-zinc-200 dark:border-zin200';
+    const timelineBackground = mode === 'supplier' ? 'bg-white/30 dark:bg-blue-950/30' : 'bg-zinc-100 dark:bg-zinc-900/50';
+  const timelineBorder = mode === 'supplier' ? 'border-blue-100 dark:border-blue-900' : 'border-zinc-200 dark:border-zinc-200/20';
   
   // We'll still keep the action buttons for supplier mode
   let actionButtons = null;
@@ -148,14 +149,16 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
   if (mode === 'supplier') {
     if (isSendInProgress) {
       actionButtons = (
-        <Button 
-          size="sm" 
-          variant="default"
-          onClick={handleProvideFeedback}
-          className="bg-blue-600 hover:bg-blue-700"
-        >
-          Submit for Review
-        </Button>
+        <div className='rounded-[12px] bg-gradient-to-r from-mainred to-mainblue flex justify-center items-center p-0.5 cursor-pointer ml-2'>
+          <Button 
+            size="sm" 
+            variant="default"
+            onClick={handleProvideFeedback}
+            className="bg-zinc-800 rounded-[12px] text-[#F6F6F6] hover:bg-zinc-700"
+          >
+            Submit for Review
+          </Button>
+        </div>
       );
     } else if (isFeedbackInProgress) {
       actionButtons = (
@@ -216,19 +219,21 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
   
   // Unified rendering for both Schreiber and Supplier modes
   return (
-    <div className={`w-full ${timelineBackground} border-b ${timelineBorder} px-4 py-3`}>
-      <div className="flex justify-between items-start">
+    <div className={`w-full ${timelineBackground} border-b ${timelineBorder} px-4 py-5 h-[170px] absolute top-0 z-10 backdrop-blur-xl`}>
+      <div className="flex justify-center items-center h-full">
         <div>
-          <h3 className="text-sm font-medium mb-2">Supplier Specification Timeline</h3>
+          <h3 className="text-lg font-medium pb-2 mb-4 text-center">Supplier Specification Timeline</h3>
           <div className="flex items-center">
             {timeline.steps.map((step, index) => (
-              <div key={step.id} className="flex items-center">
+              <div key={step.id} className="flex items-center h-[75px]">
                 <TimelineStep step={step} />
                 {index < timeline.steps.length - 1 && (
-                  <div className={cn(
-                    "h-px w-8 mx-1", 
-                    step.status === 'completed' ? "bg-primary" : "bg-muted"
-                  )} />
+                  <div
+                    className={cn(
+                      "w-8 mx-5 border-t",
+                      step.status === 'completed' ? "border-primary border-solid" : "border-primary border-dashed"
+                    )}
+                  />
                 )}
               </div>
             ))}
@@ -248,26 +253,26 @@ export function SupplierTimeline({ chatId }: SupplierTimelineProps) {
 
 function TimelineStep({ step }: { step: { id: string; label: string; status: string; timestamp?: string } }) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center h-full">
       <div className="relative">
         <div 
           className={cn(
-            "w-6 h-6 rounded-full flex items-center justify-center",
-            step.status === 'completed' ? "bg-primary text-primary-foreground" : 
-            step.status === 'in-progress' ? "bg-primary/20 text-primary border border-primary" : 
+            "w-8 h-8 rounded-full flex items-center justify-center",
+            step.status === 'completed' ? "bg-white dark:bg-primary text-primary-foreground" : 
+            step.status === 'in-progress' ? "bg-white/20 dark:bg-primary/20 text-primary border border-primary" : 
             "bg-muted text-muted-foreground"
           )}
         >
           {step.status === 'completed' ? (
-            <CheckCircleFillIcon size={12} />
+            <CircleCheck className='w-4 h-4 text-green-700' />
           ) : step.status === 'in-progress' ? (
-            <ClockRewind size={12} />
+            <Send className='w-3 h-3' />
           ) : (
-            <span className="w-2 h-2 rounded-full bg-current" />
+            <span className="w-3 h-3 rounded-full bg-current" />
           )}
         </div>
       </div>
-      <div className="mt-1 text-xs max-w-16 text-center">
+      <div className="mt-2 text-xs max-w-32 text-center">
         {step.label}
       </div>
       {step.timestamp && (

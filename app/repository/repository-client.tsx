@@ -6,6 +6,7 @@ import type { UserFile } from '@/lib/db/schema';
 import { TrashIcon } from '@/components/icons';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Trash } from 'lucide-react';
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} bytes`;
@@ -58,7 +59,7 @@ export default function RepositoryClient({ files: initialFiles }: { files: UserF
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Your Files Repository</h1>
+      <h1 className="text-2xl font-bold mb-8 mt-2">Your Files Repository</h1>
       
       {files.length === 0 && (
         <p className="text-muted-foreground">You haven&apos;t uploaded any files yet.</p>
@@ -66,18 +67,18 @@ export default function RepositoryClient({ files: initialFiles }: { files: UserF
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {files.map((file) => (
-          <Card key={file.id} className="overflow-hidden">
+          <Card key={file.id} className="overflow-hidden bg-fulldark rounded-[12px]">
             <CardHeader className="pb-2">
               <div className="flex justify-between items-start">
-                <CardTitle className="truncate text-lg">{file.fileName}</CardTitle>
+                <CardTitle className="truncate text-md text-bright">{file.fileName}</CardTitle>
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500"
+                  className="h-8 w-8 p-0 text-muted-foreground hover:text-red-500 bg-none hover:bg-none"
                   onClick={() => deleteFile(file.id)}
                   disabled={deleting === file.id}
                 >
-                  <TrashIcon size={16} />
+                  <Trash size={16} />
                 </Button>
               </div>
               <p className="text-sm text-muted-foreground">

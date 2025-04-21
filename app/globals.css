@@ -211,29 +211,19 @@
   margin-top: auto;
 }
 
-/* Search page specific styles */
-.search-page {
-  background-color: var(--background);
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+/* table animation */
+.cell-highlight-0 {
+    background-color: yellow;
 }
-
-.dark .search-page {
-  background-color: rgb(24, 24, 27); /* bg-zinc-900 */
+.cell-highlight-1 {
+    background-color: green;
 }
-
-/* Fix for the search page to ensure a consistent dark background */
-.dark body {
-  background-color: rgb(24, 24, 27);
+.cell-highlight-2 {
+    background-color: blue;
 }
-
-/* Remove sidebar styling for search pages */
-.remove-sidebar-style.group\/sidebar-wrapper {
-  background-color: transparent !important;
+.cell-highlight-3 {
+    background-color: pink;
 }
-
-.remove-sidebar-style .has-\[\[data-variant\=inset\]\]\:bg-sidebar {
-  background-color: transparent !important;
+.cell-highlight-4 {
+    background-color: brown;
 }

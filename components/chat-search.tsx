@@ -6,7 +6,7 @@ import type { Attachment, UIMessage } from 'ai';
 import { useChat } from '@ai-sdk/react';
 import { useState, useEffect } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
-import { SearchMultimodalInput } from '@/components/search-multimodal-input';
+import { ChatHeader } from '@/components/chat-header';
 import type { Vote } from '@/lib/db/schema';
 import { fetcher, generateUUID } from '@/lib/utils';
 import { Artifact } from './artifact';
@@ -22,7 +22,6 @@ import { useUserMode, MessageModeContext } from './mode-toggle';
 import { SupplierSheetAnalysis } from './supplier-sheet-analysis';
 import { cn } from '@/lib/utils';
 import { useSearchParams } from 'next/navigation';
-import { SuggestedSearches } from './suggested-searches';
 
 export function ChatSearch({
   id,
@@ -41,7 +40,6 @@ export function ChatSearch({
   const { mode } = useUserMode();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
   const [sheetContent, setSheetContent] = useState<string>('');
-  const [inputPosition, setInputPosition] = useState<'top' | 'bottom'>('top');
   
   // Check for schreiberApproval query parameter
   const searchParams = useSearchParams();
@@ -50,43 +48,6 @@ export function ChatSearch({
   // When switching modes, this state ensures existing messages don't suddenly change position
   // Messages will always maintain their original mode/position
   const [messageModeOverride, setMessageModeOverride] = useState<null | 'supplier' | 'schreiber'>(null);
-  
-  const {
-    messages,
-    setMessages,
-    handleSubmit,
-    input,
-    setInput,
-    append,
-    status,
-    stop,
-    reload,
-    error
-  } = useChat({
-    id,
-    body: { id, selectedChatModel: selectedChatModel, userMode: mode },
-    initialMessages,
-    experimental_throttle: 100,
-    sendExtraMessageFields: true,
-    generateId: generateUUID,
-    onFinish: () => {
-      mutate(unstable_serialize(getChatHistoryPaginationKey));
-      console.log("[CHAT] Chat finished successfully");
-    },
-    onError: (error) => {
-      console.error("[CHAT] Error from useChat:", error);
-      toast.error(`Error: ${error?.message || 'An error occurred, please try again!'}`);
-    },
-  });
-  
-  // Move input to bottom after first message
-  useEffect(() => {
-    if (messages.length > 0) {
-      setInputPosition('bottom');
-    } else {
-      setInputPosition('top');
-    }
-  }, [messages.length]);
   
   // Use this effect to stabilize message appearance during mode transitions
   useEffect(() => {
@@ -142,6 +103,34 @@ export function ChatSearch({
     }
   }, [id, mode]);
 
+  const {
+    messages,
+    setMessages,
+    handleSubmit,
+    input,
+    setInput,
+    append,
+    status,
+    stop,
+    reload,
+    error
+  } = useChat({
+    id,
+    body: { id, selectedChatModel: selectedChatModel, userMode: mode },
+    initialMessages,
+    experimental_throttle: 100,
+    sendExtraMessageFields: true,
+    generateId: generateUUID,
+    onFinish: () => {
+      mutate(unstable_serialize(getChatHistoryPaginationKey));
+      console.log("[CHAT] Chat finished successfully");
+    },
+    onError: (error) => {
+      console.error("[CHAT] Error from useChat:", error);
+      toast.error(`Error: ${error?.message || 'An error occurred, please try again!'}`);
+    },
+  });
+  
   // Add debug logging for message state
   useEffect(() => {
     if (messages.length > 0) {
@@ -231,29 +220,6 @@ export function ChatSearch({
               : {})
         };
         
-        // Check if this appears to be a search query - in that case modify the content
-        if (typeof messageWithMode.content === 'string') {
-          // If we're in search mode (using the SearchMultimodalInput component with isSearchMode=true)
-          // Add the prompt to use requestPdf tool if in search mode
-          if (isSearchMode) {
-            // Extract original query if it has the "Search query:" prefix
-            let originalQuery = messageWithMode.content;
-            if (messageWithMode.content.startsWith('Search query:')) {
-              const match = messageWithMode.content.match(/Search query: (.*?)(\n|$)/);
-              if (match && match[1]) {
-                originalQuery = match[1].trim();
-              }
-            }
-            
-            // Format the search query with proper instructions
-            messageWithMode.content = `Search query: ${originalQuery}
-
-Think deeply about this query to identify the most relevant PDF documents from my repository. 
-After analyzing the query, ALWAYS use the requestPdf tool to fetch and display the most relevant PDF document.
-If there are multiple relevant documents, prioritize showing the one that's most directly related to my query.`;
-          }
-        }
-        
         if (isFirstMessage && attachments.length > 0) {
           console.log("[APPEND] First message - adding attachments:", attachments);
         } else if (isFirstMessage) {
@@ -275,9 +241,6 @@ If there are multiple relevant documents, prioritize showing the one that's most
     // For non-user messages, just pass through
     return append(message);
   };
-  
-  // Whether this is being used in search mode (based on props)
-  const isSearchMode = true;
 
   // Handler for when supplier sends feedback
   const handleSendFeedback = (feedback: string) => {
@@ -290,29 +253,20 @@ If there are multiple relevant documents, prioritize showing the one that's most
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
-        "flex flex-col min-w-0 min-h-dvh bg-background dark:bg-zinc-900 overflow-visible"
+        "flex flex-col min-w-0 h-dvh bg-[url(/images/dark-background.webp)] bg-cover bg-top-right bg-fixed"
       )}>
-        {/* Top search input - only shown when inputPosition is 'top' */}
-        {inputPosition === 'top' && (
-          <div className="sticky top-0 z-10 max-w-3xl mx-auto w-full">
-            <SearchMultimodalInput
+        <div className="flex justify-center w-full">
+          <div className="max-w-2xl w-full">
+            <ChatHeader
               chatId={id}
-              input={input}
-              setInput={setInput}
-              status={status}
-              stop={stop}
-              attachments={attachments}
-              setAttachments={setAttachments}
-              messages={messages}
-              setMessages={setMessages}
-              append={appendWithMode}
-              handleSubmit={handleSubmit}
-              isSearchMode={true}
-              disabled={isReadonly}
-              supplierMode={mode === 'supplier'}
+              selectedModelId={selectedChatModel}
+              selectedVisibilityType={selectedVisibilityType}
+              isReadonly={isReadonly}
             />
           </div>
-        )}
+        </div>
+
+        <SupplierTimeline chatId={id} />
 
         {mode === 'supplier' && sheetContent && (
           <SupplierSheetAnalysis
@@ -322,50 +276,41 @@ If there are multiple relevant documents, prioritize showing the one that's most
           />
         )}
 
-        <div className="mx-auto max-w-3xl w-full overflow-visible pb-24">
-          {messages.length === 0 ? (
-            <SuggestedSearches
-              chatId={id}
-              append={appendWithMode}
-              disabled={isReadonly || status === 'loading'}
-              setInput={setInput}
-            />
-          ) : (
-            <Messages
-              chatId={id}
-              status={status}
-              votes={votes}
-              messages={messages}
-              setMessages={setMessages}
-              reload={reload}
-              isReadonly={isReadonly}
-              isArtifactVisible={isArtifactVisible}
-              isSchreiberApproval={isSchreiberApproval}
-            />
-          )}
-        </div>
+        <Messages
+          chatId={id}
+          status={status}
+          votes={votes}
+          messages={messages}
+          setMessages={setMessages}
+          reload={reload}
+          isReadonly={isReadonly}
+          isArtifactVisible={isArtifactVisible}
+          isSchreiberApproval={isSchreiberApproval}
+        />
 
-        {/* Bottom search input - only shown when inputPosition is 'bottom' */}
-        {inputPosition === 'bottom' && (
-          <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
-            <SearchMultimodalInput
-              chatId={id}
-              input={input}
-              setInput={setInput}
-              status={status}
-              stop={stop}
-              attachments={attachments}
-              setAttachments={setAttachments}
-              messages={messages}
-              setMessages={setMessages}
-              append={appendWithMode}
-              handleSubmit={handleSubmit}
-              isSearchMode={true}
-              disabled={isReadonly}
-              supplierMode={mode === 'supplier'}
-            />
-          </div>
-        )}
+        <form className="flex mx-auto px-4 bg-none pb-4 md:pb-6 gap-2 w-full md:max-w-3xl flex-col">
+          <MultimodalInput
+            chatId={id}
+            input={input}
+            setInput={setInput}
+            handleSubmit={handleSubmit}
+            status={status}
+            stop={stop}
+            attachments={attachments}
+            setAttachments={setAttachments}
+            messages={messages}
+            setMessages={setMessages}
+            append={appendWithMode}
+            disabled={isReadonly}
+            supplierMode={mode === 'supplier'}
+            className={cn(
+              'min-h-[24px] max-h-[calc(75dvh)] overflow-hidden resize-none rounded-2xl !text-base pb-10 dark:border-zinc-700',
+              mode === 'supplier'
+                ? 'bg-blue-50 border-blue-200 text-black'
+                : 'bg-muted border-zinc-200 text-black',
+            )}
+          />
+        </form>
       </div>
 
       <Artifact

@@ -70,7 +70,7 @@ export function SupplierAlert() {
   // Set different styles based on user mode
   const styles = {
     bg: mode === 'supplier' ? 'bg-red-50 dark:bg-red-900/20' : 'bg-emerald-50 dark:bg-emerald-900/20',
-    border: mode === 'supplier' ? 'border-red-200 dark:border-red-800' : 'border-emerald-200 dark:border-emerald-800',
+    border: mode === 'supplier' ? 'border-red-500 dark:border-red-800' : 'border-emerald-200 dark:border-emerald-800',
     icon: mode === 'supplier' ? 'text-red-500 dark:text-red-400' : 'text-emerald-500 dark:text-emerald-400',
     text: mode === 'supplier' ? 'text-red-900 dark:text-red-100' : 'text-emerald-900 dark:text-emerald-100',
     button: mode === 'supplier' ? 'border-red-300 text-red-700 hover:bg-red-50 dark:border-red-700 dark:text-red-300 dark:hover:bg-red-900/50' : 

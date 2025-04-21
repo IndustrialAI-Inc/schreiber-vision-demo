@@ -4,6 +4,7 @@ import type { User } from 'next-auth';
 import { useRouter } from 'next/navigation';
 
 import { FolderIcon, PlusIcon } from '@/components/icons';
+import { Folder, FileSearch2 } from 'lucide-react';
 import { SearchIcon } from '@/components/icons-search';
 import { SidebarHistory } from '@/components/sidebar-history';
 import { SidebarUserNav } from '@/components/sidebar-user-nav';
@@ -31,7 +32,7 @@ export function AppSidebar({ user }: { user: User | undefined }) {
       <SidebarHeader>
         <SidebarMenu>
           <div className="flex flex-col space-y-2">
-            <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-row justify-between items-center mb-1">
               <Link
                 href="/"
                 onClick={() => {
@@ -70,10 +71,11 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               onClick={() => {
                 setOpenMobile(false);
               }}
-              className="flex flex-row gap-2 items-center"
+              className="flex flex-row gap-2 items-center px-2 py-2 hover:bg-muted rounded-[12px]"
             >
-              <FolderIcon className="h-4 w-4" />
-              <span className="text-sm font-medium hover:bg-muted rounded-md cursor-pointer px-1">
+              {/* <FolderIcon className="h-4 w-4" /> */}
+              <Folder className="h-5 w-5" />
+              <span className="text-sm font-medium rounded-md cursor-pointer px-1">
                 Repository
               </span>
             </Link>
@@ -83,10 +85,11 @@ export function AppSidebar({ user }: { user: User | undefined }) {
               onClick={() => {
                 setOpenMobile(false);
               }}
-              className="flex flex-row gap-2 items-center"
+              className="flex flex-row gap-2 items-center px-2 py-2 hover:bg-muted rounded-[12px]"
             >
-              <SearchIcon className="h-4 w-4" />
-              <span className="text-sm font-medium hover:bg-muted rounded-md cursor-pointer px-1">
+              {/* <SearchIcon className="h-4 w-4" /> */}
+              <FileSearch2 className="h-5 w-5" />
+              <span className="text-sm font-medium rounded-md cursor-pointer px-1">
                 PDF Search
               </span>
             </Link>
