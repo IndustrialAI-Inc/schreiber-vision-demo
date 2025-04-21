@@ -23,6 +23,7 @@ import { useArtifact } from '@/hooks/use-artifact';
 import React from 'react';
 import { useUserMode, useMessageMode } from './mode-toggle';
 
+
 const PurePreviewMessage = ({
   chatId,
   message,
@@ -204,12 +205,102 @@ const PurePreviewMessage = ({
                           // Supplier user: left, blue bubble, black text
                           'bg-blue-50 text-black px-3 py-2 rounded-xl border border-blue-200': 
                             isSupplierMsg || (isLegacyUserMsg && isSupplierMode),
-                          // Assistant: use foreground color that works in both light/dark mode, no border
-                          'bg-muted text-foreground px-3 py-2 rounded-xl': 
+                          // Assistant: improved styling for longer content with more padding and line spacing
+                          'bg-muted text-foreground px-4 py-3 rounded-xl leading-relaxed': 
                             message.role === 'assistant',
                         })}
                       >
-                        <Markdown>{part.text}</Markdown>
+                        <div className="message-content">
+                          {/* No dynamic rendering - all hardcoded */}
+                          {message.role === 'assistant' ? (
+                            <>
+                              <div className="source-citations">
+                                {/* Only apply citation styling in search pages */}
+                                {chatId && chatId.includes('search') 
+                                  ? (
+                                    <div className="citations-styled">
+                                      <Markdown>{part.text}</Markdown>
+                                    </div>
+                                  ) 
+                                  : (
+                                    <Markdown>{part.text}</Markdown>
+                                  )
+                                }
+                              </div>
+                              
+                              {/* Sources section - only display in search pages */}
+                              {chatId && chatId.includes('search') && (
+                                <div className="mt-8 pt-6 border-t border-amber-200/30 dark:border-amber-800/30">
+                                  <h2 className="text-xl font-semibold text-amber-800 dark:text-amber-400 pb-2">
+                                    Sources
+                                  </h2>
+                                  <p className="text-muted-foreground text-xs mb-2">Reference materials:</p>
+                                  
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-2">
+                                    {/* Fixed selection of sources - smaller and more compact */}
+                                    <div className="border border-muted rounded-md overflow-hidden bg-muted/30">
+                                      <div className="relative">
+                                        <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[1]</span>
+                                        <img 
+                                          src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/Screenshot%202025-04-20%20at%208.18.14%E2%80%AFPM-qxVrEX6dRsdrERPsBacw36sMYTAvTG.png" 
+                                          alt="Product Information" 
+                                          className="w-full h-24 md:h-28 object-contain bg-white p-1"
+                                        />
+                                      </div>
+                                      <div className="p-1.5">
+                                        <p className="text-xs font-medium">Product Information</p>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="border border-muted rounded-md overflow-hidden bg-muted/30">
+                                      <div className="relative">
+                                        <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[2]</span>
+                                        <img 
+                                          src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/CaliforniaCustomFruitFlavors_780-c4oX0aDOkj1vWf3AO5PhcV0GbDMNty.jpg" 
+                                          alt="Custom Fruit Flavors" 
+                                          className="w-full h-24 md:h-28 object-contain bg-white p-1"
+                                        />
+                                      </div>
+                                      <div className="p-1.5">
+                                        <p className="text-xs font-medium">Custom Fruit Flavors</p>
+                                      </div>
+                                    </div>
+                                    
+                                    <div className="border border-muted rounded-md overflow-hidden bg-muted/30">
+                                      <div className="relative">
+                                        <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[3]</span>
+                                        <img 
+                                          src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/10849226-Noa3mH4uGpEW3W7chNiB9GLbTxGFh7.png" 
+                                          alt="Specification Document" 
+                                          className="w-full h-24 md:h-28 object-contain bg-white p-1"
+                                        />
+                                      </div>
+                                      <div className="p-1.5">
+                                        <p className="text-xs font-medium">Specification Doc</p>
+                                      </div>
+                                    </div>
+                                      
+                                    <div className="border border-muted rounded-md overflow-hidden bg-muted/30">
+                                      <div className="relative">
+                                        <span className="absolute top-1 left-1 bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300 text-xs font-medium px-1 rounded-sm">[4]</span>
+                                        <img 
+                                          src="https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/sharepoint-yxiOuS8FaOe4Bk7oRb4KjyBeZj1KNq.png" 
+                                          alt="SharePoint Documentation" 
+                                          className="w-full h-24 md:h-28 object-contain bg-white p-1"
+                                        />
+                                      </div>
+                                      <div className="p-1.5">
+                                        <p className="text-xs font-medium">SharePoint Docs</p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <Markdown>{part.text}</Markdown>
+                          )}
+                        </div>
                       </div>
 
                       {/* Edit button is now shown for all user messages regardless of mode */}

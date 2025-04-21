@@ -44,6 +44,46 @@ function PureSuggestedSearches({
       query:
         'Does Strawberry NF Light YFB contain any major allergens or gluten, and what controls prevent cross‑contact?',
     },
+    {
+      title: 'Supply Chain Risk Assessment',
+      label: 'Identify vulnerable ingredient sources',
+      query: 'Analyze the supply chain risk profile for Strawberry NF Light YFB. Which ingredients have the highest geographical concentration risk?'
+    },
+    {
+      title: 'Cost-Volume Analysis',
+      label: 'Price sensitivity vs production volume',
+      query: 'Compare cost structures of Strawberry NF Light YFB across different production volumes and identify price sensitivity thresholds.'
+    },
+    {
+      title: 'Regulatory Compliance Forecast',
+      label: 'Upcoming regulatory impacts',
+      query: 'Identify which ingredients in Strawberry NF Light YFB face changing regulatory requirements in the next 18 months across our key markets.'
+    },
+    {
+      title: 'Market Segmentation Analysis',
+      label: 'Customer profile optimization',
+      query: 'Which market segments show highest adoption rates for Strawberry NF Light YFB? Analyze demographic and application patterns.'
+    },
+    {
+      title: 'Competitive Differentiation',
+      label: 'Unique value proposition analysis',
+      query: 'Compare Strawberry NF Light YFB with competitive products. What unique value propositions can we emphasize in marketing materials?'
+    },
+    {
+      title: 'Sustainability Metrics',
+      label: 'Environmental impact assessment',
+      query: 'Calculate the carbon footprint and water usage metrics for Strawberry NF Light YFB production. How does it compare to industry averages?'
+    },
+    {
+      title: 'Quality Control Optimization',
+      label: 'Statistical process control insights',
+      query: 'Analyze quality control data for Strawberry NF Light YFB production. Where are the highest variance points in the manufacturing process?'
+    },
+    {
+      title: 'Formulation Trend Analysis',
+      label: 'Industry-wide ingredient shifts',
+      query: 'What emerging alternative ingredients are replacing traditional components in products similar to Strawberry NF Light YFB across the industry?'
+    }
   ];
 
   const handleSearchClick = async (query: string) => {
@@ -85,7 +125,7 @@ function PureSuggestedSearches({
         transition={{ delay: 0.5 }}
         className="text-2xl font-semibold text-center mb-2"
       >
-        Search PDF Repository
+        Endeavor AI Search
       </motion.div>
       
       <motion.div

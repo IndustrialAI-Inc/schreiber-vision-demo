@@ -19,6 +19,7 @@ import { useUserMode } from './mode-toggle';
 import { cn } from '@/lib/utils';
 import { MessageReasoning } from './message-reasoning';
 import { SuggestedSearches } from './suggested-searches';
+import { SearchPills } from './search-pills';
 
 // Create a local message mode context for search page
 const MessageModeContext = createContext<{
@@ -235,14 +236,7 @@ export function SearchChat({
         
         // Prepare message with instructions to use requestPdf tool
         let originalQuery = messageWithMode.content;
-        if (typeof messageWithMode.content === 'string') {          
-          // Format the search query with proper instructions, but don't show "Search query:" in the UI
-          messageWithMode.content = `${originalQuery}
 
-Think deeply about this query to identify the most relevant PDF documents from my repository. 
-After analyzing the query, ALWAYS use the requestPdf tool to fetch and display the most relevant PDF document.
-If there are multiple relevant documents, prioritize showing the one that's most directly related to my query.`;
-        }
         
         console.log("[SEARCH APPEND] Final message:", JSON.stringify(messageWithMode));
         const result = await append(messageWithMode);
@@ -306,6 +300,7 @@ If there are multiple relevant documents, prioritize showing the one that's most
               disabled={isReadonly}
               supplierMode={false}
             />
+            {/* Hide search pills when no messages (SuggestedSearches will show instead) */}
           </div>
         )}
 
@@ -344,6 +339,23 @@ If there are multiple relevant documents, prioritize showing the one that's most
         {/* Bottom search input - only shown when inputPosition is 'bottom' */}
         {inputPosition === 'bottom' && (
           <div className="sticky bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-sm dark:bg-zinc-900/80 mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
+            {/* Only show search pills in the bottom input when there are messages */}
+            {messages.length > 0 && (
+              <SearchPills 
+                onPillClick={(pillQuery) => {
+                  // Set the query in the input field for visibility
+                  setQuery(pillQuery);
+                  
+                  // Then immediately execute the search
+                  appendWithMode({
+                    role: 'user',
+                    content: pillQuery,
+                  });
+                }}
+                disabled={isReadonly || status === 'loading'}
+                className="bg-background/80 dark:bg-zinc-900/80 backdrop-blur-sm"
+              />
+            )}
             <SearchMultimodalInput
               chatId={id}
               input={query}

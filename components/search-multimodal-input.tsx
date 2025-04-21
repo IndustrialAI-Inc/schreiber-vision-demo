@@ -269,7 +269,7 @@ export function SearchMultimodalInput({
         <Textarea
           data-testid="search-multimodal-input"
           ref={textareaRef}
-          placeholder={'Type your search query...'}
+          placeholder={'Search PDFs or try the suggestions below...'}
           value={input}
           onChange={handleInput}
           className={cn(

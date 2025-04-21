@@ -253,7 +253,7 @@ export function Chat({
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
-        "flex flex-col min-w-0 h-dvh bg-background bg-[url(/images/dark-background.webp)] bg-cover bg-top-right bg-fixed"
+        "flex flex-col min-w-0 h-dvh bg-background bg-[url(/images/dark-background.webp)] bg-cover bg-top-right bg-fixed overflow-hidden"
       )}>
         <ChatHeader
           chatId={id}
