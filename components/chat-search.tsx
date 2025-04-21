@@ -253,7 +253,7 @@ export function ChatSearch({
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
-        "flex flex-col min-w-0 h-dvh bg-background"
+        "flex flex-col min-w-0 h-dvh bg-[url(/images/dark-background.webp)] bg-cover bg-top-right bg-fixed"
       )}>
         <div className="flex justify-center w-full">
           <div className="max-w-2xl w-full">
@@ -288,7 +288,7 @@ export function ChatSearch({
           isSchreiberApproval={isSchreiberApproval}
         />
 
-        <form className="flex mx-auto px-4 bg-background pb-4 md:pb-6 gap-2 w-full md:max-w-3xl flex-col">
+        <form className="flex mx-auto px-4 bg-none pb-4 md:pb-6 gap-2 w-full md:max-w-3xl flex-col">
           <MultimodalInput
             chatId={id}
             input={input}
