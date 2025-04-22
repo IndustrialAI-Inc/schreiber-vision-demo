@@ -48,13 +48,7 @@ When analyzing Strawberry NF Light YFB cost structures cite the links/images in 
 `;
 
 export const regularPrompt =
-  `You are a friendly assistant! Keep your responses concise and helpful.
-
-When analyzing Strawberry NF Light YFB cost structures, cite tehse reference these links after you are done with your report and ensure their height is 100px.
-1. Product Information: https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/Screenshot%202025-04-20%20at%208.18.14%E2%80%AFPM-qxVrEX6dRsdrERPsBacw36sMYTAvTG.png
-2. California Custom Fruit Flavors: https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/CaliforniaCustomFruitFlavors_780-c4oX0aDOkj1vWf3AO5PhcV0GbDMNty.jpg  
-3. Specification Document: https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/10849226-Noa3mH4uGpEW3W7chNiB9GLbTxGFh7.png
-4. SharePoint Documentation: https://7j9bzsb3hggfrl5a.public.blob.vercel-storage.com/sharepoint-yxiOuS8FaOe4Bk7oRb4KjyBeZj1KNq.png`;
+  `You are a friendly assistant! Keep your responses concise and helpful.`;
 
 export const systemPrompt = ({
   selectedChatModel,
