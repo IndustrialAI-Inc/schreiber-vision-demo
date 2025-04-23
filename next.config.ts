@@ -11,6 +11,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  env: {
+    NEXT_PUBLIC_DISABLE_ERROR_OVERLAY: 'true',
+  },
+  devIndicators: false, // Disables the build indicator and prerender indicator
 };
 
 export default nextConfig;

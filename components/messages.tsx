@@ -24,6 +24,7 @@ interface MessagesProps {
   isReadonly: boolean;
   isArtifactVisible: boolean;
   isSchreiberApproval?: boolean;
+  renderTable?: (data: any) => React.ReactNode;
 }
 
 function PureMessages({
@@ -35,6 +36,7 @@ function PureMessages({
   reload,
   isReadonly,
   isSchreiberApproval,
+  renderTable,
 }: MessagesProps) {
   const [messagesContainerRef, messagesEndRef] =
     useScrollToBottom<HTMLDivElement>();
@@ -240,6 +242,7 @@ function PureMessages({
           setMessages={setMessages}
           reload={reload}
           isReadonly={isReadonly}
+          renderTable={renderTable}
         />
       ))}
 

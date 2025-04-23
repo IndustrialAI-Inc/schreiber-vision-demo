@@ -22,28 +22,24 @@ function PureSuggestedSearches({
 }: SuggestedSearchesProps) {
   const suggestedSearches = [
     {
-      title: 'Country of Origin',
-      label: 'Where every ingredient is sourced',
-      query:
-        'List each ingredient in Strawberry NF Light YFB (503941) and its country of origin.',
+      title: 'Tree Nut Allergen Search',
+      label: 'Find ingredients containing tree nuts',
+      query: 'What active ingredients contain a tree nut allergen?',
     },
     {
-      title: 'Ingredient % Breakdown',
-      label: 'Percent ranges for each component',
-      query:
-        'Show the percent range of every ingredient in Strawberry NF Light YFB from the product reference PDF data.',
+      title: 'Viscosity Search',
+      label: 'Find ingredients with viscosity 600-700 cP',
+      query: 'What active ingredients have a viscosity between 600 and 700 cP?',
     },
     {
-      title: 'Certifications & Compliance',
-      label: 'Kosher, BE status and SDS requirement',
-      query:
-        'Is Strawberry NF Light YFB kosher, does it need a BE disclosure, and does it require an SDS?',
+      title: 'COO Search (Japan)',
+      label: 'Find ingredients with from Japan',
+      query: 'What active ingredients have a sub-ingredient where the country of origin is Japan?',
     },
     {
-      title: 'Allergens & Gluten‑Free Claim',
-      label: 'Verify allergens and gluten status',
-      query:
-        'Does Strawberry NF Light YFB contain any major allergens or gluten, and what controls prevent cross‑contact?',
+      title: 'Supplier Search (Strawberry Fruit Prep)',
+      label: 'Find suppliers of strawberry fruit prep',
+      query: 'What Suppliers, including those we do not have a relationship with today, produce strawberry fruit prep?',
     },
     {
       title: 'Supply Chain Risk Assessment',

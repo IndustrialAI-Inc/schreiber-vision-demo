@@ -3,7 +3,7 @@
 
 import type { Attachment, UIMessage } from 'ai';
 import { useChat } from '@ai-sdk/react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { SearchMultimodalInput } from '@/components/search-multimodal-input';
 import type { Vote } from '@/lib/db/schema';
@@ -28,6 +28,28 @@ const MessageModeContext = createContext<{
 }>({
   messageModeOverride: null,
 });
+
+// new: lightweight table renderer for JSON answers
+function AnswerTable({data}:{data:any}){
+  if(!data) return null;
+  const {columns,rows}=data;
+  return (
+    <table className="w-full text-sm border border-zinc-700 mb-4 animate-fade-in">
+      <thead className="bg-zinc-800 text-zinc-100">
+        <tr>{columns.map((c:string)=>(<th key={c} className="p-2 text-left">{c}</th>))}</tr>
+      </thead>
+      <tbody>
+        {rows.length?rows.map((r:string[],i:number)=>(
+          <tr key={i} className="even:bg-zinc-900 hover:bg-zinc-800">
+            {r.map((cell,j)=>(<td key={j} className="p-2 break-all">
+              {columns[j]==='PDF'?<a href={cell} target="_blank" className="underline text-emerald-400">link</a>:cell}
+            </td>))}
+          </tr>
+        )):(<tr><td colSpan={columns.length} className="p-3 italic">No matches.</td></tr>)}
+      </tbody>
+    </table>
+  );
+}
 
 export function SearchChat({
   id,
@@ -277,6 +299,80 @@ export function SearchChat({
     }
   };
 
+  // Process messages before displaying
+  const processedMessages = useMemo(() => {
+    return messages.map(message => {
+      // Only process assistant messages
+      if (message.role === 'assistant') {
+        let content = message.content || '';
+        
+        // Check for function call format: <function name="showTable">...</function>
+        const functionMatch = content.match(/<function name="showTable">([\s\S]*?)<\/function>/);
+        
+        if (functionMatch) {
+          try {
+            // Sanitize the JSON string before parsing
+            let jsonString = functionMatch[1];
+            
+            // First try to clean up common JSON errors
+            // Remove any trailing commas in arrays
+            jsonString = jsonString.replace(/,\s*]/g, ']');
+            // Remove any trailing commas in objects
+            jsonString = jsonString.replace(/,\s*}/g, '}');
+            // Fix missing commas between array elements
+            jsonString = jsonString.replace(/](\s*)\[/g, '],[');
+            // Handle any other malformed JSON with a more permissive approach
+            
+            try {
+              // Extract JSON data from inside the function call
+              const jsonData = JSON.parse(jsonString);
+              
+              // If valid table JSON with columns and rows
+              if (jsonData && jsonData.columns && jsonData.rows) {
+                // Create a special message part for the table
+                const tableMessage = {
+                  ...message,
+                  parts: message.parts || [],
+                  // Add a special tool invocation part
+                  tableToolInvocation: {
+                    toolName: 'showTable',
+                    data: jsonData
+                  }
+                };
+                
+                // Replace the function call in the content with a placeholder
+                const newContent = content.replace(functionMatch[0], '');
+                tableMessage.content = newContent.trim();
+                
+                return tableMessage;
+              }
+            } catch (parseError) {
+              console.error("Error parsing JSON:", parseError);
+              // If JSON parsing fails, create a fallback table with error message
+              return {
+                ...message,
+                // Remove the function call entirely from content
+                content: content.replace(/<function.*?<\/function>/gs, ''),
+                // Don't add the tableToolInvocation since we couldn't parse it
+              };
+            }
+          } catch (e) {
+            console.error("Error processing function call:", e);
+            // Return message with function call removed
+            return {
+              ...message,
+              content: content.replace(/<function.*?<\/function>/gs, '')
+            };
+          }
+        }
+      }
+      return message;
+    });
+  }, [messages]);
+
+  // capture JSON answers - no longer used for top display
+  const [answerJSON, setAnswerJSON] = useState<any|null>(null);
+
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
       <div className={cn(
@@ -327,12 +423,13 @@ export function SearchChat({
               chatId={id}
               status={status}
               votes={votes}
-              messages={messages}
+              messages={processedMessages}
               setMessages={setMessages}
               reload={reload}
               isReadonly={isReadonly}
               isArtifactVisible={isArtifactVisible}
               isSchreiberApproval={false}
+              renderTable={(data) => <AnswerTable data={data} />}
             />
           )}
         </div>

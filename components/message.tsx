@@ -34,6 +34,7 @@ const PurePreviewMessage = ({
   setMessages,
   reload,
   isReadonly,
+  renderTable,
 }: {
   chatId: string;
   message: UIMessage;
@@ -42,6 +43,7 @@ const PurePreviewMessage = ({
   setMessages: UseChatHelpers['setMessages'];
   reload: UseChatHelpers['reload'];
   isReadonly: boolean;
+  renderTable?: (data: any) => React.ReactNode;
 }) => {
   const [mode, setMode] = useState<'view' | 'edit'>('view');
   const { setArtifact } = useArtifact();
@@ -229,6 +231,17 @@ const PurePreviewMessage = ({
                                   )
                                 }
                               </div>
+                              
+                              {/* Table tool invocation */}
+                              {(message as any).tableToolInvocation && renderTable && (
+                                <div className="mt-4 pt-3 border-t border-zinc-700/20">
+                                  <div className="flex items-center gap-2 mb-2 text-xs text-zinc-500">
+                                    <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-xs font-mono">showTable</span>
+                                    <span>Results</span>
+                                  </div>
+                                  {renderTable((message as any).tableToolInvocation.data)}
+                                </div>
+                              )}
                               
                               {/* Sources section - only display in search pages */}
                               {chatId && chatId.includes('search') && (

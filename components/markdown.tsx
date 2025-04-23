@@ -6,6 +6,22 @@ import remarkGfm from 'remark-gfm';
 import { CodeBlock } from './code-block';
 import { cn } from '@/lib/utils';
 
+// Function to filter out content between <function> tags and handle potential malformed JSON
+const filterFunctionTags = (content: string): string => {
+  if (!content) return '';
+  
+  // First pass - completely remove function tags and their content
+  let filteredContent = content.replace(/<function.*?<\/function>/gs, '');
+  
+  // Second pass - handle any incomplete/malformed function tags
+  filteredContent = filteredContent.replace(/<function.*$/gm, '');
+  
+  // Handle any lingering function name attributes
+  filteredContent = filteredContent.replace(/name="showTable".*?}/gs, '');
+  
+  return filteredContent;
+};
+
 const components: Partial<Components> = {
   // @ts-expect-error
   code: CodeBlock,
@@ -155,7 +171,7 @@ const remarkPlugins = [remarkGfm];
 const NonMemoizedMarkdown = ({ children }: { children: string }) => {
   return (
     <ReactMarkdown remarkPlugins={remarkPlugins} components={components}>
-      {children}
+      {filterFunctionTags(children)}
     </ReactMarkdown>
   );
 };

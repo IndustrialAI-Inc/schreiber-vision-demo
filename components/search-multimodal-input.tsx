@@ -136,11 +136,15 @@ export function SearchMultimodalInput({
       // Search mode - Simple input that will be processed by appendWithMode
       console.log("[SEARCH] Submitting search query:", input);
       
-      // Store the current input and clear immediately
+      // Store the current input before clearing
       const currentInput = input.trim();
-      setInput(''); // Clear input before submission for immediate feedback
       
       try {
+        // Clear local storage and input before append operation
+        setLocalStorageInput('');
+        setInput('');
+        resetHeight();
+        
         await append({
           role: 'user',
           content: currentInput, // Send just the raw query, appendWithMode will format it
@@ -175,11 +179,12 @@ export function SearchMultimodalInput({
         console.error("[CHAT] Error submitting message:", error);
         toast.error("Error sending message");
       }
+      
+      // Clear input state
+      setLocalStorageInput('');
+      setInput('');
+      resetHeight();
     }
-    
-    // Reset state after submission
-    setLocalStorageInput('');
-    resetHeight();
     
     // Auto-focus after submission on larger screens
     if (width && width > 768) {
