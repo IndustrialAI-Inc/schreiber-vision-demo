@@ -1,4 +1,4 @@
- 'use client';
+'use client';
 
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
@@ -21,21 +21,17 @@ export function ModeToggle() {
     <div className="flex items-center space-x-4 p-4">
       <button
         onClick={() => setTheme('light')}
-        className={
-          `px-3 py-1 rounded ${
-            !isDark ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
-          }`
-        }
+        className={`px-3 py-1 rounded ${
+          !isDark ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+        }`}
       >
         Supplier
       </button>
       <button
         onClick={() => setTheme('dark')}
-        className={
-          `px-3 py-1 rounded ${
-            isDark ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
-          }`
-        }
+        className={`px-3 py-1 rounded ${
+          isDark ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
+        }`}
       >
         Schreiber
       </button>

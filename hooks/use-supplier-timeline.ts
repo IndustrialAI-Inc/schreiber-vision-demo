@@ -61,14 +61,16 @@ export const initialTimelineData: TimelineState = {
 type Selector<T> = (state: TimelineState) => T;
 
 // Selector hook to access parts of the timeline state
-export function useSupplierTimelineSelector<Selected>(selector: Selector<Selected>) {
+export function useSupplierTimelineSelector<Selected>(
+  selector: Selector<Selected>,
+) {
   const { data: timelineData } = useSWR<TimelineState>(
     '/api/timeline',
     fetcher,
     {
       fallbackData: initialTimelineData,
       refreshInterval: 5000, // Poll for updates every 5 seconds
-    }
+    },
   );
 
   // For debugging
@@ -91,9 +93,11 @@ export function useSupplierTimeline(chatId?: string) {
     chatId ? `/api/timeline?chatId=${chatId}` : null,
     fetcher,
     {
-      fallbackData: chatId ? {...initialTimelineData, chatId} : initialTimelineData,
+      fallbackData: chatId
+        ? { ...initialTimelineData, chatId }
+        : initialTimelineData,
       refreshInterval: 5000, // Poll for updates every 5 seconds
-    }
+    },
   );
 
   // Also fetch the current visible timeline
@@ -103,7 +107,7 @@ export function useSupplierTimeline(chatId?: string) {
     {
       fallbackData: initialTimelineData,
       refreshInterval: 5000, // Poll for updates every 5 seconds
-    }
+    },
   );
 
   const timeline = useMemo(() => {
@@ -112,21 +116,27 @@ export function useSupplierTimeline(chatId?: string) {
   }, [timelineData]);
 
   const setTimeline = useCallback(
-    async (updaterFn: TimelineState | ((currentTimeline: TimelineState) => TimelineState), chatId?: string) => {
+    async (
+      updaterFn:
+        | TimelineState
+        | ((currentTimeline: TimelineState) => TimelineState),
+      chatId?: string,
+    ) => {
       if (!chatId && !timeline.chatId) {
         console.error('No chatId provided for timeline update');
         return;
       }
-      
+
       const timelineToUpdate = timeline || initialTimelineData;
-      const newState = typeof updaterFn === 'function'
-        ? updaterFn(timelineToUpdate)
-        : updaterFn;
-      
+      const newState =
+        typeof updaterFn === 'function'
+          ? updaterFn(timelineToUpdate)
+          : updaterFn;
+
       try {
         // Update the local state immediately
         setTimelineData(newState, false);
-        
+
         // Send the update to the server
         const response = await fetch('/api/timeline', {
           method: 'POST',
@@ -139,17 +149,17 @@ export function useSupplierTimeline(chatId?: string) {
             steps: newState.steps,
           }),
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to update timeline');
         }
-        
+
         // Get the updated state from the server
         const updatedTimeline = await response.json();
-        
+
         // Update the local state with the server response
         setTimelineData(updatedTimeline, false);
-        
+
         // Revalidate the visible timeline if needed
         if (newState.isVisible) {
           // Force a revalidation of the visible timeline
@@ -161,66 +171,91 @@ export function useSupplierTimeline(chatId?: string) {
         setTimelineData(timelineToUpdate, false);
       }
     },
-    [timeline, setTimelineData]
+    [timeline, setTimelineData],
   );
 
   // Helper functions for common timeline operations
-  const showTimeline = useCallback((chatId: string) => {
-    setTimeline((current) => {
-      // If we have an existing timeline for this chat, use its steps
-      // Otherwise use the initial steps
-      const steps = current.steps;
-      
-      return {
-        ...current,
-        isVisible: true,
-        chatId,
-        steps: steps.map(step => 
-          step.id === 'send' 
-            ? { ...step, status: 'in-progress' as const, timestamp: new Date().toISOString() } 
-          : step.id === 'prepare' 
-            ? { ...step, status: 'completed' as const, timestamp: new Date().toISOString() }
-            : step.id === 'review'
-              ? { ...step, status: 'completed' as const, timestamp: new Date().toISOString() }
-              : step
-        )
-      };
-    }, chatId);
-  }, [setTimeline]);
+  const showTimeline = useCallback(
+    (chatId: string) => {
+      setTimeline((current) => {
+        // If we have an existing timeline for this chat, use its steps
+        // Otherwise use the initial steps
+        const steps = current.steps;
+
+        return {
+          ...current,
+          isVisible: true,
+          chatId,
+          steps: steps.map((step) =>
+            step.id === 'send'
+              ? {
+                  ...step,
+                  status: 'in-progress' as const,
+                  timestamp: new Date().toISOString(),
+                }
+              : step.id === 'prepare'
+                ? {
+                    ...step,
+                    status: 'completed' as const,
+                    timestamp: new Date().toISOString(),
+                  }
+                : step.id === 'review'
+                  ? {
+                      ...step,
+                      status: 'completed' as const,
+                      timestamp: new Date().toISOString(),
+                    }
+                  : step,
+          ),
+        };
+      }, chatId);
+    },
+    [setTimeline],
+  );
 
   const hideTimeline = useCallback(() => {
     if (!timeline.chatId) return;
-    
+
     setTimeline((current) => ({
       ...current,
       isVisible: false,
     }));
   }, [setTimeline, timeline.chatId]);
 
-  const updateStepStatus = useCallback((stepId: string, status: TimelineStepStatus) => {
-    if (!timeline.chatId) return;
-    
-    setTimeline((current) => ({
-      ...current,
-      steps: current.steps.map(step => 
-        step.id === stepId 
-          ? { ...step, status, timestamp: status !== 'pending' ? new Date().toISOString() : step.timestamp } 
-          : step
-      )
-    }));
-  }, [setTimeline, timeline.chatId]);
+  const updateStepStatus = useCallback(
+    (stepId: string, status: TimelineStepStatus) => {
+      if (!timeline.chatId) return;
+
+      setTimeline((current) => ({
+        ...current,
+        steps: current.steps.map((step) =>
+          step.id === stepId
+            ? {
+                ...step,
+                status,
+                timestamp:
+                  status !== 'pending'
+                    ? new Date().toISOString()
+                    : step.timestamp,
+              }
+            : step,
+        ),
+      }));
+    },
+    [setTimeline, timeline.chatId],
+  );
 
   // Function to check if this timeline is currently visible
   const isTimelineVisible = useMemo(() => {
     if (!chatId) return false;
-    
+
     // Add debug information
     console.log('Checking visibility:', {
       chatId,
       timelineChatId: timeline?.chatId,
-      isVisible: timeline?.isVisible
+      isVisible: timeline?.isVisible,
     });
-    
+
     // It should be visible if:
     // 1. The timeline belongs to this chat
     // 2. The timeline is set to visible
@@ -233,6 +268,6 @@ export function useSupplierTimeline(chatId?: string) {
     showTimeline,
     hideTimeline,
     updateStepStatus,
-    isTimelineVisible
+    isTimelineVisible,
   };
-} 
+}

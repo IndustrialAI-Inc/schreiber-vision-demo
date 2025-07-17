@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -36,7 +35,7 @@ export function SearchInput({
   return (
     <header className="flex sticky top-0 z-10 bg-background border-b border-border py-1.5 items-center px-4 h-10 shadow-sm">
       <SidebarToggle className="mr-2" />
-      
+
       <div className="flex-grow">
         <form onSubmit={handleSearch} className="flex w-full gap-2">
           <div className="relative flex-grow">
@@ -50,21 +49,22 @@ export function SearchInput({
               disabled={isSearching}
             />
           </div>
-          <Button 
-            type="submit" 
+          <Button
+            type="submit"
             size="sm"
             variant="default"
             disabled={isSearching || !query.trim()}
             className="px-3 h-8"
           >
-            {isSearching ? 
-              <LoaderIcon className="h-3.5 w-3.5 animate-spin" /> : 
+            {isSearching ? (
+              <LoaderIcon size={14} />
+            ) : (
               <span className="text-xs">Search</span>
-            }
+            )}
           </Button>
           {isSearching && (
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={stopSearch}
               className="px-3 h-8"

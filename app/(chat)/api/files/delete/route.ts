@@ -1,20 +1,21 @@
 import { NextResponse } from 'next/server';
-import { auth } from '@/app/(auth)/auth';
 import { deleteUserFile, getUserFileById } from '@/lib/db/queries';
 import { del } from '@vercel/blob';
 
 export async function DELETE(request: Request) {
   try {
-    const session = await auth();
+    console.log('[DELETE] File deletion request (auth disabled for testing)');
 
-    if (!session || !session.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    // Use test user ID for demo/testing purposes
+    const testUserId = 'b4278fb7-8292-43df-b00e-af7c1ecfc808';
 
     const { fileId } = await request.json();
 
     if (!fileId) {
-      return NextResponse.json({ error: 'File ID is required' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'File ID is required' },
+        { status: 400 },
+      );
     }
 
     // Get file to check ownership and get URL
@@ -24,8 +25,8 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: 'File not found' }, { status: 404 });
     }
 
-    // Ensure user owns the file
-    if (file.userId !== session.user.id) {
+    // Ensure file belongs to test user
+    if (file.userId !== testUserId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
@@ -34,7 +35,7 @@ export async function DELETE(request: Request) {
       if (file.fileUrl) {
         await del(file.fileUrl);
       }
-      
+
       // Delete from database
       await deleteUserFile({ id: fileId });
 
@@ -43,14 +44,14 @@ export async function DELETE(request: Request) {
       console.error('Error deleting file:', error);
       return NextResponse.json(
         { error: 'Failed to delete file' },
-        { status: 500 }
+        { status: 500 },
       );
     }
   } catch (error) {
     console.error('Error in delete file API:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
-      { status: 500 }
+      { status: 500 },
     );
   }
-} 
+}

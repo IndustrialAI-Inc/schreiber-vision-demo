@@ -8,8 +8,8 @@ export default async function RepositoryLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  const files = session?.user?.id 
-    ? await getUserFilesByUserId({ userId: session.user.id }) 
+  const files = session?.user?.id
+    ? await getUserFilesByUserId({ userId: session.user.id })
     : [];
 
   // Pass files as a prop to the page component through SearchParams

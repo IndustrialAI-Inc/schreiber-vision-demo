@@ -1,10 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from './ui/button';
-import { SearchIcon } from './icons-search';
 import { cn } from '@/lib/utils';
-import { Search } from 'lucide-react';
 
 interface SearchPillsProps {
   onPillClick: (query: string) => void;
@@ -12,33 +9,32 @@ interface SearchPillsProps {
   disabled?: boolean;
 }
 
-export function SearchPills({ 
-  onPillClick, 
-  className, 
-  disabled = false 
+export function SearchPills({
+  onPillClick,
+  className,
+  disabled = false,
 }: SearchPillsProps) {
-  // Sample quick search queries based on common food ingredient searches
+  // Common supplier specification search queries
   const quickSearches = [
     'Country of origin',
     'Allergen status',
     'Kosher certification',
     'Gluten free',
     'Nutritional info',
-    'Sources used'
+    'Sources used',
   ];
 
   return (
-    <div className={cn(
-      "flex items-center gap-2 overflow-x-auto py-2 px-4 justify-center",
-      className
-    )}>
-      {/* <SearchIcon size={16} className="text-amber-700 dark:text-amber-400 shrink-0" /> */}
-      {/* <Search className='size-4 text-bright' /> */}
-      
+    <div
+      className={cn(
+        'flex items-center gap-2 overflow-x-auto py-2 px-4 justify-center',
+        className,
+      )}
+    >
       <div className="flex overflow-x-auto pb-1 gap-2 scrollbar-hide justify-center">
-        {quickSearches.map((query, index) => (
+        {quickSearches.map((query) => (
           <Button
-            key={`search-pill-${index}`}
+            key={query.replace(/\s+/g, '-').toLowerCase()}
             variant="outline"
             size="sm"
             onClick={() => onPillClick(query)}

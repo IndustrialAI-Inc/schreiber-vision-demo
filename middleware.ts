@@ -1,9 +1,7 @@
-import NextAuth from 'next-auth';
+// Disabled middleware for spec-centric system
+export { auth as middleware } from '@/app/(auth)/auth';
 
-import { authConfig } from '@/app/(auth)/auth.config';
-
-export default NextAuth(authConfig).auth;
-
+// Allow all routes
 export const config = {
-  matcher: ['/', '/:id', '/api/:path*', '/login', '/register'],
+  matcher: [],
 };

@@ -29,26 +29,74 @@ const MessageModeContext = createContext<{
   messageModeOverride: null,
 });
 
-// new: lightweight table renderer for JSON answers
-function AnswerTable({data}:{data:any}){
-  if(!data) return null;
-  const {columns,rows}=data;
+// Table renderer for structured search results
+interface TableData {
+  columns: string[];
+  rows: string[][];
+}
+
+function AnswerTable({ data }: { data: TableData | null }) {
+  if (!data) return null;
+
+  const { columns, rows } = data;
+
   return (
     <table className="w-full text-sm border border-zinc-700 mb-4 animate-fade-in">
       <thead className="bg-zinc-800 text-zinc-100">
-        <tr>{columns.map((c:string)=>(<th key={c} className="p-2 text-left">{c}</th>))}</tr>
+        <tr>
+          {columns.map((column: string) => (
+            <th key={`col-${column}`} className="p-2 text-left">
+              {column}
+            </th>
+          ))}
+        </tr>
       </thead>
       <tbody>
-        {rows.length?rows.map((r:string[],i:number)=>(
-          <tr key={i} className="even:bg-zinc-900 hover:bg-zinc-800">
-            {r.map((cell,j)=>(<td key={j} className="p-2 break-all">
-              {columns[j]==='PDF'?<a href={cell} target="_blank" className="underline text-emerald-400">link</a>:cell}
-            </td>))}
+        {rows.length ? (
+          rows.map((row: string[], rowIndex: number) => (
+            <tr
+              key={`row-${rowIndex}-${row[0] || 'empty'}`}
+              className="even:bg-zinc-900 hover:bg-zinc-800"
+            >
+              {row.map((cell, cellIndex) => (
+                <td
+                  key={`cell-${rowIndex}-${cellIndex}-${cell}`}
+                  className="p-2 break-all"
+                >
+                  {columns[cellIndex] === 'PDF' ? (
+                    <a
+                      href={cell}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-emerald-400"
+                    >
+                      link
+                    </a>
+                  ) : (
+                    cell
+                  )}
+                </td>
+              ))}
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan={columns.length} className="p-3 italic">
+              No matches.
+            </td>
           </tr>
-        )):(<tr><td colSpan={columns.length} className="p-3 italic">No matches.</td></tr>)}
+        )}
       </tbody>
     </table>
   );
+}
+
+interface SearchChatProps {
+  id: string;
+  initialMessages: Array<UIMessage>;
+  selectedChatModel: string;
+  selectedVisibilityType: VisibilityType;
+  isReadonly: boolean;
 }
 
 export function SearchChat({
@@ -57,24 +105,38 @@ export function SearchChat({
   selectedChatModel,
   selectedVisibilityType,
   isReadonly,
-}: {
-  id: string;
-  initialMessages: Array<UIMessage>;
-  selectedChatModel: string;
-  selectedVisibilityType: VisibilityType;
-  isReadonly: boolean;
-}) {
+}: SearchChatProps) {
   const { mutate } = useSWRConfig();
   const { mode } = useUserMode();
   const isArtifactVisible = useArtifactSelector((state) => state.isVisible);
-  const [query, setQuery] = useState('');
   const [inputPosition, setInputPosition] = useState<'top' | 'bottom'>('top');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const reasoningRef = useRef<HTMLDivElement>(null);
 
   // Message mode override for consistent styling
-  const [messageModeOverride, setMessageModeOverride] = useState<null | 'supplier' | 'schreiber'>(null);
-  
+  const [messageModeOverride, setMessageModeOverride] = useState<
+    'supplier' | 'schreiber' | null
+  >(null);
+
+  const chatHelpers = useChat({
+    id,
+    body: { id, selectedChatModel, userMode: mode },
+    initialMessages,
+    experimental_throttle: 200,
+    sendExtraMessageFields: true,
+    generateId: generateUUID,
+    onFinish: () => {
+      mutate(unstable_serialize(getChatHistoryPaginationKey));
+    },
+    onError: (error) => {
+      console.error('Search error:', error);
+      toast.error(
+        `Error: ${error?.message || 'An error occurred, please try again!'}`,
+      );
+    },
+    api: '/search/api/search',
+  });
+
   const {
     messages,
     setMessages,
@@ -86,282 +148,121 @@ export function SearchChat({
     stop,
     reload,
     error,
-    reasoning,
-  } = useChat({
-    id,
-    body: { id, selectedChatModel, userMode: mode },
-    initialMessages,
-    experimental_throttle: 200,
-    sendExtraMessageFields: true,
-    generateId: generateUUID,
-    onFinish: () => {
-      mutate(unstable_serialize(getChatHistoryPaginationKey));
-      console.log("[SEARCH] Search completed successfully");
-    },
-    onError: (error) => {
-      console.error("[SEARCH] Error:", error);
-      toast.error(`Error: ${error?.message || 'An error occurred, please try again!'}`);
-    },
-    experimental_sendReasoningMessages: false, // Hide reasoning in the final response
-    api: '/search/api/search', // Uses our dedicated search endpoint with DeepSeek model
-  });
-  
+  } = chatHelpers;
+
+  // Mock reasoning for display (since it's not available in current useChat)
+  const [reasoning] = useState<string[]>([]);
+
   // Focus the search input when the page loads
   useEffect(() => {
     if (searchInputRef.current) {
       searchInputRef.current.focus();
     }
   }, []);
-  
+
   // Move input to bottom after first message
   useEffect(() => {
     if (messages.length > 0) {
       setInputPosition('bottom');
-      
-      // Keep URL simple - don't include ID in URL
-      window.history.replaceState({}, '', `/search`);
+      window.history.replaceState({}, '', '/search');
     } else {
       setInputPosition('top');
     }
   }, [messages.length]);
 
-  // When switching modes, this state ensures existing messages don't suddenly change position
+  // Handle mode transitions
   useEffect(() => {
     const prevMode = messageModeOverride || mode;
     setMessageModeOverride(prevMode);
-    
+
     const timer = setTimeout(() => {
       setMessageModeOverride(null);
     }, 200);
-    
+
     return () => clearTimeout(timer);
   }, [mode, messageModeOverride]);
-
-  // Log message state for debugging
-  useEffect(() => {
-    if (messages.length > 0) {
-      console.log(`[SEARCH] Messages updated (${messages.length} total):`, 
-        messages.map(m => ({
-          role: m.role,
-          content: typeof m.content === 'string' ? m.content.substring(0, 30) + '...' : 'Non-string content',
-          partsCount: m.parts?.length || 0,
-          hasAttachments: !!m.experimental_attachments,
-          attachmentsCount: m.experimental_attachments?.length || 0
-        }))
-      );
-    }
-    
-    if (error) {
-      console.error('[SEARCH] Current error state:', error);
-    }
-  }, [messages, error]);
 
   const { data: votes } = useSWR<Array<Vote>>(
     messages.length >= 2 ? `/api/vote?chatId=${id}` : null,
     fetcher,
   );
 
-  // Dynamic attachments from user's uploaded PDFs
+  // No attachments needed - spec system searches all files automatically
   const [attachments, setAttachments] = useState<Array<Attachment>>([]);
-  
-  // Load PDFs when component mounts
-  useEffect(() => {
-    async function loadPDFs() {
-      try {
-        // Fetch all PDFs from Vercel Blob storage
-        console.log("[SEARCH] Fetching PDFs from Vercel Blob storage...");
-        const response = await fetch('/api/files?type=application/pdf');
-        
-        if (response.ok) {
-          const files = await response.json();
-          console.log("[SEARCH] API response:", files);
-          
-          if (files && files.length > 0) {
-            console.log("[SEARCH] Found PDFs in Vercel Blob:", files);
-            
-            // Convert all PDFs from Vercel Blob to attachments format
-            const pdfAttachments = files.map(file => ({
-              name: file.fileName,
-              url: file.fileUrl, // This is an absolute URL to Vercel Blob storage
-              contentType: file.fileType
-            }));
-            
-            // Set attachments for first message
-            setAttachments(pdfAttachments);
-            console.log("[SEARCH] Set attachments for first message");
-          } else {
-            console.log("[SEARCH] No PDFs found in API response");
-          }
-        } else {
-          console.error("[SEARCH] API response was not OK:", response.status);
-        }
-      } catch (error) {
-        console.error("[SEARCH] Error loading PDFs:", error);
-        setAttachments([]);
-      }
-    }
-    
-    loadPDFs();
-  }, []);
-  
-  // Add reasoning section above message handling when it's available
-  const hasReasoning = reasoning && reasoning.length > 0 && status === 'loading';
-  
-  // Add a wrapper around append to include the senderMode and attachments
-  const appendWithMode = async (message: any) => {
-    // Only user messages need a senderMode and attachments
+
+  // Check for reasoning display
+  const hasReasoning =
+    reasoning &&
+    Array.isArray(reasoning) &&
+    reasoning.length > 0 &&
+    status === 'in_progress';
+
+  // Simplified append function for spec-centric search
+  const appendWithMode = async (message: UIMessage) => {
     if (message.role === 'user') {
       try {
-        console.log("[SEARCH APPEND] Before processing message:", JSON.stringify(message));
-        
-        // Only add attachments to the first message in the conversation
-        const isFirstMessage = messages.length === 0;
-        
-        // Always include PDFs for the first message
-        let pdfAttachments = attachments;
-        
-        // If this is the first message, make sure we have PDFs
-        if (isFirstMessage && (!attachments || attachments.length === 0)) {
-          try {
-            // Direct fetch for PDFs
-            const response = await fetch('/api/files?type=application/pdf');
-            
-            if (response.ok) {
-              const files = await response.json();
-              
-              if (files && files.length > 0) {
-                // Convert all PDFs to attachments
-                pdfAttachments = files.map(file => ({
-                  name: file.fileName,
-                  url: file.fileUrl,
-                  contentType: file.fileType
-                }));
-                
-                setAttachments(pdfAttachments);
-                console.log("[SEARCH APPEND] Got PDF attachments directly:", pdfAttachments.length);
-              }
-            }
-          } catch (error) {
-            console.error("[SEARCH APPEND] Error fetching PDFs:", error);
-          }
-        }
-        
-        // Create message with mode and attachments
-        const messageWithMode = {
-          ...message,
-          senderMode: mode,
-          ...(isFirstMessage && pdfAttachments?.length > 0 
-            ? { experimental_attachments: pdfAttachments } 
-            : {})
-        };
-        
-        console.log("[SEARCH APPEND] Submitting message with prompt to use requestPdf tool and search PDFs");
-        
-        // Prepare message with instructions to use requestPdf tool
-        let originalQuery = messageWithMode.content;
-
-        
-        console.log("[SEARCH APPEND] Final message:", JSON.stringify(messageWithMode));
-        const result = await append(messageWithMode);
+        // In spec system, search automatically includes all spec files
+        // No need to attach files manually
+        const result = await append(message);
         return result;
-        
       } catch (error) {
-        console.error("[SEARCH APPEND] Error appending message:", error);
-        toast.error("Error sending search query");
+        console.error('Error sending search query:', error);
+        toast.error('Error sending search query');
         return null;
       }
     } else {
-      return append({...message});
+      return append(message);
     }
   };
 
-  const handleSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim() || status === 'loading') return;
-    
-    // Store current query and immediately clear input field
-    const currentQuery = query;
-    setQuery(''); // Clear input immediately for better UX
-    
-    try {
-      await appendWithMode({
-        role: 'user',
-        content: currentQuery,
-      });
-    } catch (err) {
-      console.error('Error during search:', err);
-    }
-    
-    // Clear input again to ensure it's empty after the search
-    setQuery('');
-    if (searchInputRef.current) {
-      searchInputRef.current.value = '';
-    }
-  };
-
-  // Process messages before displaying
+  // Process messages for display
   const processedMessages = useMemo(() => {
-    return messages.map(message => {
-      // Only process assistant messages
+    return messages.map((message) => {
       if (message.role === 'assistant') {
-        let content = message.content || '';
-        
-        // Check for function call format: <function name="showTable">...</function>
-        const functionMatch = content.match(/<function name="showTable">([\s\S]*?)<\/function>/);
-        
+        const content = message.content || '';
+
+        // Check for function call format
+        const functionMatch = content.match(
+          /<function name="showTable">([\s\S]*?)<\/function>/,
+        );
+
         if (functionMatch) {
           try {
-            // Sanitize the JSON string before parsing
-            let jsonString = functionMatch[1];
-            
-            // First try to clean up common JSON errors
-            // Remove any trailing commas in arrays
-            jsonString = jsonString.replace(/,\s*]/g, ']');
-            // Remove any trailing commas in objects
-            jsonString = jsonString.replace(/,\s*}/g, '}');
-            // Fix missing commas between array elements
-            jsonString = jsonString.replace(/](\s*)\[/g, '],[');
-            // Handle any other malformed JSON with a more permissive approach
-            
+            const jsonString = functionMatch[1]
+              .replace(/,\s*]/g, ']')
+              .replace(/,\s*}/g, '}')
+              .replace(/](\s*)\[/g, '],[');
+
             try {
-              // Extract JSON data from inside the function call
-              const jsonData = JSON.parse(jsonString);
-              
-              // If valid table JSON with columns and rows
-              if (jsonData && jsonData.columns && jsonData.rows) {
-                // Create a special message part for the table
+              const jsonData = JSON.parse(jsonString) as TableData;
+
+              if (jsonData?.columns && jsonData?.rows) {
                 const tableMessage = {
                   ...message,
                   parts: message.parts || [],
-                  // Add a special tool invocation part
                   tableToolInvocation: {
                     toolName: 'showTable',
-                    data: jsonData
-                  }
+                    data: jsonData,
+                  },
                 };
-                
-                // Replace the function call in the content with a placeholder
+
                 const newContent = content.replace(functionMatch[0], '');
                 tableMessage.content = newContent.trim();
-                
+
                 return tableMessage;
               }
             } catch (parseError) {
-              console.error("Error parsing JSON:", parseError);
-              // If JSON parsing fails, create a fallback table with error message
+              console.error('Error parsing JSON:', parseError);
               return {
                 ...message,
-                // Remove the function call entirely from content
                 content: content.replace(/<function.*?<\/function>/gs, ''),
-                // Don't add the tableToolInvocation since we couldn't parse it
               };
             }
           } catch (e) {
-            console.error("Error processing function call:", e);
-            // Return message with function call removed
+            console.error('Error processing function call:', e);
             return {
               ...message,
-              content: content.replace(/<function.*?<\/function>/gs, '')
+              content: content.replace(/<function.*?<\/function>/gs, ''),
             };
           }
         }
@@ -370,21 +271,20 @@ export function SearchChat({
     });
   }, [messages]);
 
-  // capture JSON answers - no longer used for top display
-  const [answerJSON, setAnswerJSON] = useState<any|null>(null);
-
   return (
     <MessageModeContext.Provider value={{ messageModeOverride }}>
-      <div className={cn(
-        "flex flex-col min-w-0 min-h-dvh bg-none overflow-visible search-page bg-[url(/images/dark-background.webp)] bg-cover bg-top-right bg-fixed"
-      )}>
-        {/* Top search input - only shown when inputPosition is 'top' */}
+      <div
+        className={cn(
+          'flex flex-col min-w-0 min-h-dvh bg-none overflow-visible search-page bg-[url(/images/dark-background.webp)] bg-cover bg-top-right bg-fixed',
+        )}
+      >
+        {/* Top search input */}
         {inputPosition === 'top' && (
           <div className="sticky top-0 z-10 max-w-3xl mx-auto w-full px-4 py-4 bg-none rounded-b-xl">
             <SearchMultimodalInput
               chatId={id}
-              input={query}
-              setInput={setQuery}
+              input={input}
+              setInput={setInput}
               status={status}
               stop={stop}
               attachments={attachments}
@@ -397,26 +297,32 @@ export function SearchChat({
               disabled={isReadonly}
               supplierMode={false}
             />
-            {/* Hide search pills when no messages (SuggestedSearches will show instead) */}
           </div>
         )}
 
-        {/* Display reasoning during search */}
+        {/* Reasoning display */}
         {hasReasoning && (
           <div className="mx-auto max-w-3xl w-full px-4">
-            <div ref={reasoningRef} className="px-4 py-2 bg-muted/50 my-3 rounded-md shadow-sm">
-              <MessageReasoning isLoading={true} reasoning={reasoning} />
+            <div
+              ref={reasoningRef}
+              className="px-4 py-2 bg-muted/50 my-3 rounded-md shadow-sm"
+            >
+              <MessageReasoning
+                isLoading={true}
+                reasoning={reasoning.join(' ')}
+              />
             </div>
           </div>
         )}
 
+        {/* Main content area */}
         <div className="flex-grow mx-auto max-w-3xl w-full pb-24 px-4">
           {messages.length === 0 ? (
             <SuggestedSearches
               chatId={id}
               append={appendWithMode}
               disabled={isReadonly || status === 'loading'}
-              setInput={setQuery}
+              setInput={setInput}
             />
           ) : (
             <Messages
@@ -429,22 +335,27 @@ export function SearchChat({
               isReadonly={isReadonly}
               isArtifactVisible={isArtifactVisible}
               isSchreiberApproval={false}
-              renderTable={(data) => <AnswerTable data={data} />}
+              renderTable={(data: TableData) => <AnswerTable data={data} />}
             />
           )}
         </div>
 
-        {/* Bottom search input - only shown when inputPosition is 'bottom' */}
+        {/* Bottom search input */}
         {inputPosition === 'bottom' && (
-          <div className="sticky bottom-0 z-10 border-t border-border backdrop-blur-md bg-none mx-auto w-full" style={{ position: 'fixed', left: '50%', transform: 'translateX(-50%)', maxWidth: '768px' }}>
-            {/* Only show search pills in the bottom input when there are messages */}
+          <div
+            className="sticky bottom-0 z-10 border-t border-border backdrop-blur-md bg-none mx-auto w-full"
+            style={{
+              position: 'fixed',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              maxWidth: '768px',
+            }}
+          >
             {messages.length > 0 && (
-              <SearchPills 
+              <SearchPills
                 onPillClick={(pillQuery) => {
-                  // Set the query in the input field for visibility
-                  setQuery(pillQuery);
-                  
-                  // Then immediately execute the search
+                  setInput(pillQuery);
+
                   appendWithMode({
                     role: 'user',
                     content: pillQuery,
@@ -456,8 +367,8 @@ export function SearchChat({
             )}
             <SearchMultimodalInput
               chatId={id}
-              input={query}
-              setInput={setQuery}
+              input={input}
+              setInput={setInput}
               status={status}
               stop={stop}
               attachments={attachments}

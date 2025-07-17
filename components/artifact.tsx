@@ -8,6 +8,7 @@ import {
   useCallback,
   useEffect,
   useState,
+  type ComponentType,
 } from 'react';
 import useSWR, { useSWRConfig } from 'swr';
 import { useDebounceCallback, useWindowSize } from 'usehooks-ts';
@@ -289,7 +290,7 @@ function PureArtifact({
 
           {!isMobile && (
             <motion.div
-              className={`relative w-[400px] bg-muted dark:bg-background ${artifact.kind != "dashboard" ? "bg-[url(/images/dark-background.webp)]" : 'bg-background'} bg-contain bg-top-left bg-fixed h-dvh shrink-0`}
+              className={`relative w-[400px] bg-muted dark:bg-background ${artifact.kind !== 'dashboard' ? 'bg-[url(/images/dark-background.webp)]' : 'bg-background'} bg-contain bg-top-left bg-fixed h-dvh shrink-0`}
               initial={{ opacity: 0, x: 10, scale: 1 }}
               animate={{
                 opacity: 1,

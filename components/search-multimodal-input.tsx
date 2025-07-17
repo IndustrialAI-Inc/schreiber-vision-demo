@@ -27,19 +27,19 @@ interface SearchMultimodalInputProps {
   setInput: (input: string) => void;
   status: UseChatHelpers['status'];
   stop: () => void;
-  
+
   // Attachments
   attachments: Array<Attachment>;
   setAttachments: Dispatch<SetStateAction<Array<Attachment>>>;
-  
+
   // Messages
   messages: Array<UIMessage>;
   setMessages: UseChatHelpers['setMessages'];
   append: UseChatHelpers['append'];
-  
+
   // Submission
   handleSubmit: UseChatHelpers['handleSubmit'];
-  
+
   // Modes and styling
   isSearchMode?: boolean;
   disabled?: boolean;
@@ -68,25 +68,25 @@ export function SearchMultimodalInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
-  
+
   // State
   const [uploadQueue, setUploadQueue] = useState<Array<string>>([]);
   const [localStorageKey] = useState<string>(`input-${chatId}`);
   const [localStorageInput, setLocalStorageInput] = useLocalStorage(
     localStorageKey,
-    ''
+    '',
   );
-  
+
   // Window size for responsive adjustments
   const { width } = useWindowSize();
-  
+
   // Initialize input from local storage if available
   useEffect(() => {
     if (localStorageInput && !input) {
       setInput(localStorageInput);
     }
   }, [localStorageInput, input, setInput]);
-  
+
   // Focus input when component mounts
   useEffect(() => {
     if (isSearchMode && searchInputRef.current) {
@@ -95,119 +95,125 @@ export function SearchMultimodalInput({
       textareaRef.current.focus();
     }
   }, [isSearchMode]);
-  
+
   // Save input to local storage when it changes
   useEffect(() => {
     setLocalStorageInput(input);
   }, [input, setLocalStorageInput]);
-  
+
   // Handle input change
-  const handleInput = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+  const handleInput = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+  ) => {
     if (disabled) return;
     setInput(event.target.value);
+
+    // Only adjust height for chat mode (multiline), not search mode (single line)
     if (!isSearchMode && textareaRef.current) {
-      adjustHeight();
-    } else if (isSearchMode && textareaRef.current) {
-      // Ensure textarea height adjusts for search mode too
       adjustHeight();
     }
   };
-  
+
   // Adjust textarea height based on content
   const adjustHeight = () => {
     if (!textareaRef.current) return;
-    
+
     textareaRef.current.style.height = 'auto';
     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
   };
-  
+
   // Reset textarea height
   const resetHeight = () => {
     if (!textareaRef.current) return;
     textareaRef.current.style.height = 'auto';
   };
-  
+
   // Submit message or search query
-  const submitForm = useCallback(async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    if (disabled || !input.trim()) return;
-    
-    if (isSearchMode) {
-      // Search mode - Simple input that will be processed by appendWithMode
-      console.log("[SEARCH] Submitting search query:", input);
-      
-      // Store the current input before clearing
-      const currentInput = input.trim();
-      
-      try {
-        // Clear local storage and input before append operation
+  const submitForm = useCallback(
+    async (e?: React.FormEvent) => {
+      if (e) e.preventDefault();
+      if (disabled || !input.trim()) return;
+
+      if (isSearchMode) {
+        // Search mode - Simple input that will be processed by appendWithMode
+
+        // Store the current input before clearing
+        const currentInput = input.trim();
+
+        try {
+          // Clear local storage and input before append operation
+          setLocalStorageInput('');
+          setInput('');
+          resetHeight();
+
+          await append({
+            role: 'user',
+            content: currentInput, // Send just the raw query, appendWithMode will format it
+          });
+
+          // Keep URL simple
+          window.history.replaceState({}, '', `/search`);
+        } catch (error) {
+          console.error('[SEARCH] Error submitting search:', error);
+          toast.error('Error submitting search');
+        }
+      } else {
+        // Chat mode - support attachments for first message
+        console.log(
+          '[CHAT] Submitting message with attachments:',
+          attachments.length > 0,
+        );
+
+        window.history.replaceState({}, '', `/chat/${chatId}`);
+
+        try {
+          // Only include attachments in the first message
+          const isFirstMessage = messages.length === 0;
+
+          if (isFirstMessage && attachments.length > 0) {
+            console.log('[CHAT] First message - adding attachments');
+            handleSubmit(undefined, {
+              experimental_attachments: attachments,
+            });
+          } else {
+            console.log('[CHAT] Not first message or no attachments');
+            handleSubmit();
+          }
+        } catch (error) {
+          console.error('[CHAT] Error submitting message:', error);
+          toast.error('Error sending message');
+        }
+
+        // Clear input state
         setLocalStorageInput('');
         setInput('');
         resetHeight();
-        
-        await append({
-          role: 'user',
-          content: currentInput, // Send just the raw query, appendWithMode will format it
-        });
-        
-        // Keep URL simple
-        window.history.replaceState({}, '', `/search`);
-      } catch (error) {
-        console.error("[SEARCH] Error submitting search:", error);
-        toast.error("Error submitting search");
       }
-    } else {
-      // Chat mode - support attachments for first message
-      console.log("[CHAT] Submitting message with attachments:", attachments.length > 0);
-      
-      window.history.replaceState({}, '', `/chat/${chatId}`);
-      
-      try {
-        // Only include attachments in the first message
-        const isFirstMessage = messages.length === 0;
-        
-        if (isFirstMessage && attachments.length > 0) {
-          console.log("[CHAT] First message - adding attachments");
-          handleSubmit(undefined, {
-            experimental_attachments: attachments
-          });
-        } else {
-          console.log("[CHAT] Not first message or no attachments");
-          handleSubmit();
+
+      // Auto-focus after submission on larger screens
+      if (width && width > 768) {
+        if (isSearchMode && searchInputRef.current) {
+          searchInputRef.current.focus();
+        } else if (textareaRef.current) {
+          textareaRef.current.focus();
         }
-      } catch (error) {
-        console.error("[CHAT] Error submitting message:", error);
-        toast.error("Error sending message");
       }
-      
-      // Clear input state
-      setLocalStorageInput('');
-      setInput('');
-      resetHeight();
-    }
-    
-    // Auto-focus after submission on larger screens
-    if (width && width > 768) {
-      if (isSearchMode && searchInputRef.current) {
-        searchInputRef.current.focus();
-      } else if (textareaRef.current) {
-        textareaRef.current.focus();
-      }
-    }
-  }, [
-    attachments,
-    append,
-    chatId,
-    disabled,
-    handleSubmit,
-    input,
-    isSearchMode,
-    messages.length,
-    setLocalStorageInput,
-    width,
-    setInput,
-  ]);
-  
+    },
+    [
+      attachments,
+      append,
+      chatId,
+      disabled,
+      handleSubmit,
+      input,
+      isSearchMode,
+      messages.length,
+      setLocalStorageInput,
+      width,
+      setInput,
+    ],
+  );
+
   // Handle file uploads
   const uploadFile = async (file: File) => {
     const formData = new FormData();
@@ -235,7 +241,7 @@ export function SearchMultimodalInput({
       toast.error('Failed to upload file, please try again!');
     }
   };
-  
+
   // Handle file selection
   const handleFileChange = useCallback(
     async (event: ChangeEvent<HTMLInputElement>) => {
@@ -267,7 +273,7 @@ export function SearchMultimodalInput({
     },
     [setAttachments, messages.length],
   );
-  
+
   // Search mode renders a specialized header input that matches SearchModalMultimodalInput style
   if (isSearchMode) {
     return (
@@ -280,7 +286,7 @@ export function SearchMultimodalInput({
           onChange={handleInput}
           className={cn(
             'min-h-[48px] overflow-hidden resize-none rounded-2xl !text-base py-3 px-4 pr-16',
-            'border border-amber-200 dark:border-zinc-700', 
+            'border border-amber-200 dark:border-zinc-700',
             'bg-amber-50 text-amber-900 dark:bg-zinc-800 dark:text-white',
             'focus:ring-1 focus:ring-amber-300 dark:focus:ring-zinc-600',
             'placeholder:text-amber-800/70 dark:placeholder:text-zinc-400',
@@ -308,7 +314,7 @@ export function SearchMultimodalInput({
           autoComplete="off"
           disabled={disabled || status === 'loading'}
         />
-        
+
         {/* Submit/Stop buttons */}
         <div className="absolute right-4 top-1/2 transform -translate-y-1/2 flex items-center">
           {status === 'loading' ? (
@@ -353,17 +359,21 @@ export function SearchMultimodalInput({
       </div>
     );
   }
-  
+
   // Chat mode renders the full multimodal input
   return (
     <div className="relative w-full flex flex-col gap-4">
       {/* Show suggested actions for empty chat if not in supplier mode */}
       {messages.length === 0 &&
         attachments.length === 0 &&
-        uploadQueue.length === 0 && 
-        !supplierMode && 
+        uploadQueue.length === 0 &&
+        !supplierMode &&
         !isSearchMode && (
-          <SuggestedActions append={append} chatId={chatId} disabled={disabled} />
+          <SuggestedActions
+            append={append}
+            chatId={chatId}
+            disabled={disabled}
+          />
         )}
 
       {/* Hidden file input */}
@@ -376,14 +386,14 @@ export function SearchMultimodalInput({
         tabIndex={-1}
         disabled={disabled || status !== 'ready'}
       />
-      
+
       {/* Hidden elements for testing purposes */}
       {uploadQueue.map((filename) => (
         <div key={filename} style={{ display: 'none' }}>
           <div data-testid="input-attachment-loader" className="hidden" />
         </div>
       ))}
-      
+
       {/* Attachment previews */}
       {(attachments.length > 0 || uploadQueue.length > 0) && (
         <div
@@ -396,7 +406,7 @@ export function SearchMultimodalInput({
               attachment={attachment}
               onRemove={() => {
                 setAttachments((attachments) =>
-                  attachments.filter((_, index) => index !== i)
+                  attachments.filter((_, index) => index !== i),
                 );
               }}
               disabled={disabled}
@@ -489,7 +499,10 @@ export function SearchMultimodalInput({
 }
 
 // Helper icon component
-function ArrowUpIcon({ size = 24, ...props }: { size?: number } & React.SVGAttributes<SVGElement>) {
+function ArrowUpIcon({
+  size = 24,
+  ...props
+}: { size?: number } & React.SVGAttributes<SVGElement>) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"

@@ -5,33 +5,29 @@ import { SearchChat } from '@/components/search-chat';
 import { generateUUID } from '@/lib/utils';
 
 export const metadata: Metadata = {
-  title: 'PDF Search',
-  description: 'Search through your repository PDFs using AI',
+  title: 'Semantic Search - Schreiber Endeavor AI',
+  description:
+    'Search through your supplier specifications using advanced AI semantic search',
 };
 
 export default async function SearchPage() {
-  // Generate a new search ID
-  const id = generateUUID();
+  // TEMPORARY: Bypass auth for testing - REMOVE IN PRODUCTION
+  // const session = await auth();
 
-  // Handle authentication
-  const session = await auth();
-  if (!session?.user) {
-    redirect('/login');
-  }
-  
-  // Use DeepSeek model to enable visible reasoning process
-  const selectedChatModel = "deepseek-r1-distill-llama-70b";
-  
-  // Render search interface directly
+  // if (!session) {
+  //   redirect('/login');
+  // }
+
+  // Generate a unique search session ID
+  const searchId = generateUUID();
+
   return (
-    <div className="w-full min-h-screen bg-background dark:bg-zinc-900" style={{ minHeight: '100vh' }}>
-      <SearchChat
-        id={id}
-        initialMessages={[]}
-        selectedChatModel={selectedChatModel}
-        selectedVisibilityType="private"
-        isReadonly={false}
-      />
-    </div>
+    <SearchChat
+      id={searchId}
+      initialMessages={[]}
+      selectedChatModel="deepseek-r1-distill-llama-70b"
+      selectedVisibilityType="private"
+      isReadonly={false}
+    />
   );
 }

@@ -17,11 +17,12 @@ export const useSchreiberSubmit = create<SchreiberSubmitState>()(
     (set) => ({
       isSubmitted: false,
       submittedChatId: null,
-      setSubmitted: (chatId: string) => set({ isSubmitted: true, submittedChatId: chatId }),
+      setSubmitted: (chatId: string) =>
+        set({ isSubmitted: true, submittedChatId: chatId }),
       resetSubmitted: () => set({ isSubmitted: false, submittedChatId: null }),
     }),
     {
       name: 'schreiber-submit-storage',
-    }
-  )
+    },
+  ),
 );
